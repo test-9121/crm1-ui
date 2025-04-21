@@ -33,16 +33,18 @@ import { ILead } from "@/modules/leads/types";
 import { useQuery } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api";
 import { leadsApi } from "@/lib/api";
+import { ColorPicker, COLOR_MAP, ColorName } from "./ColorPicker";
 
 const eventFormSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
   notes: z.string().optional(),
-  startDateTime: z.string().min(1, { message: "Start date is required" }),
-  endDateTime: z.string().min(1, { message: "End date is required" }),
+  startDate: z.string().min(1, { message: "Start date is required" }),
+  endDate: z.string().min(1, { message: "End date is required" }),
   allDay: z.boolean().optional(),
   leadId: z.string().optional(),
   userId: z.string().optional(),
+  color: z.string().optional(),
 });
 
 export interface EventModalProps {
@@ -67,22 +69,20 @@ export function EventModal({
   isLoading = false
 }: EventModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Fetch users and leads for select dropdowns - fix return type handling
+  const [selectedColor, setSelectedColor] = useState<ColorName>(event?.color as ColorName || "green");
+
   const usersQuery = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const response = await usersApi.getAll();
-      // response is User[]
       return response || [];
     }
   });
-  
+
   const leadsQuery = useQuery({
     queryKey: ["leads"],
     queryFn: async () => {
       const response = await leadsApi.getAll();
-      // Assuming response might be object or array, handle both cases
       return response.leads || response || [];
     }
   });
@@ -93,37 +93,45 @@ export function EventModal({
       title: event?.title || "",
       description: event?.description || "",
       notes: event?.notes || "",
-      startDateTime: event?.startDateTime || event?.startDate || new Date().toISOString().slice(0, 16),
-      endDateTime: event?.endDateTime || event?.endDate || new Date().toISOString().slice(0, 16),
+      startDate: event?.startDate || event?.startDateTime || new Date().toISOString().slice(0, 16),
+      endDate: event?.endDate || event?.endDateTime || new Date().toISOString().slice(0, 16),
       allDay: event?.allDay || false,
       leadId: event?.leadId || "",
       userId: event?.userId || "",
+      color: event?.color || "green"
     },
   });
 
-  // Update form values when event changes
   useEffect(() => {
     if (event) {
+      setSelectedColor(event.color as ColorName || "green");
       form.reset({
         title: event.title || "",
         description: event.description || "",
         notes: event.notes || "",
-        startDateTime: event.startDateTime || event.startDate || new Date().toISOString().slice(0, 16),
-        endDateTime: event.endDateTime || event.endDate || new Date().toISOString().slice(0, 16),
+        startDate: event.startDate || event.startDateTime || new Date().toISOString().slice(0, 16),
+        endDate: event.endDate || event.endDateTime || new Date().toISOString().slice(0, 16),
         allDay: event.allDay || false,
         leadId: event.leadId || "",
         userId: event.userId || "",
+        color: event.color || "green"
       });
+    } else {
+      setSelectedColor("green");
     }
   }, [event, form]);
 
   const handleSubmit = async (values: z.infer<typeof eventFormSchema>) => {
     try {
       setIsSubmitting(true);
+      const payload = {
+        ...values,
+        color: selectedColor,
+      };
       if (isCreating) {
-        await onCreateEvent(values as EventFormValues);
+        await onCreateEvent(payload as EventFormValues);
       } else if (event?.id) {
-        await onUpdateEvent(event.id, values as EventFormValues);
+        await onUpdateEvent(event.id, payload as EventFormValues);
       }
     } finally {
       setIsSubmitting(false);
@@ -143,7 +151,6 @@ export function EventModal({
     }
   };
 
-  // This ensures the modal is properly closed when the user clicks outside or presses escape
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       onClose();
@@ -158,7 +165,6 @@ export function EventModal({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            {/* User selection */}
             <FormField
               control={form.control}
               name="userId"
@@ -189,8 +195,7 @@ export function EventModal({
                 </FormItem>
               )}
             />
-            
-            {/* Lead selection */}
+
             <FormField
               control={form.control}
               name="leadId"
@@ -221,7 +226,7 @@ export function EventModal({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="title"
@@ -264,10 +269,21 @@ export function EventModal({
               )}
             />
 
+            <FormItem>
+              <FormLabel>Event Color</FormLabel>
+              <ColorPicker
+                value={selectedColor}
+                onChange={(color) => {
+                  setSelectedColor(color);
+                  form.setValue("color", color);
+                }}
+              />
+            </FormItem>
+
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="startDateTime"
+                name="startDate"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Start Date</FormLabel>
@@ -281,7 +297,7 @@ export function EventModal({
 
               <FormField
                 control={form.control}
-                name="endDateTime"
+                name="endDate"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>End Date</FormLabel>

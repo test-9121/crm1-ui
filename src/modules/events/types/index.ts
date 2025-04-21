@@ -1,4 +1,3 @@
-
 import { Organization } from "@/modules/organizations/types";
 import { User } from "@/modules/users/types";
 import { ILead } from "@/modules/leads/types";
@@ -10,10 +9,8 @@ export interface Event {
   title: string;
   description: string;
   notes?: string;
-  startDateTime?: string;
-  endDateTime?: string;
-  startDate?: string; // For backend compatibility
-  endDate?: string; // For backend compatibility
+  startDate?: string;
+  endDate?: string;
   allDay?: boolean;
   color?: string;
   additionalNote?: string | null;
@@ -28,8 +25,8 @@ export interface EventFormValues {
   title: string;
   description: string;
   notes?: string;
-  startDateTime: string;
-  endDateTime: string;
+  startDate: string;
+  endDate: string;
   allDay?: boolean;
   color?: string;
   leadId?: string;

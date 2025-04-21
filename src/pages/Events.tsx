@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
@@ -53,11 +52,10 @@ export default function Events() {
     setIsModalOpen(false);
   };
 
-  // Map backend data structure to component's expected structure
   const mappedEvents = Array.isArray(allEvents.data) ? allEvents.data.map(event => ({
     ...event,
-    startDateTime: event.startDate || event.startDateTime,
-    endDateTime: event.endDate || event.endDateTime
+    startDate: event.startDate || event.startDateTime,
+    endDate: event.endDate || event.endDateTime
   })) : [];
 
   if (allEvents.isError) {
