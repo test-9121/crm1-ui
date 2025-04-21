@@ -2,81 +2,140 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 254 100% 99%;      /* very light bluish background */
+    --foreground: 221 39% 22%;       /* rich, readable dark */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --card-foreground: 221 39% 22%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
- 
-    --radius: 0.5rem;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 22%;
+    --primary: 262 82% 65%;          /* vivid purple as primary */
+    --primary-foreground: 55 82% 95%;/* near white for readable fg */
+
+    --secondary: 51 100% 91%;        /* soft yellow for accent/secondary */
+    --secondary-foreground: 221 39% 22%;
+
+    --muted: 264 63% 97%;            /* faint purple gray bg for muted */
+    --muted-foreground: 221 39% 55%;
+
+    --accent: 198 93% 61%;           /* blue accent */
+    --accent-foreground: 221 39% 22%;
+
+    --destructive: 348 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 264 14% 87%;
+    --input: 245 21% 94%;
+    --ring: 262 82% 65%;
+    --radius: 1rem;
   }
- 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+
+  body {
+    @apply bg-gradient-to-b from-background to-secondary font-sans text-foreground min-h-screen antialiased;
+    background-image: linear-gradient(111.4deg, #E5DEFF 10%, #FEF7CD 100%);
+    font-size: 17px;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Poppins', 'Inter', 'sans-serif';
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #4C1D95;
+  }
+
+  .card-gradient {
+    @apply rounded-2xl shadow-xl bg-card-gradient;
+    border: none;
   }
 }
- 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+
+/* Subtle button glow on hover for clicky feel */
+button, [type="button"], [type="submit"] {
+  transition: box-shadow 0.2s, transform 0.12s;
+}
+button:hover, [type="button"]:hover, [type="submit"]:hover {
+  box-shadow: 0 0 0 4px #E5DEFF33, 0 6px 32px 0 #8B5CF633;
+  transform: scale(1.03);
+}
+
+/* Table tweaks for a cleaner look */
+table {
+  @apply rounded-lg overflow-hidden shadow soft bg-white/70;
+  border-radius: 1rem;
+}
+thead {
+  background: linear-gradient(90deg,#E5DEFF 0%,#FEF7CD 100%);
+}
+tbody tr {
+  @apply transition-colors hover:bg-primary/10 bg-white;
+}
+
+/* Inputs, cards, forms */
+input, select, textarea {
+  @apply border border-input rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary;
+  background: linear-gradient(90deg, #fff 70%, #E5DEFF 100%);
+}
+
+/* Special background & glass utilities */
+.glass-panel {
+  backdrop-filter: blur(18px) saturate(120%);
+  background: linear-gradient(120deg,rgba(255,255,255,0.8) 0%,rgba(239,233,254,0.5) 100%);
+  border-radius: 1.25rem;
+  border: 1.3px solid #e5deff80;
+  box-shadow: 0 8px 32px 0 rgba(139,92,246,0.09);
+}
+
+.section-gradient {
+  background: linear-gradient(135deg, #E5DEFF 0%, #FEF7CD 100%);
 }
 
 .required:after {
   content: " *";
-  color: red;
+  color: #ea384c;
+  font-weight: bold;
 }
+
+/* Animate fade in for cards/sections */
+.fade-in {
+  animation: fade-in 0.35s ease-in;
+}
+
+/* Modern scrollbar (for large tables/panels) */
+::-webkit-scrollbar {
+  width: 11px;
+  background: #E5DEFF;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 12px;
+  background: #BFA2FC;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8B5CF6;
+}
+
+/* Responsive enhancements for paddings, main container */
+@media (min-width: 640px) {
+  .container {
+    padding: 2rem 2.5rem;
+  }
+}
+
+/* Override shadcn border if needed for clarity */
+* {
+  border-color: #E5DEFF !important;
+}
+
+/* Tooltip tweaks for visibility */
+[data-radix-popper-content-wrapper] {
+  background: linear-gradient(90deg,#E5DEFF77 0%,#FEF7CD77 100%);
+  color: #1A1F2C;
+  border-radius: 7px;
+  font-size: 15px;
+  padding: 7px 12px;
+  font-family: 'Inter', sans-serif;
+}
+
