@@ -34,13 +34,29 @@ export default function LinkedIn() {
       status: "Active",
       handledBy: {
         id: "u1",
-        name: "Admin User",
         email: "admin@example.com",
-        role: { id: "r1", name: "Admin" }
+        role: { 
+          id: "r1", 
+          roleName: "Admin",
+          roleDescription: "Administrator",
+          rolePermission: "ROLE_ADMIN",
+          createdDateTime: "2023-01-01T00:00:00Z",
+          lastUpdatedDateTime: null,
+          organization: {
+            id: "o1",
+            name: "Example Org",
+            description: "Example Organization",
+            domain: "example.com",
+            disabled: false
+          }
+        }
       },
       organization: {
         id: "o1",
-        name: "Example Org"
+        name: "Example Org",
+        description: "Example Organization",
+        domain: "example.com",
+        disabled: false
       }
     },
     {
@@ -61,13 +77,29 @@ export default function LinkedIn() {
       status: "Active",
       handledBy: {
         id: "u1",
-        name: "Admin User",
         email: "admin@example.com",
-        role: { id: "r1", name: "Admin" }
+        role: { 
+          id: "r1", 
+          roleName: "Admin",
+          roleDescription: "Administrator",
+          rolePermission: "ROLE_ADMIN",
+          createdDateTime: "2023-01-01T00:00:00Z",
+          lastUpdatedDateTime: null,
+          organization: {
+            id: "o1",
+            name: "Example Org",
+            description: "Example Organization",
+            domain: "example.com",
+            disabled: false
+          }
+        }
       },
       organization: {
         id: "o2",
-        name: "Tech Solutions Inc."
+        name: "Tech Solutions Inc.",
+        description: "Tech Solutions Organization",
+        domain: "techsolutions.com",
+        disabled: false
       }
     },
   ]);

@@ -139,6 +139,11 @@ const Leads = () => {
     }
   };
 
+  const handleCreateNewLead = () => {
+    setLeadToEdit(null);
+    setShowNewLeadForm(true);
+  };
+
   const filteredLeads = leads.filter(lead => 
     `${lead.firstname} ${lead.lastname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -154,7 +159,7 @@ const Leads = () => {
     <DashboardLayout>
       <div className="flex flex-col gap-6">
         <LeadToolbar 
-          onCreate={handleNewLead}
+          onCreate={handleCreateNewLead}
         />
         
         <LeadHeader 
