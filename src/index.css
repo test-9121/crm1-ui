@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -79,4 +78,32 @@
 .required:after {
   content: " *";
   color: red;
+}
+
+@layer utilities {
+  /* Vibrant side glow utility */
+  .side-glow {
+    position: relative;
+    z-index: 1;
+  }
+  .side-glow:before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: -15px;
+    width: 8px;
+    height: 92%;
+    border-radius: 12px;
+    background: linear-gradient(180deg,#8B5CF6 0%,#F97316 100%);
+    box-shadow: 0 0 40px 8px #8B5CF644, 0 0 24px 4px #F9731655;
+    z-index: -1;
+    opacity: 0.95;
+    filter: blur(0.5px);
+  }
+}
+
+/* Remove table background to use default/neutral background */
+table {
+  @apply rounded-lg overflow-hidden shadow bg-white/70;
+  border-radius: 1rem;
 }

@@ -1,21 +1,14 @@
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle
+} from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { 
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend, defs, linearGradient, stop
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Add vibrant color palette (grads and bright accent colors)
 const salesData = [
   { name: "Jan", amount: 1200 },
   { name: "Feb", amount: 900 },
@@ -25,19 +18,22 @@ const salesData = [
   { name: "Jun", amount: 1900 },
 ];
 
+// Pie chart colors (vivid, consistent with gradients)
+const pieColors = ["#8B5CF6", "#F97316", "#3b82f6", "#F59E42"];
 const leadsData = [
-  { name: "New", value: 42, color: "#3b82f6" },
-  { name: "Contacted", value: 28, color: "#10b981" },
-  { name: "Qualified", value: 15, color: "#f59e0b" },
-  { name: "Lost", value: 8, color: "#ef4444" },
+  { name: "New", value: 42, color: "#8B5CF6" },
+  { name: "Contacted", value: 28, color: "#F97316" },
+  { name: "Qualified", value: 15, color: "#3b82f6" },
+  { name: "Lost", value: 8, color: "#F59E42" },
 ];
 
 const Dashboard = () => {
   const { user } = useAuth();
-  
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6">
+        {/* Welcome Section */}
         <section className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name || "User"}</h1>
           <p className="text-muted-foreground">
@@ -45,9 +41,9 @@ const Dashboard = () => {
           </p>
         </section>
 
-        {/* Stats Overview */}
+        {/* Stats Overview with Side Glow */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="side-glow relative">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
               <svg
@@ -73,8 +69,7 @@ const Dashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card className="side-glow relative">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Active Deals</CardTitle>
               <svg
@@ -97,8 +92,7 @@ const Dashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card className="side-glow relative">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
               <svg
@@ -121,8 +115,7 @@ const Dashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card className="side-glow relative">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Revenue</CardTitle>
               <svg
@@ -148,9 +141,10 @@ const Dashboard = () => {
           </Card>
         </section>
 
-        {/* Charts */}
+        {/* Charts Section with Side Glow */}
         <section className="grid gap-4 md:grid-cols-2">
-          <Card className="col-span-1">
+          {/* Monthly Sales Bar Chart with Gradient Fill */}
+          <Card className="side-glow relative col-span-1">
             <CardHeader>
               <CardTitle>Monthly Sales</CardTitle>
               <CardDescription>
@@ -160,17 +154,25 @@ const Dashboard = () => {
             <CardContent className="pl-2">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  {/* Add gradient definition directly within BarChart */}
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#8B5CF6" />
+                      <stop offset="60%" stopColor="#F97316" />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
-                  <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="amount" fill="url(#barGradient)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card className="col-span-1">
+          {/* Lead Status Pie Chart with Vibrant Colors */}
+          <Card className="side-glow relative col-span-1">
             <CardHeader>
               <CardTitle>Lead Status</CardTitle>
               <CardDescription>
@@ -192,7 +194,7 @@ const Dashboard = () => {
                     labelLine={false}
                   >
                     {leadsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                     ))}
                   </Pie>
                   <Legend />
@@ -203,9 +205,9 @@ const Dashboard = () => {
           </Card>
         </section>
 
-        {/* Recent Activity */}
+        {/* Recent Activity List with Side Glow */}
         <section>
-          <Card>
+          <Card className="side-glow relative">
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
               <CardDescription>
