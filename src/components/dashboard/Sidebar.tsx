@@ -27,6 +27,8 @@ import {
   Briefcase,
   Menu,
   X,
+  ArrowLeft,
+  ArrowRight
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -36,6 +38,7 @@ const userManagementLinks = [
   { label: "Roles", path: "/roles", icon: <Shield size={20} /> },
   { label: "Organizations", path: "/organizations", icon: <Building size={20} /> },
 ];
+
 const managementLinks = [
   { label: "Targets", path: "/targets", icon: <Target size={20} /> },
   { label: "Projects", path: "/projects", icon: <Folder size={20} /> },
@@ -67,13 +70,16 @@ export function Sidebar() {
   const [mgmtOpen, setMgmtOpen] = useState(true);
   const [cmsOpen, setCmsOpen] = useState(false);
 
-  // Color scheme for consistency
-  const sidebarBg = "bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3]";
-  const borderCol = "border-r border-[#403E43]";
-  const labelColor = "text-[#161F33]";
-  const iconColor = "text-[#161F33]";
-  const sectionLabel = "uppercase tracking-wide text-[#8A898C] text-xs font-semibold mb-2 mt-2";
-  const activeGradient = "bg-gradient-to-r from-[#4948d2] to-[#457fff]";
+  // Color scheme for new dark sidebar & highlights
+  const sidebarBg = "bg-gradient-to-br from-[#151a2b] to-[#232750]";
+  const borderCol = "border-r border-[#313652]";
+  const labelColor = "text-gray-200";
+  const iconColor = "text-white";
+  const sectionLabel = "uppercase tracking-wide text-[#7bd2fb] text-xs font-semibold mb-2 mt-2";
+  const activeGradient = "bg-gradient-to-r from-[#1f286c] to-[#1eaedb]";
+  const hoverGradient = "hover:bg-gradient-to-r hover:from-[#232750] hover:to-[#175e8e]";
+  const mobileTriggerBtn =
+    "text-white hover:bg-[#22304a] rounded-full flex items-center justify-center p-2 focus:outline-none";
 
   const toggleSidebar = () => setIsSidebarOpen((o) => !o);
 
@@ -84,14 +90,14 @@ export function Sidebar() {
     if (type === "cms") setCmsOpen((o) => !o);
   };
 
-  // Conditionally render mobile overlay
+  // Mobile Sidebar Overlay
   const mobileSidebar = (
     <div
       className={cn(
         "fixed inset-0 z-40 flex",
         isMobileSidebarOpen ? "visible" : "hidden"
       )}
-      style={{ background: "rgba(22,31,51, 0.50)" }}
+      style={{ background: "rgba(22,31,51, 0.7)" }}
     >
       <aside
         className={cn(
@@ -102,10 +108,10 @@ export function Sidebar() {
         )}
         style={{ minWidth: "16rem" }}
       >
-        {/* Heading and mobile close icon */}
+        {/* Heading and mobile close/collapse icon */}
         <div className="flex items-center mb-5 h-10">
           <span
-            className="text-2xl font-extrabold"
+            className="text-2xl font-extrabold text-white"
             style={{
               background: "linear-gradient(90deg, #4effa2 0%, #6366f1 100%)",
               WebkitBackgroundClip: "text",
@@ -123,17 +129,24 @@ export function Sidebar() {
             }}>
             CRM
           </span>
-          {/* Mobile close button (shows only in mobile sidebar overlay) */}
           <button
             onClick={() => setIsMobileSidebarOpen(false)}
-            className="ml-auto text-[#161F33] hover:text-[#1EAEDB] rounded-full flex items-center justify-center p-1 focus:outline-none md:hidden"
+            className={mobileTriggerBtn + " ml-auto"}
             aria-label="Close sidebar"
           >
-            <X size={24} />
+            <X size={26} />
           </button>
         </div>
+        {/* Collapse/expand for mobile */}
+        <button
+          onClick={toggleSidebar}
+          className={cn(mobileTriggerBtn, "mb-4")}
+          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {isSidebarOpen ? <ArrowLeft size={22} /> : <ArrowRight size={22} />}
+        </button>
         {/* Premium Card */}
-        <PremiumCard />
+        {isSidebarOpen && <PremiumCard />}
 
         {/* Main navigation */}
         <nav className="mb-3 mt-2">
@@ -143,12 +156,12 @@ export function Sidebar() {
               "flex items-center gap-3 px-3 py-2 rounded-lg font-medium mb-2 transition",
               location.pathname === "/dashboard"
                 ? activeGradient + " text-white"
-                : iconColor + " hover:bg-[#f3ecdc]"
+                : iconColor + " " + hoverGradient
             )}
             onClick={() => setIsMobileSidebarOpen(false)}
           >
             <LayoutDashboard size={20} />
-            <span className="ml-1">Dashboard</span>
+            {isSidebarOpen && <span className="ml-1">Dashboard</span>}
           </Link>
 
           {/* User Management */}
@@ -156,20 +169,24 @@ export function Sidebar() {
             <button
               type="button"
               className={cn(
-                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group hover:bg-[#f3ecdc] transition",
-                sectionLabel
+                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+                sectionLabel,
+                hoverGradient
               )}
               onClick={() => toggleSection("user")}
               aria-expanded={userMgmtOpen}
             >
-              <Users size={20} className="text-[#161F33]" />
-              <span>User Management</span>
-              {userMgmtOpen
-                ? <ChevronUp size={18} className="ml-auto" />
-                : <ChevronDown size={18} className="ml-auto" />}
+              <Users size={20} className={iconColor} />
+              {isSidebarOpen && <span>User Management</span>}
+              {isSidebarOpen &&
+                (userMgmtOpen ? (
+                  <ChevronUp size={18} className="ml-auto" />
+                ) : (
+                  <ChevronDown size={18} className="ml-auto" />
+                ))}
             </button>
-            {userMgmtOpen && (
-              <div className="ml-6 border-l border-[#e2d1c3] pb-2">
+            {userMgmtOpen && isSidebarOpen && (
+              <div className="ml-6 border-l border-[#2d3550] pb-2">
                 {userManagementLinks.map(({ label, path, icon }) => (
                   <Link
                     key={path}
@@ -177,8 +194,8 @@ export function Sidebar() {
                     className={cn(
                       "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
                       location.pathname === path
-                        ? "bg-[#1EAEDB] text-white"
-                        : labelColor + " hover:bg-[#f9f5ec]"
+                        ? activeGradient + " text-white"
+                        : labelColor + " " + hoverGradient
                     )}
                     onClick={() => setIsMobileSidebarOpen(false)}
                   >
@@ -195,49 +212,57 @@ export function Sidebar() {
             <button
               type="button"
               className={cn(
-                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group hover:bg-[#f3ecdc] transition",
-                sectionLabel
+                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+                sectionLabel,
+                hoverGradient
               )}
               onClick={() => toggleSection("mgmt")}
               aria-expanded={mgmtOpen}
             >
-              <Briefcase size={20} className="text-[#161F33]" />
-              <span>Management</span>
-              {mgmtOpen
-                ? <ChevronUp size={18} className="ml-auto" />
-                : <ChevronDown size={18} className="ml-auto" />}
+              <Briefcase size={20} className={iconColor} />
+              {isSidebarOpen && <span>Management</span>}
+              {isSidebarOpen &&
+                (mgmtOpen ? (
+                  <ChevronUp size={18} className="ml-auto" />
+                ) : (
+                  <ChevronDown size={18} className="ml-auto" />
+                ))}
             </button>
-            {mgmtOpen && (
-              <div className="ml-6 border-l border-[#e2d1c3] pb-2">
-                {managementLinks.map(item =>
+            {mgmtOpen && isSidebarOpen && (
+              <div className="ml-6 border-l border-[#2d3550] pb-2">
+                {managementLinks.map((item) =>
                   item.children ? (
                     <div key={item.label}>
                       <button
                         type="button"
                         className={cn(
-                          "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full hover:bg-[#f9f5ec]",
+                          "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full",
                           location.pathname.startsWith("/cms")
-                            ? "bg-[#1EAEDB] text-white"
-                            : labelColor
+                            ? activeGradient + " text-white"
+                            : labelColor + " " + hoverGradient
                         )}
                         onClick={() => toggleSection("cms")}
                         aria-expanded={cmsOpen}
                       >
                         {item.icon}
                         <span>CMS</span>
-                        {cmsOpen ? <ChevronUp size={16} className="ml-auto" /> : <ChevronDown size={16} className="ml-auto" />}
+                        {cmsOpen ? (
+                          <ChevronUp size={16} className="ml-auto" />
+                        ) : (
+                          <ChevronDown size={16} className="ml-auto" />
+                        )}
                       </button>
                       {cmsOpen && (
                         <div className="ml-5">
-                          {item.children.map(sub => (
+                          {item.children.map((sub) => (
                             <Link
                               key={sub.path}
                               to={sub.path}
                               className={cn(
                                 "flex items-center gap-2 px-2 py-1 rounded-md mb-1 transition-colors",
                                 location.pathname === sub.path
-                                  ? "bg-[#1EAEDB] text-white"
-                                  : labelColor + " hover:bg-[#f3ecdc]"
+                                  ? activeGradient + " text-white"
+                                  : labelColor + " " + hoverGradient
                               )}
                               onClick={() => setIsMobileSidebarOpen(false)}
                             >
@@ -255,8 +280,8 @@ export function Sidebar() {
                       className={cn(
                         "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
                         location.pathname === item.path
-                          ? "bg-[#1EAEDB] text-white"
-                          : labelColor + " hover:bg-[#f9f5ec]"
+                          ? activeGradient + " text-white"
+                          : labelColor + " " + hoverGradient
                       )}
                       onClick={() => setIsMobileSidebarOpen(false)}
                     >
@@ -271,30 +296,36 @@ export function Sidebar() {
         </nav>
         <div className="flex-1" />
         {/* User profile + logout */}
-        <div className="mb-2 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#32346e] to-[#224899] flex items-center justify-center">
-            <span className="text-lg font-bold text-white/80">
-              {user?.name?.charAt(0) || "U"}
-            </span>
+        {isSidebarOpen && (
+          <div className="mb-2 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#32346e] to-[#224899] flex items-center justify-center">
+              <span className="text-lg font-bold text-white/80">
+                {user?.name?.charAt(0) || "U"}
+              </span>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-xs font-semibold text-white truncate">
+                {user?.name || "User"}
+              </p>
+              <p className="text-xs text-[#d2e8fc] truncate">
+                {user?.email || ""}
+              </p>
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <p className="text-xs font-semibold text-[#161F33] truncate">{user?.name || "User"}</p>
-            <p className="text-xs text-[#8A898C] truncate">{user?.email || ""}</p>
-          </div>
-        </div>
+        )}
         <button
           className={cn(
-            "flex items-center gap-2 w-full justify-start text-[#161F33] hover:bg-[#f3ecdc] rounded-lg px-3 py-2 transition"
+            "flex items-center gap-2 w-full justify-start text-white hover:bg-[#232750] rounded-lg px-3 py-2 transition"
           )}
           onClick={logout}
         >
           <svg width="18" height="18" fill="none">
             <path d="M15 3v2a4 4 0 0 1-4 4H5m8-6l3 3m0 0l-3 3m3-3H9" stroke="#b4baff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span>Sign out</span>
+          {isSidebarOpen && <span>Sign out</span>}
         </button>
       </aside>
-      {/* Click out to close */}
+      {/* Click-out area */}
       <div className="flex-1" onClick={() => setIsMobileSidebarOpen(false)} />
     </div>
   );
@@ -329,16 +360,15 @@ export function Sidebar() {
           }}>
           CRM
         </span>
-        {/* Desktop: show nothing for collapse here. Only show mobile menu icon on mobile */}
-        <span className="ml-auto md:hidden block">
-          <button
-            onClick={() => setIsMobileSidebarOpen(true)}
-            className="ml-auto text-[#161F33] hover:text-[#1EAEDB] rounded-full flex items-center justify-center p-1 focus:outline-none"
-            aria-label="Open sidebar"
-          >
-            <Menu size={22} />
-          </button>
-        </span>
+        {/* Collapse icon (only show on desktop) */}
+        <button
+          onClick={toggleSidebar}
+          className="ml-auto text-white bg-[#283156] hover:bg-[#1eaedb] rounded-full flex items-center justify-center p-1 transition"
+          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {isSidebarOpen ? <ArrowLeft size={22} /> : <ArrowRight size={22} />}
+        </button>
+        {/* Mobile menu icon (hidden on desktop, shown on mobile below) */}
       </div>
       {/* Premium Card */}
       {isSidebarOpen && <PremiumCard />}
@@ -349,7 +379,9 @@ export function Sidebar() {
           to="/dashboard"
           className={cn(
             "flex items-center gap-3 px-3 py-2 rounded-lg font-medium mb-2 transition",
-            location.pathname === "/dashboard" ? activeGradient + " text-white" : iconColor + " hover:bg-[#f3ecdc]"
+            location.pathname === "/dashboard"
+              ? activeGradient + " text-white"
+              : iconColor + " " + hoverGradient
           )}
         >
           <LayoutDashboard size={20} />
@@ -360,25 +392,34 @@ export function Sidebar() {
         <div>
           <button
             type="button"
-            className={cn("flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group hover:bg-[#f3ecdc] transition", sectionLabel)}
+            className={cn(
+              "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+              sectionLabel,
+              hoverGradient
+            )}
             onClick={() => toggleSection("user")}
             aria-expanded={userMgmtOpen}
           >
-            <Users size={20} className="text-[#161F33]" />
+            <Users size={20} className={iconColor} />
             {isSidebarOpen && <span>User Management</span>}
-            {isSidebarOpen && (userMgmtOpen
-              ? <ChevronUp size={18} className="ml-auto" />
-              : <ChevronDown size={18} className="ml-auto" />)}
+            {isSidebarOpen &&
+              (userMgmtOpen ? (
+                <ChevronUp size={18} className="ml-auto" />
+              ) : (
+                <ChevronDown size={18} className="ml-auto" />
+              ))}
           </button>
           {userMgmtOpen && isSidebarOpen && (
-            <div className="ml-6 border-l border-[#e2d1c3] pb-2">
+            <div className="ml-6 border-l border-[#2d3550] pb-2">
               {userManagementLinks.map(({ label, path, icon }) => (
                 <Link
                   key={path}
                   to={path}
                   className={cn(
                     "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
-                    location.pathname === path ? "bg-[#1EAEDB] text-white" : labelColor + " hover:bg-[#f9f5ec]"
+                    location.pathname === path
+                      ? activeGradient + " text-white"
+                      : labelColor + " " + hoverGradient
                   )}
                 >
                   {icon}
@@ -393,31 +434,46 @@ export function Sidebar() {
         <div>
           <button
             type="button"
-            className={cn("flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group hover:bg-[#f3ecdc] transition", sectionLabel)}
+            className={cn(
+              "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+              sectionLabel,
+              hoverGradient
+            )}
             onClick={() => toggleSection("mgmt")}
             aria-expanded={mgmtOpen}
           >
-            <Briefcase size={20} className="text-[#161F33]" />
+            <Briefcase size={20} className={iconColor} />
             {isSidebarOpen && <span>Management</span>}
-            {isSidebarOpen && (mgmtOpen
-              ? <ChevronUp size={18} className="ml-auto" />
-              : <ChevronDown size={18} className="ml-auto" />)}
+            {isSidebarOpen &&
+              (mgmtOpen ? (
+                <ChevronUp size={18} className="ml-auto" />
+              ) : (
+                <ChevronDown size={18} className="ml-auto" />
+              ))}
           </button>
           {mgmtOpen && isSidebarOpen && (
-            <div className="ml-6 border-l border-[#e2d1c3] pb-2">
+            <div className="ml-6 border-l border-[#2d3550] pb-2">
               {managementLinks.map((item) =>
                 item.children ? (
                   <div key={item.label}>
                     <button
                       type="button"
-                      className={cn("flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full hover:bg-[#f9f5ec]",
-                        location.pathname.startsWith("/cms") ? "bg-[#1EAEDB] text-white" : labelColor)}
+                      className={cn(
+                        "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full",
+                        location.pathname.startsWith("/cms")
+                          ? activeGradient + " text-white"
+                          : labelColor + " " + hoverGradient
+                      )}
                       onClick={() => toggleSection("cms")}
                       aria-expanded={cmsOpen}
                     >
                       {item.icon}
                       <span>CMS</span>
-                      {cmsOpen ? <ChevronUp size={16} className="ml-auto" /> : <ChevronDown size={16} className="ml-auto" />}
+                      {cmsOpen ? (
+                        <ChevronUp size={16} className="ml-auto" />
+                      ) : (
+                        <ChevronDown size={16} className="ml-auto" />
+                      )}
                     </button>
                     {cmsOpen && (
                       <div className="ml-5">
@@ -427,7 +483,9 @@ export function Sidebar() {
                             to={sub.path}
                             className={cn(
                               "flex items-center gap-2 px-2 py-1 rounded-md mb-1 transition-colors",
-                              location.pathname === sub.path ? "bg-[#1EAEDB] text-white" : labelColor + " hover:bg-[#f3ecdc]"
+                              location.pathname === sub.path
+                                ? activeGradient + " text-white"
+                                : labelColor + " " + hoverGradient
                             )}
                           >
                             {sub.icon}
@@ -443,7 +501,9 @@ export function Sidebar() {
                     to={item.path}
                     className={cn(
                       "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
-                      location.pathname === item.path ? "bg-[#1EAEDB] text-white" : labelColor + " hover:bg-[#f9f5ec]"
+                      location.pathname === item.path
+                        ? activeGradient + " text-white"
+                        : labelColor + " " + hoverGradient
                     )}
                   >
                     {item.icon}
@@ -465,14 +525,14 @@ export function Sidebar() {
             </span>
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-xs font-semibold text-[#161F33] truncate">{user?.name || "User"}</p>
-            <p className="text-xs text-[#8A898C] truncate">{user?.email || ""}</p>
+            <p className="text-xs font-semibold text-white truncate">{user?.name || "User"}</p>
+            <p className="text-xs text-[#d2e8fc] truncate">{user?.email || ""}</p>
           </div>
         </div>
       )}
       <button
         className={cn(
-          "flex items-center gap-2 w-full justify-start text-[#161F33] hover:bg-[#f3ecdc] rounded-lg px-3 py-2 transition",
+          "flex items-center gap-2 w-full justify-start text-white hover:bg-[#232750] rounded-lg px-3 py-2 transition",
           !isSidebarOpen && "justify-center"
         )}
         onClick={logout}
@@ -488,12 +548,14 @@ export function Sidebar() {
   return (
     <>
       {isMobile
-        ? (isMobileSidebarOpen ? mobileSidebar : (
+        ? (isMobileSidebarOpen ? (
+            mobileSidebar
+          ) : (
             // Only show mobile menu icon on mobile, sidebar is closed by default
             <div className="fixed top-3 left-3 z-50 md:hidden">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="text-[#161F33] hover:text-[#1EAEDB] rounded-full flex items-center justify-center p-2 bg-white/70 shadow-md"
+                className="text-white bg-[#232750] hover:bg-[#3855a2] rounded-full flex items-center justify-center p-2 shadow-md"
                 aria-label="Open sidebar"
               >
                 <Menu size={26} />
@@ -504,5 +566,5 @@ export function Sidebar() {
     </>
   );
 }
-// NOTE: This file is now getting long (over 200 lines). Consider refactoring into smaller components for maintainability.
+// NOTE: This file is over 200 lines. Consider asking for a refactor into smaller components for maintainability.
 
