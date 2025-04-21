@@ -34,7 +34,25 @@ export default function LinkedIn() {
       status: "Active",
       handledBy: {
         id: "u1",
+        firstName: "Admin",
+        lastName: "User",
         email: "admin@example.com",
+        disabled: false,
+        city: "San Francisco",
+        state: "California",
+        country: "USA",
+        address: "123 Admin St",
+        zipCode: "94105",
+        phoneNumber: "123-456-7890",
+        company: "Example Org",
+        avatarUrl: null,
+        status: "Active",
+        verified: true,
+        emailVerified: true,
+        lastLoginDateTime: "2023-01-01T00:00:00Z",
+        department: "IT",
+        location: "Headquarters",
+        jobTitle: "Administrator",
         role: { 
           id: "r1", 
           roleName: "Admin",
@@ -52,7 +70,19 @@ export default function LinkedIn() {
             createdDateTime: "2023-01-01T00:00:00Z",
             lastUpdatedDateTime: null
           }
-        }
+        },
+        organization: {
+          id: "o1",
+          name: "Example Org",
+          description: "Example Organization",
+          domain: "example.com",
+          disabled: false,
+          logoImgSrc: null,
+          createdDateTime: "2023-01-01T00:00:00Z",
+          lastUpdatedDateTime: null
+        },
+        createdDateTime: "2023-01-01T00:00:00Z",
+        lastUpdatedDateTime: "2023-01-01T00:00:00Z"
       },
       organization: {
         id: "o1",
@@ -83,7 +113,25 @@ export default function LinkedIn() {
       status: "Active",
       handledBy: {
         id: "u1",
+        firstName: "Admin",
+        lastName: "User",
         email: "admin@example.com",
+        disabled: false,
+        city: "New York",
+        state: "New York",
+        country: "USA",
+        address: "456 Admin Ave",
+        zipCode: "10001",
+        phoneNumber: "123-456-7890",
+        company: "Example Org",
+        avatarUrl: null,
+        status: "Active",
+        verified: true,
+        emailVerified: true,
+        lastLoginDateTime: "2023-01-01T00:00:00Z",
+        department: "IT",
+        location: "East Coast Office",
+        jobTitle: "Administrator",
         role: { 
           id: "r1", 
           roleName: "Admin",
@@ -101,7 +149,19 @@ export default function LinkedIn() {
             createdDateTime: "2023-01-01T00:00:00Z",
             lastUpdatedDateTime: null
           }
-        }
+        },
+        organization: {
+          id: "o1",
+          name: "Example Org",
+          description: "Example Organization",
+          domain: "example.com",
+          disabled: false,
+          logoImgSrc: null,
+          createdDateTime: "2023-01-01T00:00:00Z",
+          lastUpdatedDateTime: null
+        },
+        createdDateTime: "2023-01-01T00:00:00Z",
+        lastUpdatedDateTime: "2023-01-01T00:00:00Z"
       },
       organization: {
         id: "o2",
