@@ -1,10 +1,11 @@
+
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
 } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, defs, linearGradient, stop
+  PieChart, Pie, Cell, Legend
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -154,7 +155,6 @@ const Dashboard = () => {
             <CardContent className="pl-2">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  {/* Add gradient definition directly within BarChart */}
                   <defs>
                     <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stopColor="#8B5CF6" />
