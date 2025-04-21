@@ -23,6 +23,9 @@ import TargetTable from "@/modules/targets/components/TargetTable";
 import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
 import TargetDetailsPanelContent from "@/modules/targets/components/TargetDetailsPanelContent";
 import { PremiumFeatureCard } from "@/components/dashboard/PremiumFeatureCard";
+import SummaryCard from "@/components/dashboard/SummaryCard";
+import { ModulePremiumCard } from "@/components/dashboard/ModulePremiumCard";
+import { UserRound, Target as LucideTarget, Link as LinkIcon, FileText } from "lucide-react";
 
 const Targets = () => {
   const navigate = useNavigate();
@@ -119,9 +122,41 @@ const Targets = () => {
       )
     : [];
 
+  const totalTargets = filteredTargets.length;
+  const totalLeads = filteredTargets.reduce((acc, t) => acc + (t.noOfLeadsIdentified || 0), 0);
+  const totalConnections = filteredTargets.reduce((acc, t) => acc + (t.connectionsCount || 0), 0);
+  const totalMessages = 190; // Placeholding this number
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 w-full max-w-full overflow-x-hidden">
+        <div className="flex gap-3 mb-2 flex-wrap">
+          <SummaryCard
+            title="Total Targets"
+            value={totalTargets}
+            icon={<LucideTarget className="text-green-400" size={24} />}
+            colorClass="bg-green-50"
+          />
+          <SummaryCard
+            title="Total Leads"
+            value={totalLeads}
+            icon={<UserRound className="text-purple-400" size={24} />}
+            colorClass="bg-purple-50"
+          />
+          <SummaryCard
+            title="Connections"
+            value={totalConnections}
+            icon={<LinkIcon className="text-indigo-400" size={24} />}
+            colorClass="bg-indigo-50"
+          />
+          <SummaryCard
+            title="Messages"
+            value={totalMessages}
+            icon={<FileText className="text-yellow-400" size={24} />}
+            colorClass="bg-yellow-50"
+          />
+        </div>
+
         <TargetToolbar 
           onSearchChange={handleSearchChange}
           onNewTarget={() => {
@@ -141,30 +176,40 @@ const Targets = () => {
           onEditingChange={setIsEditing}
         />
 
-        {!isCollapsed && (
-          <div className="w-full overflow-x-auto">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500">Loading targets...</p>
+        <div className="flex flex-row gap-4">
+          <div className="flex-1 w-0">
+            {!isCollapsed && (
+              <div className="w-full overflow-x-auto">
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-32">
+                    <p className="text-gray-500">Loading targets...</p>
+                  </div>
+                ) : isEmpty ? (
+                  <Alert>
+                    <AlertDescription className="text-center py-8">
+                      No targets available. Click the "New Target" button to add one.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <TargetTable 
+                    targets={filteredTargets}
+                    tableColor={tableColor}
+                    onEditTarget={handleEditTarget}
+                    onDeleteTarget={handleDeleteTarget}
+                    isLoading={isLoading}
+                    onRowClick={handleRowClick}
+                  />
+                )}
               </div>
-            ) : isEmpty ? (
-              <Alert>
-                <AlertDescription className="text-center py-8">
-                  No targets available. Click the "New Target" button to add one.
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <TargetTable 
-                targets={filteredTargets}
-                tableColor={tableColor}
-                onEditTarget={handleEditTarget}
-                onDeleteTarget={handleDeleteTarget}
-                isLoading={isLoading}
-                onRowClick={handleRowClick}
-              />
             )}
           </div>
-        )}
+          <div className="min-w-[340px] pl-2 flex flex-col items-center">
+            <ModulePremiumCard
+              title="Target Insights"
+              description="Upgrade to unlock Target Insights and many other premium features to enhance your CRM experience."
+            />
+          </div>
+        </div>
 
         <DetailsSidePanel
           data={selectedTarget}
@@ -172,12 +217,6 @@ const Targets = () => {
           onClose={() => setIsDetailsPanelOpen(false)}
           renderContent={(target) => <TargetDetailsPanelContent target={target} />}
         />
-
-        <div className="flex justify-end items-center">
-          <div style={{ width: 340 }}>
-            <PremiumFeatureCard />
-          </div>
-        </div>
 
         {showTargetForm && (
           <TargetForm

@@ -1,8 +1,8 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
@@ -27,6 +27,21 @@ import {
   Lock
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+// Import PremiumCard from this same file for reuse
+const PremiumCard = () => (
+  <div className="premium-card">
+    <div className="premium-badge font-semibold flex items-center gap-2">
+      <svg width="24" height="24" fill="none" className="mr-2"><circle cx="12" cy="12" r="12" fill="#6a85fa" /><Lock size={16} color="#fff" className="inline" /></svg>
+      Premium Plan
+    </div>
+    <div className="text-xs mt-1 opacity-90">Active until Jul 2025</div>
+    <div className="premium-usage-bar-bg mt-2">
+      <div className="premium-usage-bar" style={{ width: '78%' }} />
+    </div>
+    <div className="premium-usage-label">Usage <span className="font-semibold">78%</span></div>
+  </div>
+);
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -79,20 +94,6 @@ const SidebarSubItem = ({ label, path, isCollapsed, isActive }: SidebarSubItemPr
   );
 };
 
-const PremiumCard = () => (
-  <div className="premium-card">
-    <div className="premium-badge font-semibold flex items-center gap-2">
-      <svg width="24" height="24" fill="none" className="mr-2"><circle cx="12" cy="12" r="12" fill="#6a85fa" /><Lock size={16} color="#fff" className="inline" /></svg>
-      Premium Plan
-    </div>
-    <div className="text-xs mt-1 opacity-90">Active until Jul 2025</div>
-    <div className="premium-usage-bar-bg mt-2">
-      <div className="premium-usage-bar" style={{ width: '78%' }} />
-    </div>
-    <div className="premium-usage-label">Usage <span className="font-semibold">78%</span></div>
-  </div>
-);
-
 export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();
@@ -144,35 +145,50 @@ export function Sidebar() {
     { id: "settings", icon: <Settings size={20} />, label: "Settings", path: "/settings" },
   ];
 
+  // Mobile Toggle Button, previously missing
+  const MobileToggle = () => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="md:hidden fixed top-4 left-4 z-50"
+      onClick={toggleMobileSidebar}
+    >
+      <Menu />
+    </Button>
+  );
+
   const renderSidebarContent = () => (
     <>
+      {/* Ensar CRM Logo and PremiumCard */}
       <div className="px-3 pt-5 pb-3 sidebar-glow">
-        <PremiumCard />
-      </div>
-      <div className="px-3 py-4">
-        <div className={cn(
-          "flex items-center",
-          isCollapsed ? "justify-center" : "justify-between"
-        )}>
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>Ensar</span>
-              <span className="text-2xl font-extrabold tracking-tighter text-white">CRM</span>
-            </div>
-          )}
-          {isCollapsed && (
-            <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>E</span>
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
-            >
-              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </Button>
-          )}
+        <div className="mb-2 flex flex-col gap-2 items-start min-h-[80px]">
+          <div className={cn(
+            "flex items-center",
+            isCollapsed ? "justify-center" : "justify-between"
+          )}>
+            {!isCollapsed && (
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>Ensar</span>
+                <span className="text-2xl font-extrabold tracking-tighter text-white">CRM</span>
+              </div>
+            )}
+            {isCollapsed && (
+              <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>E</span>
+            )}
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                className="rounded-full p-0 h-8 w-8 text-sidebar-foreground ml-auto"
+              >
+                {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+              </Button>
+            )}
+          </div>
+          <div className="w-full">
+            <PremiumCard />
+          </div>
         </div>
       </div>
 
@@ -262,17 +278,6 @@ export function Sidebar() {
         </Button>
       </div>
     </>
-  );
-
-  const MobileToggle = () => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="md:hidden fixed top-4 left-4 z-50"
-      onClick={toggleMobileSidebar}
-    >
-      <Menu />
-    </Button>
   );
 
   if (isMobile) {
