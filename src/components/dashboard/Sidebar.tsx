@@ -80,28 +80,16 @@ const SidebarSubItem = ({ label, path, isCollapsed, isActive }: SidebarSubItemPr
 };
 
 const PremiumCard = () => (
-  <div className="premium-card-premium-ui">
+  <div className="premium-card">
     <div className="premium-badge font-semibold flex items-center gap-2">
-      <svg width="28" height="28" fill="none" className="mr-2">
-        <defs>
-          <linearGradient id="premiumGoldGradient" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#FFE29F" />
-            <stop offset="1" stopColor="#FF719A" />
-          </linearGradient>
-        </defs>
-        <circle cx="14" cy="14" r="14" fill="url(#premiumGoldGradient)" />
-        {/* Lucide "star" icon used for premium */}
-        <g>
-          <path d="m14 4.5 2.4 6.03 6.6.4-5.16 4.38 1.62 5.68L14 16.99l-5.46 3.02 1.62-5.68L5 10.93l6.6-.4L14 4.5Z" stroke="#fff" strokeWidth="1.2" fill="#fff8" />
-        </g>
-      </svg>
-      <span>Premium Plan</span>
+      <svg width="24" height="24" fill="none" className="mr-2"><circle cx="12" cy="12" r="12" fill="#6a85fa" /><Lock size={16} color="#fff" className="inline" /></svg>
+      Premium Plan
     </div>
     <div className="text-xs mt-1 opacity-90">Active until Jul 2025</div>
     <div className="premium-usage-bar-bg mt-2">
-      <div className="premium-usage-bar" style={{ width: '78%', background: 'linear-gradient(90deg,#ffe29f 0%,#ff719a 100%)', boxShadow: '0 0 8px #fbbf24cc,0 2px 12px 0 #eab30822' }} />
+      <div className="premium-usage-bar" style={{ width: '78%' }} />
     </div>
-    <div className="premium-usage-label text-[13px]">Usage <span className="font-semibold">78%</span></div>
+    <div className="premium-usage-label">Usage <span className="font-semibold">78%</span></div>
   </div>
 );
 
@@ -159,36 +147,35 @@ export function Sidebar() {
   const renderSidebarContent = () => (
     <>
       <div className="px-3 pt-5 pb-3 sidebar-glow">
-        {/* Move premium card below Ensar CRM title/logo */}
-        <div className="mb-4">{/* SIDEBAR LOGO/TITLE */} 
-          <div className={cn(
-            "flex items-center",
-            isCollapsed ? "justify-center" : "justify-between"
-          )}>
-            {!isCollapsed && (
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>Ensar</span>
-                <span className="text-2xl font-extrabold tracking-tighter text-white">CRM</span>
-              </div>
-            )}
-            {isCollapsed && (
-              <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>E</span>
-            )}
-            {!isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
-              >
-                {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-              </Button>
-            )}
-          </div>
-        </div>
         <PremiumCard />
       </div>
-      {/* Remove old PremiumCard (if double), and move rest of sidebar up */}
+      <div className="px-3 py-4">
+        <div className={cn(
+          "flex items-center",
+          isCollapsed ? "justify-center" : "justify-between"
+        )}>
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>Ensar</span>
+              <span className="text-2xl font-extrabold tracking-tighter text-white">CRM</span>
+            </div>
+          )}
+          {isCollapsed && (
+            <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>E</span>
+          )}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
+            >
+              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </Button>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-1 px-3 py-2 flex-1">
         {sidebarItems.map((item) => (
           <div key={item.id} className="flex flex-col">
@@ -275,6 +262,17 @@ export function Sidebar() {
         </Button>
       </div>
     </>
+  );
+
+  const MobileToggle = () => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="md:hidden fixed top-4 left-4 z-50"
+      onClick={toggleMobileSidebar}
+    >
+      <Menu />
+    </Button>
   );
 
   if (isMobile) {

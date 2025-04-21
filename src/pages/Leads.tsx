@@ -25,7 +25,6 @@ import LeadHeader from "@/modules/leads/components/LeadHeader";
 import LeadToolbar from "@/modules/leads/components/LeadToolbar";
 import LeadTable from "@/modules/leads/components/LeadTable";
 import { adaptOrganizationsForLeads } from "@/modules/common/adapters/organizationAdapter";
-import { PremiumFeatureCard } from "@/components/dashboard/PremiumFeatureCard";
 
 const Leads = () => {
   const queryClient = useQueryClient();
@@ -204,16 +203,10 @@ const Leads = () => {
           initialData={leadToEdit}
           industries={industries}
           designations={designations}
+          // Pass users but cast to the type expected by LeadForm
           users={users as any} 
           organizations={adaptedOrganizations}
         />
-
-        <div className="flex justify-end items-center">
-          <div style={{ width: 360 }}>
-            {/* Premium feature card shown at the end of the page */}
-            {<PremiumFeatureCard />}
-          </div>
-        </div>
 
         <AlertDialog open={leadToDelete !== null} onOpenChange={() => setLeadToDelete(null)}>
           <AlertDialogContent>

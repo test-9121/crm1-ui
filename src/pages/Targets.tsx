@@ -174,8 +174,8 @@ const Targets = () => {
         />
 
         <div className="flex justify-end items-center">
-          <div style={{ width: 360 }}>
-            {<PremiumFeatureCard />}
+          <div style={{ width: 340 }}>
+            <PremiumFeatureCard />
           </div>
         </div>
 
