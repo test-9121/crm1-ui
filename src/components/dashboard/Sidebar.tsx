@@ -6,12 +6,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   User,
-  Organization,
-  Role,
+  Users,
+  Shield,
   Linkedin,
   Target,
-  Events,
-  Lead,
+  CalendarDays,
+  Contact,
   HelpCircle,
   LogOut
 } from "lucide-react";
@@ -64,8 +64,8 @@ export function Sidebar() {
       group: "User Management",
       items: [
         { label: "User", icon: User, path: "/users", key: "user" },
-        { label: "Organization", icon: Organization, path: "/organizations", key: "organization" },
-        { label: "Role", icon: Role, path: "/roles", key: "role" }
+        { label: "Organization", icon: Users, path: "/organizations", key: "organization" },
+        { label: "Role", icon: Shield, path: "/roles", key: "role" }
       ]
     },
     {
@@ -87,13 +87,13 @@ export function Sidebar() {
         },
         {
           label: "Events",
-          icon: Events,
+          icon: CalendarDays,
           path: "/calendar",
           key: "events"
         },
         {
           label: "Lead",
-          icon: Lead,
+          icon: Contact,
           path: "/leads",
           key: "lead"
         }
