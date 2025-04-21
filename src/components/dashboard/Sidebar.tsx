@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PremiumCard } from "./PremiumCard";
@@ -28,11 +27,11 @@ import {
   Menu,
   X,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  LogIn
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-// Sidebar menu configs
 const userManagementLinks = [
   { label: "Users", path: "/users", icon: <User size={20} /> },
   { label: "Roles", path: "/roles", icon: <Shield size={20} /> },
@@ -59,6 +58,42 @@ const managementLinks = [
   { label: "Settings", path: "/settings", icon: <Settings size={20} /> },
 ];
 
+const sidebarBg = "bg-gradient-to-br from-[#131c36] to-[#22304a]";
+const borderCol = "border-r border-[#254073]";
+const labelColor = "text-gray-300";
+const iconColor = "text-white";
+const sectionLabel = "uppercase tracking-wide text-[#33C3F0] text-xs font-bold mb-2 mt-2";
+const activeGradient = "bg-gradient-to-r from-[#162c63] to-[#1eaedb]";
+const hoverGradient = "hover:bg-gradient-to-r hover:from-[#22304a] hover:to-[#1eaedb]";
+const collapseBtn =
+  "ml-2 rounded-full bg-[#213d5b] hover:bg-[#1eaedb] transition-colors text-white flex items-center justify-center p-1";
+const crmLogoColor = "text-gradient bg-gradient-to-tr from-[#1EAEDB] via-[#4effa2] to-white";
+const crmLogoBg = "rounded-full bg-gradient-to-tr from-[#1EAEDB] to-[#22304a] shadow-md p-0.5";
+const collapsedSidebarWidth = "w-16 min-w-[4rem] max-w-[4rem] px-1";
+const expandedSidebarWidth = "w-64 px-5 min-w-[16rem]";
+const mobileTriggerBtn =
+  "text-white hover:bg-[#22304a] rounded-full flex items-center justify-center p-2 focus:outline-none";
+
+function SidebarIconLink({ to, icon, active, label }) {
+  return (
+    <Link
+      to={to}
+      className={cn(
+        "flex items-center justify-center my-2 rounded-lg group transition relative",
+        active
+          ? activeGradient + " " + iconColor + " shadow-lg"
+          : hoverGradient + " " + labelColor
+      )}
+      style={{ minHeight: 44, minWidth: 44 }}
+    >
+      <span className={cn("flex items-center justify-center", iconColor, "transition-all")}>
+        {icon}
+        <span className="sr-only">{label}</span>
+      </span>
+    </Link>
+  );
+}
+
 export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();
@@ -70,34 +105,41 @@ export function Sidebar() {
   const [mgmtOpen, setMgmtOpen] = useState(true);
   const [cmsOpen, setCmsOpen] = useState(false);
 
-  // Color scheme for new dark sidebar & highlights
-  const sidebarBg = "bg-gradient-to-br from-[#151a2b] to-[#232750]";
-  const borderCol = "border-r border-[#313652]";
-  const labelColor = "text-gray-200";
-  const iconColor = "text-white";
-  const sectionLabel = "uppercase tracking-wide text-[#7bd2fb] text-xs font-semibold mb-2 mt-2";
-  const activeGradient = "bg-gradient-to-r from-[#1f286c] to-[#1eaedb]";
-  const hoverGradient = "hover:bg-gradient-to-r hover:from-[#232750] hover:to-[#175e8e]";
-  const mobileTriggerBtn =
-    "text-white hover:bg-[#22304a] rounded-full flex items-center justify-center p-2 focus:outline-none";
+  const handleSidebarToggle = () => setIsSidebarOpen((o) => !o);
+  const handleMobileSidebarToggle = () => setIsMobileSidebarOpen((o) => !o);
 
-  const toggleSidebar = () => setIsSidebarOpen((o) => !o);
+  const collapsedMenuIcons = [
+    { to: "/dashboard", icon: <LayoutDashboard size={24} />, label: "Dashboard" },
+    ...userManagementLinks.map((item) => ({
+      to: item.path,
+      icon: item.icon,
+      label: item.label,
+    })),
+    ...managementLinks
+      .flatMap((item) =>
+        item.children
+          ? item.children.map((sub) => ({
+              to: sub.path,
+              icon: sub.icon,
+              label: sub.label,
+            }))
+          : [
+              {
+                to: item.path,
+                icon: item.icon,
+                label: item.label,
+              },
+            ]
+      ),
+  ];
 
-  // Accordion toggles
-  const toggleSection = (type: "user" | "mgmt" | "cms") => {
-    if (type === "user") setUserMgmtOpen((o) => !o);
-    if (type === "mgmt") setMgmtOpen((o) => !o);
-    if (type === "cms") setCmsOpen((o) => !o);
-  };
-
-  // Mobile Sidebar Overlay
   const mobileSidebar = (
     <div
       className={cn(
         "fixed inset-0 z-40 flex",
         isMobileSidebarOpen ? "visible" : "hidden"
       )}
-      style={{ background: "rgba(22,31,51, 0.7)" }}
+      style={{ background: "rgba(19,28,54, 0.7)" }}
     >
       <aside
         className={cn(
@@ -108,10 +150,10 @@ export function Sidebar() {
         )}
         style={{ minWidth: "16rem" }}
       >
-        {/* Heading and mobile close/collapse icon */}
         <div className="flex items-center mb-5 h-10">
+          <span className={crmLogoBg}><LogIn size={28} className="text-[#1EAEDB]" /></span>
           <span
-            className="text-2xl font-extrabold text-white"
+            className="text-2xl font-extrabold text-white ml-2"
             style={{
               background: "linear-gradient(90deg, #4effa2 0%, #6366f1 100%)",
               WebkitBackgroundClip: "text",
@@ -130,25 +172,21 @@ export function Sidebar() {
             CRM
           </span>
           <button
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={handleMobileSidebarToggle}
             className={mobileTriggerBtn + " ml-auto"}
             aria-label="Close sidebar"
           >
             <X size={26} />
           </button>
         </div>
-        {/* Collapse/expand for mobile */}
         <button
-          onClick={toggleSidebar}
-          className={cn(mobileTriggerBtn, "mb-4")}
+          onClick={handleSidebarToggle}
+          className={cn(collapseBtn, "mb-4 mt-2")}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
           {isSidebarOpen ? <ArrowLeft size={22} /> : <ArrowRight size={22} />}
         </button>
-        {/* Premium Card */}
         {isSidebarOpen && <PremiumCard />}
-
-        {/* Main navigation */}
         <nav className="mb-3 mt-2">
           <Link
             to="/dashboard"
@@ -158,34 +196,31 @@ export function Sidebar() {
                 ? activeGradient + " text-white"
                 : iconColor + " " + hoverGradient
             )}
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={handleMobileSidebarToggle}
           >
             <LayoutDashboard size={20} />
-            {isSidebarOpen && <span className="ml-1">Dashboard</span>}
+            <span className="ml-1">Dashboard</span>
           </Link>
-
-          {/* User Management */}
           <div>
             <button
               type="button"
               className={cn(
-                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-bold group transition",
                 sectionLabel,
                 hoverGradient
               )}
-              onClick={() => toggleSection("user")}
+              onClick={() => setUserMgmtOpen((o) => !o)}
               aria-expanded={userMgmtOpen}
             >
               <Users size={20} className={iconColor} />
-              {isSidebarOpen && <span>User Management</span>}
-              {isSidebarOpen &&
-                (userMgmtOpen ? (
-                  <ChevronUp size={18} className="ml-auto" />
-                ) : (
-                  <ChevronDown size={18} className="ml-auto" />
-                ))}
+              <span>User Management</span>
+              {userMgmtOpen ? (
+                <ChevronUp size={18} className="ml-auto" />
+              ) : (
+                <ChevronDown size={18} className="ml-auto" />
+              )}
             </button>
-            {userMgmtOpen && isSidebarOpen && (
+            {userMgmtOpen && (
               <div className="ml-6 border-l border-[#2d3550] pb-2">
                 {userManagementLinks.map(({ label, path, icon }) => (
                   <Link
@@ -197,7 +232,7 @@ export function Sidebar() {
                         ? activeGradient + " text-white"
                         : labelColor + " " + hoverGradient
                     )}
-                    onClick={() => setIsMobileSidebarOpen(false)}
+                    onClick={handleMobileSidebarToggle}
                   >
                     {icon}
                     <span>{label}</span>
@@ -206,29 +241,26 @@ export function Sidebar() {
               </div>
             )}
           </div>
-
-          {/* Management */}
           <div>
             <button
               type="button"
               className={cn(
-                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
+                "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-bold group transition",
                 sectionLabel,
                 hoverGradient
               )}
-              onClick={() => toggleSection("mgmt")}
+              onClick={() => setMgmtOpen((o) => !o)}
               aria-expanded={mgmtOpen}
             >
               <Briefcase size={20} className={iconColor} />
-              {isSidebarOpen && <span>Management</span>}
-              {isSidebarOpen &&
-                (mgmtOpen ? (
-                  <ChevronUp size={18} className="ml-auto" />
-                ) : (
-                  <ChevronDown size={18} className="ml-auto" />
-                ))}
+              <span>Management</span>
+              {mgmtOpen ? (
+                <ChevronUp size={18} className="ml-auto" />
+              ) : (
+                <ChevronDown size={18} className="ml-auto" />
+              )}
             </button>
-            {mgmtOpen && isSidebarOpen && (
+            {mgmtOpen && (
               <div className="ml-6 border-l border-[#2d3550] pb-2">
                 {managementLinks.map((item) =>
                   item.children ? (
@@ -241,7 +273,7 @@ export function Sidebar() {
                             ? activeGradient + " text-white"
                             : labelColor + " " + hoverGradient
                         )}
-                        onClick={() => toggleSection("cms")}
+                        onClick={() => setCmsOpen((o) => !o)}
                         aria-expanded={cmsOpen}
                       >
                         {item.icon}
@@ -264,7 +296,6 @@ export function Sidebar() {
                                   ? activeGradient + " text-white"
                                   : labelColor + " " + hoverGradient
                               )}
-                              onClick={() => setIsMobileSidebarOpen(false)}
                             >
                               {sub.icon}
                               <span>{sub.label}</span>
@@ -283,7 +314,6 @@ export function Sidebar() {
                           ? activeGradient + " text-white"
                           : labelColor + " " + hoverGradient
                       )}
-                      onClick={() => setIsMobileSidebarOpen(false)}
                     >
                       {item.icon}
                       <span>{item.label}</span>
@@ -295,7 +325,6 @@ export function Sidebar() {
           </div>
         </nav>
         <div className="flex-1" />
-        {/* User profile + logout */}
         {isSidebarOpen && (
           <div className="mb-2 flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#32346e] to-[#224899] flex items-center justify-center">
@@ -325,198 +354,227 @@ export function Sidebar() {
           {isSidebarOpen && <span>Sign out</span>}
         </button>
       </aside>
-      {/* Click-out area */}
-      <div className="flex-1" onClick={() => setIsMobileSidebarOpen(false)} />
+      <div className="flex-1" onClick={handleMobileSidebarToggle} />
     </div>
   );
 
-  // Desktop sidebar (persistent)
   const desktopSidebar = (
     <aside
       className={cn(
-        "flex flex-col",
+        "flex flex-col h-screen relative transition-all duration-300",
         sidebarBg,
         borderCol,
-        "h-screen w-64 px-5 py-6 relative transition-all duration-300",
-        !isSidebarOpen && "w-16 px-1"
+        isSidebarOpen ? expandedSidebarWidth : collapsedSidebarWidth
       )}
-      style={{ minWidth: isSidebarOpen ? "16rem" : "3.5rem" }}
+      style={
+        isSidebarOpen
+          ? { minWidth: "16rem", width: "16rem" }
+          : { minWidth: "4rem", maxWidth: "4rem", width: "4rem" }
+      }
     >
-      <div className="flex items-center mb-5 h-10">
-        <span className="text-2xl font-extrabold"
-          style={{
-            background: "linear-gradient(90deg, #4effa2 0%, #6366f1 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
-          }}>
-          Ensar
+      <div className={cn("flex items-center h-10 mb-5", isSidebarOpen ? "" : "justify-center")}>
+        <span className={crmLogoBg}>
+          <LogIn size={28} className="text-[#1EAEDB]" />
         </span>
-        <span className="text-2xl font-extrabold"
-          style={{
-            background: "linear-gradient(90deg, #6366f1 0%, #203fa1 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            marginLeft: 2
-          }}>
-          CRM
-        </span>
-        {/* Collapse icon (only show on desktop) */}
+        {isSidebarOpen && (
+          <>
+            <span
+              className="text-2xl font-extrabold text-white ml-2"
+              style={{
+                background: "linear-gradient(90deg, #4effa2 0%, #6366f1 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }}>
+              Ensar
+            </span>
+            <span
+              className="text-2xl font-extrabold"
+              style={{
+                background: "linear-gradient(90deg, #6366f1 0%, #203fa1 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                marginLeft: 2
+              }}>
+              CRM
+            </span>
+          </>
+        )}
         <button
-          onClick={toggleSidebar}
-          className="ml-auto text-white bg-[#283156] hover:bg-[#1eaedb] rounded-full flex items-center justify-center p-1 transition"
+          onClick={handleSidebarToggle}
+          className={cn(
+            collapseBtn,
+            "ml-auto",
+            isSidebarOpen ? "" : "mx-auto"
+          )}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
           {isSidebarOpen ? <ArrowLeft size={22} /> : <ArrowRight size={22} />}
         </button>
-        {/* Mobile menu icon (hidden on desktop, shown on mobile below) */}
       </div>
-      {/* Premium Card */}
-      {isSidebarOpen && <PremiumCard />}
-
-      {/* Main navigation */}
-      <nav className="mb-3 mt-2">
-        <Link
-          to="/dashboard"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg font-medium mb-2 transition",
-            location.pathname === "/dashboard"
-              ? activeGradient + " text-white"
-              : iconColor + " " + hoverGradient
-          )}
-        >
-          <LayoutDashboard size={20} />
-          {isSidebarOpen && <span className="ml-1">Dashboard</span>}
-        </Link>
-
-        {/* User Management */}
-        <div>
-          <button
-            type="button"
-            className={cn(
-              "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
-              sectionLabel,
-              hoverGradient
-            )}
-            onClick={() => toggleSection("user")}
-            aria-expanded={userMgmtOpen}
-          >
-            <Users size={20} className={iconColor} />
-            {isSidebarOpen && <span>User Management</span>}
-            {isSidebarOpen &&
-              (userMgmtOpen ? (
-                <ChevronUp size={18} className="ml-auto" />
-              ) : (
-                <ChevronDown size={18} className="ml-auto" />
-              ))}
-          </button>
-          {userMgmtOpen && isSidebarOpen && (
-            <div className="ml-6 border-l border-[#2d3550] pb-2">
-              {userManagementLinks.map(({ label, path, icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={cn(
-                    "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
-                    location.pathname === path
-                      ? activeGradient + " text-white"
-                      : labelColor + " " + hoverGradient
-                  )}
-                >
-                  {icon}
-                  <span>{label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Management */}
-        <div>
-          <button
-            type="button"
-            className={cn(
-              "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-semibold text-base group transition",
-              sectionLabel,
-              hoverGradient
-            )}
-            onClick={() => toggleSection("mgmt")}
-            aria-expanded={mgmtOpen}
-          >
-            <Briefcase size={20} className={iconColor} />
-            {isSidebarOpen && <span>Management</span>}
-            {isSidebarOpen &&
-              (mgmtOpen ? (
-                <ChevronUp size={18} className="ml-auto" />
-              ) : (
-                <ChevronDown size={18} className="ml-auto" />
-              ))}
-          </button>
-          {mgmtOpen && isSidebarOpen && (
-            <div className="ml-6 border-l border-[#2d3550] pb-2">
-              {managementLinks.map((item) =>
-                item.children ? (
-                  <div key={item.label}>
-                    <button
-                      type="button"
+      {isSidebarOpen ? (
+        <>
+          {<PremiumCard />}
+          <nav className="mb-3 mt-2">
+            <Link
+              to="/dashboard"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg font-semibold mb-2 transition",
+                location.pathname === "/dashboard"
+                  ? activeGradient + " text-white"
+                  : iconColor + " " + hoverGradient
+              )}
+            >
+              <LayoutDashboard size={20} />
+              <span className="ml-1">Dashboard</span>
+            </Link>
+            <div>
+              <button
+                type="button"
+                className={cn(
+                  "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-bold group transition",
+                  sectionLabel,
+                  hoverGradient
+                )}
+                onClick={() => setUserMgmtOpen((o) => !o)}
+                aria-expanded={userMgmtOpen}
+              >
+                <Users size={20} className={iconColor} />
+                <span>User Management</span>
+                {userMgmtOpen ? (
+                  <ChevronUp size={18} className="ml-auto" />
+                ) : (
+                  <ChevronDown size={18} className="ml-auto" />
+                )}
+              </button>
+              {userMgmtOpen && (
+                <div className="ml-6 border-l border-[#2d3550] pb-2">
+                  {userManagementLinks.map(({ label, path, icon }) => (
+                    <Link
+                      key={path}
+                      to={path}
                       className={cn(
-                        "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full",
-                        location.pathname.startsWith("/cms")
+                        "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
+                        location.pathname === path
                           ? activeGradient + " text-white"
                           : labelColor + " " + hoverGradient
                       )}
-                      onClick={() => toggleSection("cms")}
-                      aria-expanded={cmsOpen}
                     >
-                      {item.icon}
-                      <span>CMS</span>
-                      {cmsOpen ? (
-                        <ChevronUp size={16} className="ml-auto" />
-                      ) : (
-                        <ChevronDown size={16} className="ml-auto" />
-                      )}
-                    </button>
-                    {cmsOpen && (
-                      <div className="ml-5">
-                        {item.children.map((sub) => (
-                          <Link
-                            key={sub.path}
-                            to={sub.path}
-                            className={cn(
-                              "flex items-center gap-2 px-2 py-1 rounded-md mb-1 transition-colors",
-                              location.pathname === sub.path
-                                ? activeGradient + " text-white"
-                                : labelColor + " " + hoverGradient
-                            )}
-                          >
-                            {sub.icon}
-                            <span>{sub.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
-                      location.pathname === item.path
-                        ? activeGradient + " text-white"
-                        : labelColor + " " + hoverGradient
-                    )}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </Link>
-                )
+                      {icon}
+                      <span>{label}</span>
+                    </Link>
+                  ))}
+                </div>
               )}
             </div>
-          )}
+            <div>
+              <button
+                type="button"
+                className={cn(
+                  "flex items-center w-full gap-2 px-2 py-1 rounded-md mb-1 font-bold group transition",
+                  sectionLabel,
+                  hoverGradient
+                )}
+                onClick={() => setMgmtOpen((o) => !o)}
+                aria-expanded={mgmtOpen}
+              >
+                <Briefcase size={20} className={iconColor} />
+                <span>Management</span>
+                {mgmtOpen ? (
+                  <ChevronUp size={18} className="ml-auto" />
+                ) : (
+                  <ChevronDown size={18} className="ml-auto" />
+                )}
+              </button>
+              {mgmtOpen && (
+                <div className="ml-6 border-l border-[#2d3550] pb-2">
+                  {managementLinks.map((item) =>
+                    item.children ? (
+                      <div key={item.label}>
+                        <button
+                          type="button"
+                          className={cn(
+                            "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors w-full",
+                            location.pathname.startsWith("/cms")
+                              ? activeGradient + " text-white"
+                              : labelColor + " " + hoverGradient
+                          )}
+                          onClick={() => setCmsOpen((o) => !o)}
+                          aria-expanded={cmsOpen}
+                        >
+                          {item.icon}
+                          <span>CMS</span>
+                          {cmsOpen ? (
+                            <ChevronUp size={16} className="ml-auto" />
+                          ) : (
+                            <ChevronDown size={16} className="ml-auto" />
+                          )}
+                        </button>
+                        {cmsOpen && (
+                          <div className="ml-5">
+                            {item.children.map((sub) => (
+                              <Link
+                                key={sub.path}
+                                to={sub.path}
+                                className={cn(
+                                  "flex items-center gap-2 px-2 py-1 rounded-md mb-1 transition-colors",
+                                  location.pathname === sub.path
+                                    ? activeGradient + " text-white"
+                                    : labelColor + " " + hoverGradient
+                                )}
+                              >
+                                {sub.icon}
+                                <span>{sub.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
+                          location.pathname === item.path
+                            ? activeGradient + " text-white"
+                            : labelColor + " " + hoverGradient
+                        )}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </Link>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </nav>
+        </>
+      ) : (
+        <div className="flex flex-col items-center">
+          <span className={crmLogoBg + " mb-2"}><LogIn size={28} /></span>
+          <button
+            onClick={handleSidebarToggle}
+            className={cn(collapseBtn, "mb-2")}
+            aria-label="Expand sidebar"
+          >
+            <ArrowRight size={22} />
+          </button>
+          <div className="flex flex-col items-center gap-2 mt-2">
+            {collapsedMenuIcons.map((item) => (
+              <SidebarIconLink
+                key={item.to}
+                to={item.to}
+                icon={item.icon}
+                active={location.pathname === item.to}
+                label={item.label}
+              />
+            ))}
+          </div>
         </div>
-      </nav>
+      )}
+
       <div className="flex-1" />
-      {/* User profile + logout */}
       {isSidebarOpen && (
         <div className="mb-2 flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#32346e] to-[#224899] flex items-center justify-center">
@@ -545,26 +603,23 @@ export function Sidebar() {
     </aside>
   );
 
+  const mobileMenuTrigger = !isMobileSidebarOpen && (
+    <div className="fixed top-3 left-3 z-50 md:hidden">
+      <button
+        onClick={handleMobileSidebarToggle}
+        className="text-white bg-[#232750] hover:bg-[#3855a2] rounded-full flex items-center justify-center p-2 shadow-md"
+        aria-label="Open sidebar"
+      >
+        <Menu size={26} />
+      </button>
+    </div>
+  );
+
   return (
     <>
       {isMobile
-        ? (isMobileSidebarOpen ? (
-            mobileSidebar
-          ) : (
-            // Only show mobile menu icon on mobile, sidebar is closed by default
-            <div className="fixed top-3 left-3 z-50 md:hidden">
-              <button
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="text-white bg-[#232750] hover:bg-[#3855a2] rounded-full flex items-center justify-center p-2 shadow-md"
-                aria-label="Open sidebar"
-              >
-                <Menu size={26} />
-              </button>
-            </div>
-          ))
+        ? (isMobileSidebarOpen ? mobileSidebar : mobileMenuTrigger)
         : desktopSidebar}
     </>
   );
 }
-// NOTE: This file is over 200 lines. Consider asking for a refactor into smaller components for maintainability.
-
