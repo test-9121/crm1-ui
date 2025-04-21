@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -14,6 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+// LinkedIn-related imports
 import { useLinkedIn } from "@/modules/linkedin/hooks/useLinkedIn";
 import { LinkedInProfile } from "@/modules/linkedin/types";
 import LinkedInForm from "@/modules/linkedin/components/LinkedInForm";
@@ -21,7 +24,6 @@ import LinkedInHeader from "@/modules/linkedin/components/LinkedInHeader";
 import LinkedInToolbar from "@/modules/linkedin/components/LinkedInToolbar";
 import LinkedInTable from "@/modules/linkedin/components/LinkedInTable";
 import LinkedInDetailsPanelContent from "@/modules/linkedin/components/LinkedInDetailsPanelContent";
-import { OverviewCard } from "@/components/OverviewCard";
 
 const LinkedIn = () => {
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const LinkedIn = () => {
     hideProfileDetails
   } = useLinkedIn();
 
+  // Effect to handle URL-based profile editing
   useEffect(() => {
     if (id) {
       const currentProfile = getProfileById(id);
@@ -60,6 +63,7 @@ const LinkedIn = () => {
         navigate("/linkedin", { replace: true });
       }
     } else {
+      // Only reset if we're not coming from the edit route
       if (!location.pathname.includes("/edit/")) {
         setProfileToEdit(null);
       }
@@ -84,6 +88,7 @@ const LinkedIn = () => {
     setProfileToEdit(profile);
     setShowProfileForm(true);
     
+    // Update URL to reflect editing state without creating a browser history entry
     navigate(`/linkedin/edit/${profile.id}`, { replace: false });
   };
 
@@ -101,8 +106,10 @@ const LinkedIn = () => {
   const handleFormClose = () => {
     setShowProfileForm(false);
     
+    // Navigate back to linkedin page with replace to avoid history stacking
     navigate("/linkedin", { replace: true });
     
+    // Reset the edit state after a short delay to prevent UI issues
     setTimeout(() => {
       setProfileToEdit(null);
     }, 100);
@@ -112,9 +119,11 @@ const LinkedIn = () => {
     showProfileDetails(profile);
   };
 
+  // Ensure profiles is always an array before filtering
   const profilesArray = Array.isArray(profiles) ? profiles : [];
   
   const filteredProfiles = profilesArray.filter(profile => {
+    // Get the searchable values, using fallbacks for missing properties
     const searchableValues = [
       profile.headline || profile.accountName || '',
       profile.company || '',
@@ -123,6 +132,7 @@ const LinkedIn = () => {
       profile.currentPosition || profile.designation || ''
     ].map(val => val.toLowerCase());
     
+    // Check if the search term matches any of the searchable values
     const lowerSearchTerm = searchTerm.toLowerCase();
     return searchableValues.some(value => value.includes(lowerSearchTerm));
   });
@@ -137,14 +147,6 @@ const LinkedIn = () => {
             setShowProfileForm(true);
           }}
         />
-
-        <div className="mb-2">
-          <OverviewCard
-            label="Profiles"
-            count={filteredProfiles.length}
-            color="#22304a"
-          />
-        </div>
         
         <LinkedInHeader 
           tableName={tableName}
@@ -182,6 +184,7 @@ const LinkedIn = () => {
           </div>
         )}
 
+        {/* Side panel for viewing LinkedIn profile details */}
         <DetailsSidePanel
           data={selectedProfile}
           open={profileDetailsOpen}
@@ -189,6 +192,7 @@ const LinkedIn = () => {
           renderContent={(profile) => <LinkedInDetailsPanelContent profile={profile} />}
         />
 
+        {/* Only render the LinkedInForm when showProfileForm is true */}
         {showProfileForm && (
           <LinkedInForm
             open={showProfileForm}

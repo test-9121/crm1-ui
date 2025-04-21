@@ -361,7 +361,7 @@ export function Sidebar() {
   const desktopSidebar = (
     <aside
       className={cn(
-        "flex flex-col h-screen relative transition-all duration-300 overflow-y-auto scrollbar-thin scrollbar-thumb-[#22304a]/70 scrollbar-track-[#131c36]",
+        "flex flex-col h-screen relative transition-all duration-300",
         sidebarBg,
         borderCol,
         isSidebarOpen ? expandedSidebarWidth : collapsedSidebarWidth

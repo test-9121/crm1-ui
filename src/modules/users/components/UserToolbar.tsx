@@ -1,3 +1,4 @@
+
 import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +19,7 @@ const UserToolbar = ({ onSearchChange, onNewUser }: UserToolbarProps) => {
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <Button
-        className="bg-gradient-to-r from-[#22304a] via-[#22304a]/90 to-white/10 text-white hover:from-[#22304a]/80 hover:to-white/20"
-        onClick={onNewUser}
-      >
+      <Button onClick={onNewUser}>
         <Plus className="h-4 w-4 mr-2" />
         New User
       </Button>

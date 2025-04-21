@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,10 +54,7 @@ const UserTaskToolbar = ({
             </Button>
           )}
         </div>
-        <Button
-          className="bg-gradient-to-r from-[#22304a] via-[#22304a]/90 to-white/10 text-white hover:from-[#22304a]/80 hover:to-white/20"
-          onClick={onNewUserTask}
-        >
+        <Button onClick={onNewUserTask}>
           <Plus className="h-4 w-4 mr-1" />
           New Task
         </Button>

@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+// Import from restructured modules
 import { useLeads } from "@/modules/leads/hooks/useLeads";
 import { useUsers, useDesignations, useOrganizations, useIndustries } from "@/modules/common/hooks/useEntities";
 import { leadService } from "@/modules/leads/services/leadService";
@@ -24,12 +25,11 @@ import LeadHeader from "@/modules/leads/components/LeadHeader";
 import LeadToolbar from "@/modules/leads/components/LeadToolbar";
 import LeadTable from "@/modules/leads/components/LeadTable";
 import { adaptOrganizationsForLeads } from "@/modules/common/adapters/organizationAdapter";
-import { OverviewCard } from "@/components/OverviewCard";
 
 const Leads = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // Get the lead ID from URL if it exists
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -46,6 +46,7 @@ const Leads = () => {
   const { organizations, loading: organizationsLoading } = useOrganizations();
   const { industries, loading: industriesLoading } = useIndustries();
   
+  // Effect to handle URL-based lead editing
   useEffect(() => {
     if (id) {
       const currentLead = getLeadById(id);
@@ -57,6 +58,7 @@ const Leads = () => {
         navigate("/leads");
       }
     } else {
+      // If no ID in URL, reset the edit state
       setLeadToEdit(null);
     }
   }, [id, getLeadById, navigate]);
@@ -78,18 +80,23 @@ const Leads = () => {
   const handleNewLead = async (data: any) => {
     try {
       if (id) {
+        // If we have an ID in the URL, this is an edit operation
         await leadService.updateLead(id, data);
-        queryClient.invalidateQueries({ queryKey: ["leads"] });
-        setShowNewLeadForm(false);
-        setLeadToEdit(null);
-        if (id) {
-          navigate("/leads");
-        }
+        // toast.success("Lead updated successfully");
       } else {
+        // If no ID, this is a create operation
         await leadService.createLead(data);
-        queryClient.invalidateQueries({ queryKey: ["leads"] });
-        setShowNewLeadForm(false);
-        setLeadToEdit(null);
+        // toast.success("New lead added successfully");
+      }
+      
+      // Invalidate the leads query to refetch the updated data
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      setShowNewLeadForm(false);
+      setLeadToEdit(null);
+      
+      // Clear the URL parameter after successful operation
+      if (id) {
+        navigate("/leads");
       }
     } catch (error) {
       console.error("Error saving lead:", error);
@@ -98,6 +105,7 @@ const Leads = () => {
   };
 
   const handleEditLead = (lead: ILead) => {
+    // Update URL with lead ID instead of directly setting state
     navigate(`/leads/edit/${lead.id}`);
   };
 
@@ -109,6 +117,7 @@ const Leads = () => {
     if (leadToDelete) {
       try {
         await leadService.deleteLead(leadToDelete);
+        // Invalidate the leads query to refetch the updated data
         queryClient.invalidateQueries({ queryKey: ["leads"] });
         toast.success("Lead deleted successfully");
       } catch (error) {
@@ -119,9 +128,12 @@ const Leads = () => {
     }
   };
 
+  // Handler to close the form and navigate back to leads list
   const handleFormClose = () => {
     setShowNewLeadForm(false);
     setLeadToEdit(null);
+    
+    // If we're in edit mode, navigate back to the leads list
     if (id) {
       navigate("/leads");
     }
@@ -135,6 +147,7 @@ const Leads = () => {
 
   const pageIsLoading = usersLoading || designationsLoading || organizationsLoading || industriesLoading || isLoading;
 
+  // Adapt organizations to the format expected by LeadForm
   const adaptedOrganizations = adaptOrganizationsForLeads(organizations);
 
   return (
@@ -147,14 +160,6 @@ const Leads = () => {
             setShowNewLeadForm(true);
           }}
         />
-
-        <div className="mb-2">
-          <OverviewCard
-            label="Leads"
-            count={filteredLeads.length}
-            color="#22304a"
-          />
-        </div>
         
         <LeadHeader 
           tableName={tableName}
@@ -198,6 +203,7 @@ const Leads = () => {
           initialData={leadToEdit}
           industries={industries}
           designations={designations}
+          // Pass users but cast to the type expected by LeadForm
           users={users as any} 
           organizations={adaptedOrganizations}
         />
