@@ -47,7 +47,10 @@ export default function LinkedIn() {
             name: "Example Org",
             description: "Example Organization",
             domain: "example.com",
-            disabled: false
+            disabled: false,
+            logoImgSrc: null,
+            createdDateTime: "2023-01-01T00:00:00Z",
+            lastUpdatedDateTime: null
           }
         }
       },
@@ -56,7 +59,10 @@ export default function LinkedIn() {
         name: "Example Org",
         description: "Example Organization",
         domain: "example.com",
-        disabled: false
+        disabled: false,
+        logoImgSrc: null,
+        createdDateTime: "2023-01-01T00:00:00Z",
+        lastUpdatedDateTime: null
       }
     },
     {
@@ -90,7 +96,10 @@ export default function LinkedIn() {
             name: "Example Org",
             description: "Example Organization",
             domain: "example.com",
-            disabled: false
+            disabled: false,
+            logoImgSrc: null,
+            createdDateTime: "2023-01-01T00:00:00Z",
+            lastUpdatedDateTime: null
           }
         }
       },
@@ -99,7 +108,10 @@ export default function LinkedIn() {
         name: "Tech Solutions Inc.",
         description: "Tech Solutions Organization",
         domain: "techsolutions.com",
-        disabled: false
+        disabled: false,
+        logoImgSrc: null,
+        createdDateTime: "2023-01-01T00:00:00Z",
+        lastUpdatedDateTime: null
       }
     },
   ]);
