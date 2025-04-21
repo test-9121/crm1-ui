@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -93,8 +94,8 @@ export function EventModal({
       title: event?.title || "",
       description: event?.description || "",
       notes: event?.notes || "",
-      startDate: event?.startDate || event?.startDateTime || new Date().toISOString().slice(0, 16),
-      endDate: event?.endDate || event?.endDateTime || new Date().toISOString().slice(0, 16),
+      startDate: event?.startDate || new Date().toISOString().slice(0, 16),
+      endDate: event?.endDate || new Date().toISOString().slice(0, 16),
       allDay: event?.allDay || false,
       leadId: event?.leadId || "",
       userId: event?.userId || "",
@@ -109,8 +110,8 @@ export function EventModal({
         title: event.title || "",
         description: event.description || "",
         notes: event.notes || "",
-        startDate: event.startDate || event.startDateTime || new Date().toISOString().slice(0, 16),
-        endDate: event.endDate || event.endDateTime || new Date().toISOString().slice(0, 16),
+        startDate: event.startDate || new Date().toISOString().slice(0, 16),
+        endDate: event.endDate || new Date().toISOString().slice(0, 16),
         allDay: event.allDay || false,
         leadId: event.leadId || "",
         userId: event.userId || "",

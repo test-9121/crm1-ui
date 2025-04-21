@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
@@ -54,8 +55,8 @@ export default function Events() {
 
   const mappedEvents = Array.isArray(allEvents.data) ? allEvents.data.map(event => ({
     ...event,
-    startDate: event.startDate || event.startDateTime,
-    endDate: event.endDate || event.endDateTime
+    startDate: event.startDate || event.startDate,
+    endDate: event.endDate || event.endDate
   })) : [];
 
   if (allEvents.isError) {
