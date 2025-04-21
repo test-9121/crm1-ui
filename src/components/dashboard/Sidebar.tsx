@@ -1,292 +1,216 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { PremiumCard } from "./PremiumCard";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { Icons } from "@/components/ui/icons";
-import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Users, 
-  BadgePercent, 
-  PhoneCall, 
-  Calendar, 
-  BarChart, 
-  Settings, 
-  LogOut, 
-  ChevronLeft, 
-  ChevronRight, 
-  Menu,
-  Building,
-  UserRound,
-  Linkedin,
-  Target,
-  Folder,
-  UserCheck,
-  Mail,
-  FileText
-} from "lucide-react";
+import { LayoutDashboard, Users, User, Building, Role, Linkedin, Target, Calendar, User as UserIcon, Briefcase, BarChart, PhoneCall } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  path: string;
-  isCollapsed: boolean;
-  isActive: boolean;
-}
+// Sidebar menu config
+const managementLinks = [
+  {
+    label: "LinkedIn",
+    path: "/linkedin",
+    icon: <Linkedin size={20} />,
+    badge: 3, // Hardcoded badge for demo purpose, remove or dynamically fetch as needed
+  },
+  {
+    label: "Target",
+    path: "/targets",
+    icon: <Target size={20} />,
+  },
+  {
+    label: "Events",
+    path: "/calendar",
+    icon: <Calendar size={20} />,
+  },
+  {
+    label: "Lead",
+    path: "/leads",
+    icon: <UserIcon size={20} />,
+  },
+];
 
-interface SidebarSubItemProps {
-  label: string;
-  path: string;
-  isCollapsed: boolean;
-  isActive: boolean;
-}
-
-const SidebarItem = ({ icon, label, path, isCollapsed, isActive }: SidebarItemProps) => {
-  return (
-    <Link 
-      to={path} 
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-md transition-all",
-        isActive 
-          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
-        isCollapsed && "justify-center"
-      )}
-    >
-      {icon}
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  );
-};
-
-const SidebarSubItem = ({ label, path, isCollapsed, isActive }: SidebarSubItemProps) => {
-  if (isCollapsed) return null;
-  
-  return (
-    <Link 
-      to={path} 
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 ml-6 rounded-md transition-all",
-        isActive 
-          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-      )}
-    >
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  );
-};
+const userManagementLinks = [
+  {
+    label: "User",
+    path: "/users",
+    icon: <User size={20} />,
+  },
+  {
+    label: "Organization",
+    path: "/organizations",
+    icon: <Building size={20} />,
+  },
+  {
+    label: "Role",
+    path: "/roles",
+    icon: <Role size={20} />,
+  },
+];
 
 export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();
   const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>(['cms']);
+  const [isOpen, setIsOpen] = useState(true);
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  // Sidebar collapse handler (hidden on mobile for simplicity)
+  const toggleSidebar = () => setIsOpen((o) => !o);
 
-  const toggleMobileSidebar = () => {
-    setIsMobileOpen(!isMobileOpen);
-  };
+  // Styles for active states & gradients
+  const activeGradient = "bg-gradient-to-r from-[#4948d2] to-[#457fff]";
+  const labelColor = "text-[#d8eafe]";
+  const iconColor = "text-[#d8eafe]";
+  const sectionLabel = "uppercase tracking-wide text-white/80 text-xs font-semibold mb-2 mt-2";
 
-  const toggleItemExpansion = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId) 
-        : [...prev, itemId]
-    );
-  };
-
-  const sidebarItems = [
-    { id: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/dashboard" },
-    { id: "users", icon: <UserRound size={20} />, label: "Users", path: "/users" },
-    { id: "roles", icon: <Users size={20} />, label: "Roles", path: "/roles" },
-    { id: "targets", icon: <Target size={20} />, label: "Targets", path: "/targets" },
-    { id: "projects", icon: <Folder size={20} />, label: "Projects", path: "/projects" },
-    { id: "user-tasks", icon: <UserCheck size={20} />, label: "User Tasks", path: "/user-tasks" },
-    { id: "leads", icon: <PhoneCall size={20} />, label: "Leads", path: "/leads" },
-    { id: "organizations", icon: <Building size={20} />, label: "Organizations", path: "/organizations" },
-    { id: "linkedin", icon: <Linkedin size={20} />, label: "LinkedIn", path: "/linkedin" },
-    { id: "events", icon: <Calendar size={20} />, label: "Events", path: "/calendar" },
-    { 
-      id: "cms", 
-      icon: <FileText size={20} />, 
-      label: "CMS", 
-      path: "#", 
-      hasSubItems: true,
-      subItems: [
-        { label: "Content List", path: "/cms/list" },
-        { label: "Mail List", path: "/cms-mail/list" }
-      ]
-    },
-    { id: "deals", icon: <BadgePercent size={20} />, label: "Deals", path: "/deals" },
-    { id: "reports", icon: <BarChart size={20} />, label: "Reports", path: "/reports" },
-    { id: "settings", icon: <Settings size={20} />, label: "Settings", path: "/settings" },
-  ];
-
-  const renderSidebarContent = () => (
-    <>
-      <div className="px-3 py-4">
-        <div className={cn(
-          "flex items-center",
-          isCollapsed ? "justify-center" : "justify-between"
-        )}>
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <Icons.logo className="h-6 w-6 text-sidebar-primary" />
-              <h1 className="text-xl font-bold text-sidebar-primary">Aura CRM</h1>
-            </div>
-          )}
-          {isCollapsed && (
-            <Icons.logo className="h-6 w-6 text-sidebar-primary" />
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
-            >
-              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-1 px-3 py-2 flex-1">
-        {sidebarItems.map((item) => (
-          <div key={item.id} className="flex flex-col">
-            {item.hasSubItems ? (
-              <>
-                <div 
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md transition-all cursor-pointer",
-                    location.pathname.includes(item.id.toLowerCase())
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
-                    isCollapsed && "justify-center"
-                  )}
-                  onClick={() => !isCollapsed && toggleItemExpansion(item.id)}
-                >
-                  {item.icon}
-                  {!isCollapsed && (
-                    <>
-                      <span className="flex-1">{item.label}</span>
-                      <ChevronRight 
-                        size={16} 
-                        className={cn(
-                          "transition-transform",
-                          expandedItems.includes(item.id) && "transform rotate-90"
-                        )}
-                      />
-                    </>
-                  )}
-                </div>
-                {!isCollapsed && expandedItems.includes(item.id) && (
-                  <div className="mt-1 space-y-1">
-                    {item.subItems?.map((subItem) => (
-                      <SidebarSubItem
-                        key={subItem.path}
-                        label={subItem.label}
-                        path={subItem.path}
-                        isCollapsed={isCollapsed}
-                        isActive={location.pathname === subItem.path}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <SidebarItem
-                icon={item.icon}
-                label={item.label}
-                path={item.path}
-                isCollapsed={isCollapsed}
-                isActive={location.pathname === item.path}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className={cn(
-        "p-3 border-t border-sidebar-border mt-auto",
-        isCollapsed ? "text-center" : ""
-      )}>
-        {!isCollapsed && (
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
-              <span className="text-sm font-medium text-sidebar-accent-foreground">
-                {user?.name?.charAt(0) || "U"}
-              </span>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email || ""}</p>
-            </div>
-          </div>
-        )}
-        <Button
-          variant="ghost"
-          className={cn(
-            "flex items-center gap-2 w-full justify-start text-sidebar-foreground",
-            isCollapsed && "justify-center"
-          )}
-          onClick={logout}
-        >
-          <LogOut size={18} />
-          {!isCollapsed && <span>Sign out</span>}
-        </Button>
-      </div>
-    </>
-  );
-
-  // Mobile sidebar toggle button
-  const MobileToggle = () => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="md:hidden fixed top-4 left-4 z-50"
-      onClick={toggleMobileSidebar}
-    >
-      <Menu />
-    </Button>
-  );
-
-  if (isMobile) {
-    return (
-      <>
-        <MobileToggle />
-        {/* Mobile sidebar - overlay style */}
-        {isMobileOpen && (
-          <div className="fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar} />
-        )}
-        <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 transform",
-            isMobileOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          {renderSidebarContent()}
-        </aside>
-      </>
-    );
-  }
-
+  // Main sidebar JSX
   return (
     <aside
       className={cn(
-        "bg-sidebar border-r border-sidebar-border h-screen sticky top-0 overflow-y-auto transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
+        "flex flex-col bg-gradient-to-br from-[#161F33] to-[#25284B] h-screen w-72 px-5 py-6 relative transition-all duration-300",
+        !isOpen && "w-16 px-1"
       )}
+      style={{ minWidth: isOpen ? "14rem" : "3.5rem" }}
     >
-      {renderSidebarContent()}
+      {/* App Title */}
+      <div className="flex items-center mb-5 h-10">
+        <span
+          className="text-2xl font-extrabold"
+          style={{
+            background: "linear-gradient(90deg, #4effa2 0%, #6366f1 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Ensar
+        </span>
+        <span
+          className="text-2xl font-extrabold"
+          style={{
+            background: "linear-gradient(90deg, #6366f1 0%, #203fa1 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            marginLeft: 2,
+          }}
+        >
+          CRM
+        </span>
+        <button
+          onClick={toggleSidebar}
+          className="ml-auto text-white/70 hover:text-white rounded-full flex items-center justify-center p-1 focus:outline-none"
+          aria-label="Toggle sidebar"
+        >
+          <svg width="20" height="20" fill="none">
+            <path d="M8 5l4 5-4 5" stroke="#b4baff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Premium Card */}
+      {isOpen && <PremiumCard />}
+
+      {/* Dashboard Link */}
+      <nav className="mb-3">
+        <Link
+          to="/dashboard"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 rounded-lg font-medium mb-2 transition",
+            location.pathname === "/dashboard" ? activeGradient + " text-white" : iconColor + " hover:bg-white/10"
+          )}
+        >
+          <LayoutDashboard size={20} />
+          {isOpen && <span className="ml-1">Dashboard</span>}
+        </Link>
+
+        {/* User Management Group */}
+        <div>
+          <div className="flex items-center gap-2 mt-2 mb-1">
+            <Users size={20} className="text-white" />
+            {isOpen && <span className="font-semibold text-white">User Management</span>}
+          </div>
+          <div className={isOpen ? "ml-6 border-l border-white/10 pb-2" : ""}>
+            {userManagementLinks.map(({ label, path, icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={cn(
+                  "flex items-center gap-3 px-2 py-1 rounded-md mb-1 transition-colors",
+                  location.pathname === path ? "text-white bg-white/10" : labelColor + " hover:bg-white/5"
+                )}
+              >
+                {icon}
+                {isOpen && <span>{label}</span>}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Management Group */}
+        <div>
+          <div className="flex items-center gap-2 mt-3 mb-1">
+            <Briefcase size={20} className="text-white" />
+            {isOpen && <span className="font-semibold text-white">Management</span>}
+          </div>
+          <div className={isOpen ? "ml-6 border-l border-white/10 pb-2" : ""}>
+            {managementLinks.map(({ label, path, icon, badge }) => (
+              <Link
+                key={path}
+                to={path}
+                className={cn(
+                  "flex items-center gap-3 px-2 py-1 rounded-md mb-1 relative",
+                  location.pathname === path
+                    ? activeGradient + " text-white"
+                    : labelColor + " hover:bg-white/5"
+                )}
+              >
+                {icon}
+                {isOpen && (
+                  <>
+                    <span>{label}</span>
+                    {badge && (
+                      <span className="ml-auto bg-gradient-to-r from-[#4948d2] to-[#457fff] text-white text-xs font-semibold rounded-full px-3 py-0.5">
+                        {badge}
+                      </span>
+                    )}
+                  </>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* User profile + logout */}
+      {isOpen && (
+        <div className="mb-2 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#32346e] to-[#224899] flex items-center justify-center">
+            <span className="text-lg font-bold text-white/80">
+              {user?.name?.charAt(0) || "U"}
+            </span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-xs font-semibold text-white/80 truncate">{user?.name || "User"}</p>
+            <p className="text-xs text-white/50 truncate">{user?.email || ""}</p>
+          </div>
+        </div>
+      )}
+      <button
+        className={cn(
+          "flex items-center gap-2 w-full justify-start text-white/70 hover:bg-white/5 rounded-lg px-3 py-2 transition",
+          !isOpen && "justify-center"
+        )}
+        onClick={logout}
+      >
+        <svg width="18" height="18" fill="none">
+          <path d="M15 3v2a4 4 0 0 1-4 4H5m8-6l3 3m0 0l-3 3m3-3H9" stroke="#b4baff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        {isOpen && <span>Sign out</span>}
+      </button>
     </aside>
   );
 }
