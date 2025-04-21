@@ -12,13 +12,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background blue-white-gradient">
       <Sidebar />
       <main className={cn(
-        "flex-1 overflow-y-auto",
+        "flex-1 overflow-y-auto blue-white-gradient",
         isMobile ? "pt-16" : "" // Add padding for the mobile toggle button
       )}>
-        <div className="container mx-auto p-4 md:p-6">
+        <div className="container mx-auto p-4 md:p-6 blue-white-gradient rounded-xl shadow-lg">
           {children}
         </div>
       </main>

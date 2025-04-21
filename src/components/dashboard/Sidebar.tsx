@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -131,7 +130,7 @@ export function Sidebar() {
   ];
 
   const renderSidebarContent = () => (
-    <>
+    <div className="h-full flex flex-col blue-white-gradient">
       <div className="px-3 py-4">
         <div className={cn(
           "flex items-center",
@@ -217,7 +216,8 @@ export function Sidebar() {
 
       <div className={cn(
         "p-3 border-t border-sidebar-border mt-auto",
-        isCollapsed ? "text-center" : ""
+        isCollapsed ? "text-center" : "",
+        "bg-white/60"
       )}>
         {!isCollapsed && (
           <div className="flex items-center gap-3 mb-3">
@@ -244,10 +244,9 @@ export function Sidebar() {
           {!isCollapsed && <span>Sign out</span>}
         </Button>
       </div>
-    </>
+    </div>
   );
 
-  // Mobile sidebar toggle button
   const MobileToggle = () => (
     <Button
       variant="ghost"
@@ -263,13 +262,12 @@ export function Sidebar() {
     return (
       <>
         <MobileToggle />
-        {/* Mobile sidebar - overlay style */}
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar} />
         )}
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 transform",
+            "fixed inset-y-0 left-0 z-40 w-64 blue-white-gradient transition-transform duration-300 transform",
             isMobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -282,7 +280,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-sidebar border-r border-sidebar-border h-screen sticky top-0 overflow-y-auto transition-all duration-300",
+        "blue-white-gradient border-r border-sidebar-border h-screen sticky top-0 overflow-y-auto transition-all duration-300",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
