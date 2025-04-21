@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -47,7 +46,7 @@ export function Sidebar() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  // Structure menu as in the screenshot
+  // Sidebar modules configuration
   const menu = [
     {
       group: null,
@@ -63,40 +62,23 @@ export function Sidebar() {
     {
       group: "User Management",
       items: [
-        { label: "User", icon: User, path: "/users", key: "user" },
-        { label: "Organization", icon: Users, path: "/organizations", key: "organization" },
-        { label: "Role", icon: Shield, path: "/roles", key: "role" }
+        { label: "Users", icon: Users, path: "/users", key: "users" },
+        { label: "Organizations", icon: Users, path: "/organizations", key: "organizations" },
+        { label: "Roles", icon: Shield, path: "/roles", key: "roles" }
+      ]
+    },
+    {
+      group: "LinkedIn & Targets",
+      items: [
+        { label: "LinkedIn", icon: Linkedin, path: "/linkedin", key: "linkedin", badge: 3 },
+        { label: "Targets", icon: Target, path: "/targets", key: "targets", isPremium: true }
       ]
     },
     {
       group: "Management",
       items: [
-        {
-          label: "LinkedIn",
-          icon: Linkedin,
-          path: "/linkedin",
-          key: "linkedin",
-          badge: 3 // Example badge
-        },
-        {
-          label: "Target",
-          icon: Target,
-          path: "/targets",
-          key: "target",
-          isPremium: true
-        },
-        {
-          label: "Events",
-          icon: CalendarDays,
-          path: "/calendar",
-          key: "events"
-        },
-        {
-          label: "Lead",
-          icon: Contact,
-          path: "/leads",
-          key: "lead"
-        }
+        { label: "Calendar", icon: CalendarDays, path: "/calendar", key: "calendar" },
+        { label: "Leads", icon: Contact, path: "/leads", key: "leads" }
       ]
     }
   ];
@@ -182,10 +164,8 @@ export function Sidebar() {
                 );
               })}
             </ul>
-            {/* Divider after User/Management group */}
-            {section.group === "Role" || (section.group === "Management" && idx !== menu.length - 1) ? (
-              <div className={SIDEBAR_SECTION_DIVIDER}></div>
-            ) : null}
+            {/* Section divider, only if not last group */}
+            {idx < menu.length - 1 ? <div className={SIDEBAR_SECTION_DIVIDER}></div> : null}
           </div>
         ))}
       </nav>
@@ -241,5 +221,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
-// ... no export default to avoid confusion
