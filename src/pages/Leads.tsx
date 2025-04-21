@@ -22,7 +22,7 @@ import { leadService } from "@/modules/leads/services/leadService";
 import { ILead } from "@/modules/leads/types";
 import { LeadForm } from "@/modules/leads/components/LeadForm";
 import LeadHeader from "@/modules/leads/components/LeadHeader";
-import { LeadToolbar } from "@/modules/leads/components/LeadToolbar";
+import LeadToolbar from "@/modules/leads/components/LeadToolbar";
 import LeadTable from "@/modules/leads/components/LeadTable";
 import { adaptOrganizationsForLeads } from "@/modules/common/adapters/organizationAdapter";
 
@@ -139,11 +139,6 @@ const Leads = () => {
     }
   };
 
-  const handleCreateNewLead = () => {
-    setLeadToEdit(null);
-    setShowNewLeadForm(true);
-  };
-
   const filteredLeads = leads.filter(lead => 
     `${lead.firstname} ${lead.lastname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -159,7 +154,11 @@ const Leads = () => {
     <DashboardLayout>
       <div className="flex flex-col gap-6">
         <LeadToolbar 
-          onCreate={handleCreateNewLead}
+          onSearchChange={handleSearchChange}
+          onNewLead={() => {
+            setLeadToEdit(null);
+            setShowNewLeadForm(true);
+          }}
         />
         
         <LeadHeader 
