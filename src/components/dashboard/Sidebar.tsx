@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PremiumCard } from "./PremiumCard";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, Users, User, Building, Role, Linkedin, Target, Calendar, User as UserIcon, Briefcase, BarChart, PhoneCall } from "lucide-react";
+import { LayoutDashboard, Users, User, Building, Shield, Linkedin, Target, Calendar, User as UserIcon, Briefcase, BarChart, PhoneCall } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Sidebar menu config
@@ -46,7 +45,7 @@ const userManagementLinks = [
   {
     label: "Role",
     path: "/roles",
-    icon: <Role size={20} />,
+    icon: <Shield size={20} />,
   },
 ];
 
