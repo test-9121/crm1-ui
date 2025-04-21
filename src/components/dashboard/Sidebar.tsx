@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -12,20 +13,22 @@ import {
   CalendarDays,
   Contact,
   HelpCircle,
-  LogOut
+  LogOut,
+  X,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-// Sidebar colors
+// Sidebar colors & styles
 const SIDEBAR_BG = "bg-gradient-to-b from-[#181f32] via-[#181b28] to-[#111522]";
 const SIDEBAR_CARD_BG = "bg-[#1C2236]";
 const SIDEBAR_ACCENT = "text-[#4A95F7]";
 const SIDEBAR_TITLE = "text-[#7EE38B] font-bold";
 const SIDEBAR_TITLE_ACCENT = "text-[#5D5FDB] font-bold";
 const SIDEBAR_ICON = "text-white";
-const SIDEBAR_GROUP_LABEL = "uppercase tracking-wide text-xs text-[#D0D8F6] font-semibold mb-1 mt-4";
-const SIDEBAR_MENU = "flex items-center gap-3 py-2 px-3 rounded-lg transition-all hover:bg-[#222a41]";
+const SIDEBAR_GROUP_LABEL = "uppercase tracking-wide text-xs text-[#D0D8F6] font-semibold mb-1 mt-4 px-2";
+const SIDEBAR_MENU = "flex items-center gap-3 py-2 px-3 rounded-lg transition-all hover:bg-[#222a41] cursor-pointer";
 const SIDEBAR_MENU_ACTIVE = "bg-[#404C8C] text-white";
 const SIDEBAR_MENU_LABEL = "font-medium text-white text-[16px] leading-none";
 const SIDEBAR_MENU_INACTIVE_ICON = "text-[#B0BADB]";
@@ -44,9 +47,8 @@ export function Sidebar() {
   const location = useLocation();
   const { logout } = useAuth();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
 
-  // Sidebar modules configuration
+  // Sidebar menu configuration
   const menu = [
     {
       group: null,
@@ -83,40 +85,49 @@ export function Sidebar() {
     }
   ];
 
-  // Mobile sidebar toggle
+  // Sidebar open state for mobile
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Animated open/collapse for mobile toggle
   const MobileToggle = () => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="md:hidden fixed top-4 left-4 z-50"
-      onClick={() => setIsMobileOpen((o) => !o)}
-    >
-      <svg width={24} height={24} fill="none" stroke="#fff" strokeWidth="2"><rect width="20" height="2" x="2" y="5" rx="1" /><rect width="20" height="2" x="2" y="11" rx="1" /><rect width="20" height="2" x="2" y="17" rx="1" /></svg>
-    </Button>
+    !isMobileOpen && (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden fixed top-3 left-3 z-50 bg-[#161b29] p-2 rounded-full shadow-lg group transition hover:bg-[#232944] animate-fade-in"
+        onClick={() => setIsMobileOpen(true)}
+        aria-label="Open sidebar"
+      >
+        <ChevronRight className="text-white group-hover:text-[#4A95F7] transition" />
+      </Button>
+    )
   );
 
-  const sidebarContent = (
-    <div className={cn("flex flex-col h-full w-full", SIDEBAR_BG)}>
-      {/* Header: Brand and close on mobile */}
-      <div className="px-5 pt-7 pb-1 flex items-center gap-2 justify-between">
+  // Close button with hover/focus effect
+  const MobileCloseBtn = () => (
+    <button
+      onClick={() => setIsMobileOpen(false)}
+      className="absolute top-4 right-4 z-50 flex items-center justify-center bg-[#181b28] text-white hover:text-red-400 transition rounded-full p-2 shadow-lg focus:outline-none animate-fade-in"
+      aria-label="Close sidebar"
+    >
+      <X size={22} />
+    </button>
+  );
+
+  // Sidebar scrollable content
+  const ScrollableSidebarContent = (
+    <div className={cn("h-full w-full flex flex-col", SIDEBAR_BG)}>
+      <div className="px-5 pt-7 pb-1 flex items-center gap-2 justify-between relative">
         <div className="flex-1 flex gap-1 items-center text-[1.6rem] font-bold">
           <span className={SIDEBAR_TITLE}>Ensar</span>
           <span className={SIDEBAR_TITLE_ACCENT}>CRM</span>
         </div>
-        {/* Collapse for desktop, close for mobile */}
-        {!isMobile ? null : (
-          <Button size="icon" variant="ghost" onClick={() => setIsMobileOpen(false)}>
-            <svg width={18} height={18} fill="none" stroke="#fff" strokeWidth="3"><path d="M4 4l10 10M4 14L14 4" /></svg>
-          </Button>
-        )}
+        {isMobile && <MobileCloseBtn />}
       </div>
-
       {/* Premium card */}
       <div className={cn(SIDEBAR_CARD_BG, SIDEBAR_CARD, "mt-2 mx-3 mb-5")}>
         <div className="flex gap-3 items-center">
           <span className="bg-gradient-to-br from-[#6698FF] to-[#8A72F7] w-11 h-11 rounded-full flex items-center justify-center">
-            {/* Sparkle/star icon */}
             <svg width={28} height={28} viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="none"/><path d="M14 7v5m0 0l2.22 1.3m-2.22-1.3l-2.22 1.3m2.22-1.3v7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><circle cx="14" cy="17" r="1" fill="#fff"/></svg>
           </span>
           <div>
@@ -132,59 +143,57 @@ export function Sidebar() {
           <div className={SIDEBAR_USAGE_BAR + " absolute top-0 left-0 h-2 rounded-lg"} style={{ width: "78%" }} />
         </div>
       </div>
-      
-      {/* Sections */}
-      <nav className="flex-1 flex flex-col gap-0 mt-2">
-        {menu.map((section, idx) => (
-          <div key={idx}>
-            {section.group && (
-              <div className={SIDEBAR_GROUP_LABEL}>{section.group}</div>
-            )}
-            <ul>
-              {section.items.map((item) => {
-                const isActive = location.pathname.startsWith(item.path);
-                return (
-                  <li key={item.key} className="relative">
-                    <Link
-                      to={item.path}
-                      className={cn(
-                        SIDEBAR_MENU,
-                        isActive ? SIDEBAR_MENU_ACTIVE : "text-white",
-                        isActive && item.isPremium ? "bg-gradient-to-r from-[#536BEB] to-[#4A95F7]" : "",
-                        "gap-3 my-1"
-                      )}
-                    >
-                      <item.icon className={cn("w-5 h-5", isActive ? "text-white" : SIDEBAR_MENU_INACTIVE_ICON)} />
-                      <span className={SIDEBAR_MENU_LABEL}>{item.label}</span>
-                      {item.badge && (
-                        <span className={SIDEBAR_BADGE}>{item.badge}</span>
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            {/* Section divider, only if not last group */}
-            {idx < menu.length - 1 ? <div className={SIDEBAR_SECTION_DIVIDER}></div> : null}
+      {/* Menu & content scroll area */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#292e4a] scrollbar-track-[#181f32] px-1 pb-2">
+        <nav className="flex flex-col gap-0 mt-2">
+          {menu.map((section, idx) => (
+            <div key={idx}>
+              {section.group && (
+                <div className={SIDEBAR_GROUP_LABEL}>{section.group}</div>
+              )}
+              <ul>
+                {section.items.map((item) => {
+                  const isActive = location.pathname.startsWith(item.path);
+                  return (
+                    <li key={item.key} className="relative">
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          SIDEBAR_MENU,
+                          isActive ? SIDEBAR_MENU_ACTIVE : "text-white",
+                          isActive && item.isPremium ? "bg-gradient-to-r from-[#536BEB] to-[#4A95F7]" : "",
+                          "gap-3 my-1"
+                        )}
+                      >
+                        <item.icon className={cn("w-5 h-5", isActive ? "text-white" : SIDEBAR_MENU_INACTIVE_ICON)} />
+                        <span className={SIDEBAR_MENU_LABEL}>{item.label}</span>
+                        {item.badge && (
+                          <span className={SIDEBAR_BADGE}>{item.badge}</span>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {idx < menu.length - 1 ? <div className={SIDEBAR_SECTION_DIVIDER}></div> : null}
+            </div>
+          ))}
+        </nav>
+        {/* Help/support card */}
+        <div className={cn(SIDEBAR_HELP_CARD_BG, SIDEBAR_CARD, "mx-3 my-5 flex-row items-center gap-3 py-3 px-4")}>
+          <span className={SIDEBAR_HELP_ICON_BG}>
+            <HelpCircle className="w-6 h-6 text-[#A6B0D6]" />
+          </span>
+          <div>
+            <span className="text-white font-semibold block text-sm">Need Help?</span>
+            <span className="text-xs text-[#B0BADB] block mt-0.5">Contact support team</span>
           </div>
-        ))}
-      </nav>
-
-      {/* Help/support card */}
-      <div className={cn(SIDEBAR_HELP_CARD_BG, SIDEBAR_CARD, "mx-3 my-5 flex-row items-center gap-3 py-3 px-4")}>
-        <span className={SIDEBAR_HELP_ICON_BG}>
-          <HelpCircle className="w-6 h-6 text-[#A6B0D6]" />
-        </span>
-        <div>
-          <span className="text-white font-semibold block text-sm">Need Help?</span>
-          <span className="text-xs text-[#B0BADB] block mt-0.5">Contact support team</span>
         </div>
       </div>
-      
       {/* Logout */}
       <Button
         variant="ghost"
-        className={cn("w-full flex items-center gap-2 justify-start mb-4 mt-auto px-6 py-3", SIDEBAR_LOGOUT)}
+        className={cn("w-full flex items-center gap-2 justify-start mb-4 mt-auto px-6 py-3", SIDEBAR_LOGOUT, "transition")}
         onClick={logout}
       >
         <LogOut className="w-5 h-5" />
@@ -193,31 +202,45 @@ export function Sidebar() {
     </div>
   );
 
+  // Responsive sidebar layout
   if (isMobile) {
     return (
       <>
         <MobileToggle />
         {isMobileOpen && (
-          <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileOpen(false)} />
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
+              onClick={() => setIsMobileOpen(false)}
+              aria-label="Close sidebar"
+              tabIndex={-1}
+            />
+            {/* Animated sidebar */}
+            <aside
+              className={cn(
+                "fixed inset-y-0 left-0 z-50 w-72 max-w-full shadow-xl transition-transform duration-300",
+                SIDEBAR_BG,
+                isMobileOpen ? "translate-x-0 animate-slide-in-right" : "-translate-x-full",
+                "flex flex-col h-full"
+              )}
+              style={{ maxWidth: 320 }}
+            >
+              {ScrollableSidebarContent}
+            </aside>
+          </>
         )}
-        <aside className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72",
-          SIDEBAR_BG,
-          "transition-transform duration-300 transform",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
-        )}>
-          {sidebarContent}
-        </aside>
       </>
     );
   }
 
+  // Desktop
   return (
     <aside className={cn(
       SIDEBAR_BG,
-      "w-72 min-h-screen h-full flex flex-col sticky top-0 z-30"
+      "w-72 min-h-screen h-full flex flex-col sticky top-0 z-30 px-0 py-0"
     )}>
-      {sidebarContent}
+      {ScrollableSidebarContent}
     </aside>
   );
 }
