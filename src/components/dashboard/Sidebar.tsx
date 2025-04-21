@@ -8,17 +8,17 @@ import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, 
   ChevronRight,
-  // Icons allowed below
-  "dashboard" as DashboardIcon,
-  "user" as UserIcon,
-  "users" as UsersIcon,
-  "organization" as OrganizationIcon,
-  "role" as RoleIcon,
-  "linkedin" as LinkedinIcon,
-  "target" as TargetIcon,
-  "events" as EventsIcon,
-  "lead" as LeadIcon,
-  "logout" as LogoutIcon,
+  // Icons with proper names from lucide-react
+  LayoutDashboard,
+  User, 
+  Users, 
+  Building2, // replacement for organization
+  Shield, // replacement for role
+  Linkedin, 
+  Target, 
+  CalendarDays, // replacement for events
+  Contact, // replacement for lead
+  LogOut, // replacement for logout
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -27,18 +27,18 @@ const sections = [
   {
     header: "User Management",
     items: [
-      { id: "user", icon: <UserIcon size={20} />, label: "User", path: "/users" },
-      { id: "organization", icon: <OrganizationIcon size={20} />, label: "Organization", path: "/organizations" },
-      { id: "role", icon: <UsersIcon size={20} />, label: "Role", path: "/roles" },
+      { id: "user", icon: <User size={20} />, label: "User", path: "/users" },
+      { id: "organization", icon: <Building2 size={20} />, label: "Organization", path: "/organizations" },
+      { id: "role", icon: <Shield size={20} />, label: "Role", path: "/roles" },
     ],
   },
   {
     header: "Management",
     items: [
-      { id: "linkedin", icon: <LinkedinIcon size={20} />, label: "LinkedIn", path: "/linkedin", badge: 3 },
-      { id: "target", icon: <TargetIcon size={20} />, label: "Target", path: "/targets" },
-      { id: "events", icon: <EventsIcon size={20} />, label: "Events", path: "/calendar" },
-      { id: "lead", icon: <LeadIcon size={20} />, label: "Lead", path: "/leads" },
+      { id: "linkedin", icon: <Linkedin size={20} />, label: "LinkedIn", path: "/linkedin", badge: 3 },
+      { id: "target", icon: <Target size={20} />, label: "Target", path: "/targets" },
+      { id: "events", icon: <CalendarDays size={20} />, label: "Events", path: "/calendar" },
+      { id: "lead", icon: <Contact size={20} />, label: "Lead", path: "/leads" },
     ],
   },
 ];
@@ -198,7 +198,7 @@ export function Sidebar() {
         )}
         onClick={logout}
       >
-        <LogoutIcon size={18} />
+        <LogOut size={18} />
         {!isCollapsed && <span>Logout</span>}
       </Button>
     </div>
@@ -210,7 +210,7 @@ export function Sidebar() {
       <BrandHeader />
       <PremiumCard />
       <SidebarItem
-        icon={<DashboardIcon size={20} />}
+        icon={<LayoutDashboard size={20} />}
         label={"Dashboard"}
         path={"/dashboard"}
         isCollapsed={isCollapsed}
