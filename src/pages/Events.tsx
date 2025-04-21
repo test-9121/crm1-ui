@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown, Plus } from 'lucide-react';
 import { format } from 'date-fns';
+import { PremiumFeatureCard } from "@/components/dashboard/PremiumFeatureCard";
 
 export default function Events() {
   const { allEvents, createEvent, updateEvent, deleteEvent } = useEvents();
@@ -135,6 +135,12 @@ export default function Events() {
             onDateSelect={handleDateSelect}
             loading={allEvents.isLoading}
           />
+        </div>
+
+        <div className="flex justify-end items-center">
+          <div style={{ width: 360 }}>
+            <PremiumFeatureCard />
+          </div>
         </div>
 
         {isModalOpen && (
