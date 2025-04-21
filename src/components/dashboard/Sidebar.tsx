@@ -1,292 +1,245 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { Icons } from "@/components/ui/icons";
-import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Users, 
-  BadgePercent, 
-  PhoneCall, 
-  Calendar, 
-  BarChart, 
-  Settings, 
-  LogOut, 
-  ChevronLeft, 
-  ChevronRight, 
-  Menu,
-  Building,
-  UserRound,
+import {
+  LayoutDashboard,
+  User,
+  Organization,
+  Role,
   Linkedin,
   Target,
-  Folder,
-  UserCheck,
-  Mail,
-  FileText
+  Events,
+  Lead,
+  HelpCircle,
+  LogOut
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  path: string;
-  isCollapsed: boolean;
-  isActive: boolean;
-}
+// Sidebar colors
+const SIDEBAR_BG = "bg-gradient-to-b from-[#181f32] via-[#181b28] to-[#111522]";
+const SIDEBAR_CARD_BG = "bg-[#1C2236]";
+const SIDEBAR_ACCENT = "text-[#4A95F7]";
+const SIDEBAR_TITLE = "text-[#7EE38B] font-bold";
+const SIDEBAR_TITLE_ACCENT = "text-[#5D5FDB] font-bold";
+const SIDEBAR_ICON = "text-white";
+const SIDEBAR_GROUP_LABEL = "uppercase tracking-wide text-xs text-[#D0D8F6] font-semibold mb-1 mt-4";
+const SIDEBAR_MENU = "flex items-center gap-3 py-2 px-3 rounded-lg transition-all hover:bg-[#222a41]";
+const SIDEBAR_MENU_ACTIVE = "bg-[#404C8C] text-white";
+const SIDEBAR_MENU_LABEL = "font-medium text-white text-[16px] leading-none";
+const SIDEBAR_MENU_INACTIVE_ICON = "text-[#B0BADB]";
+const SIDEBAR_LOGOUT = "text-[#B0BADB] hover:bg-[#181f32] hover:text-white";
+const SIDEBAR_BADGE = "bg-[#4A64F7] text-white text-xs font-semibold px-2 py-0.5 rounded-full ml-2";
+const SIDEBAR_SECTION_DIVIDER = "w-full h-px bg-[#232944] my-2";
 
-interface SidebarSubItemProps {
-  label: string;
-  path: string;
-  isCollapsed: boolean;
-  isActive: boolean;
-}
-
-const SidebarItem = ({ icon, label, path, isCollapsed, isActive }: SidebarItemProps) => {
-  return (
-    <Link 
-      to={path} 
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-md transition-all",
-        isActive 
-          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
-        isCollapsed && "justify-center"
-      )}
-    >
-      {icon}
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  );
-};
-
-const SidebarSubItem = ({ label, path, isCollapsed, isActive }: SidebarSubItemProps) => {
-  if (isCollapsed) return null;
-  
-  return (
-    <Link 
-      to={path} 
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 ml-6 rounded-md transition-all",
-        isActive 
-          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-      )}
-    >
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  );
-};
+// Premium plan card and Help card styling
+const SIDEBAR_CARD = "rounded-2xl px-4 py-4 flex flex-col gap-2 shadow-sm";
+const SIDEBAR_USAGE_BAR_BG = "bg-[#242D51]";
+const SIDEBAR_USAGE_BAR = "bg-gradient-to-r from-[#5285F6] to-[#7563F7]";
+const SIDEBAR_HELP_CARD_BG = "bg-[#1C2236]";
+const SIDEBAR_HELP_ICON_BG = "bg-[#252D47] rounded-full flex items-center justify-center w-8 h-8";
 
 export function Sidebar() {
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>(['cms']);
+  const navigate = useNavigate();
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const toggleMobileSidebar = () => {
-    setIsMobileOpen(!isMobileOpen);
-  };
-
-  const toggleItemExpansion = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId) 
-        : [...prev, itemId]
-    );
-  };
-
-  const sidebarItems = [
-    { id: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/dashboard" },
-    { id: "users", icon: <UserRound size={20} />, label: "Users", path: "/users" },
-    { id: "roles", icon: <Users size={20} />, label: "Roles", path: "/roles" },
-    { id: "targets", icon: <Target size={20} />, label: "Targets", path: "/targets" },
-    { id: "projects", icon: <Folder size={20} />, label: "Projects", path: "/projects" },
-    { id: "user-tasks", icon: <UserCheck size={20} />, label: "User Tasks", path: "/user-tasks" },
-    { id: "leads", icon: <PhoneCall size={20} />, label: "Leads", path: "/leads" },
-    { id: "organizations", icon: <Building size={20} />, label: "Organizations", path: "/organizations" },
-    { id: "linkedin", icon: <Linkedin size={20} />, label: "LinkedIn", path: "/linkedin" },
-    { id: "events", icon: <Calendar size={20} />, label: "Events", path: "/calendar" },
-    { 
-      id: "cms", 
-      icon: <FileText size={20} />, 
-      label: "CMS", 
-      path: "#", 
-      hasSubItems: true,
-      subItems: [
-        { label: "Content List", path: "/cms/list" },
-        { label: "Mail List", path: "/cms-mail/list" }
+  // Structure menu as in the screenshot
+  const menu = [
+    {
+      group: null,
+      items: [
+        {
+          label: "Dashboard",
+          icon: LayoutDashboard,
+          path: "/dashboard",
+          key: "dashboard"
+        }
       ]
     },
-    { id: "deals", icon: <BadgePercent size={20} />, label: "Deals", path: "/deals" },
-    { id: "reports", icon: <BarChart size={20} />, label: "Reports", path: "/reports" },
-    { id: "settings", icon: <Settings size={20} />, label: "Settings", path: "/settings" },
+    {
+      group: "User Management",
+      items: [
+        { label: "User", icon: User, path: "/users", key: "user" },
+        { label: "Organization", icon: Organization, path: "/organizations", key: "organization" },
+        { label: "Role", icon: Role, path: "/roles", key: "role" }
+      ]
+    },
+    {
+      group: "Management",
+      items: [
+        {
+          label: "LinkedIn",
+          icon: Linkedin,
+          path: "/linkedin",
+          key: "linkedin",
+          badge: 3 // Example badge
+        },
+        {
+          label: "Target",
+          icon: Target,
+          path: "/targets",
+          key: "target",
+          isPremium: true
+        },
+        {
+          label: "Events",
+          icon: Events,
+          path: "/calendar",
+          key: "events"
+        },
+        {
+          label: "Lead",
+          icon: Lead,
+          path: "/leads",
+          key: "lead"
+        }
+      ]
+    }
   ];
 
-  const renderSidebarContent = () => (
-    <>
-      <div className="px-3 py-4">
-        <div className={cn(
-          "flex items-center",
-          isCollapsed ? "justify-center" : "justify-between"
-        )}>
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <Icons.logo className="h-6 w-6 text-sidebar-primary" />
-              <h1 className="text-xl font-bold text-sidebar-primary">Aura CRM</h1>
-            </div>
-          )}
-          {isCollapsed && (
-            <Icons.logo className="h-6 w-6 text-sidebar-primary" />
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
-            >
-              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-1 px-3 py-2 flex-1">
-        {sidebarItems.map((item) => (
-          <div key={item.id} className="flex flex-col">
-            {item.hasSubItems ? (
-              <>
-                <div 
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md transition-all cursor-pointer",
-                    location.pathname.includes(item.id.toLowerCase())
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
-                    isCollapsed && "justify-center"
-                  )}
-                  onClick={() => !isCollapsed && toggleItemExpansion(item.id)}
-                >
-                  {item.icon}
-                  {!isCollapsed && (
-                    <>
-                      <span className="flex-1">{item.label}</span>
-                      <ChevronRight 
-                        size={16} 
-                        className={cn(
-                          "transition-transform",
-                          expandedItems.includes(item.id) && "transform rotate-90"
-                        )}
-                      />
-                    </>
-                  )}
-                </div>
-                {!isCollapsed && expandedItems.includes(item.id) && (
-                  <div className="mt-1 space-y-1">
-                    {item.subItems?.map((subItem) => (
-                      <SidebarSubItem
-                        key={subItem.path}
-                        label={subItem.label}
-                        path={subItem.path}
-                        isCollapsed={isCollapsed}
-                        isActive={location.pathname === subItem.path}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <SidebarItem
-                icon={item.icon}
-                label={item.label}
-                path={item.path}
-                isCollapsed={isCollapsed}
-                isActive={location.pathname === item.path}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className={cn(
-        "p-3 border-t border-sidebar-border mt-auto",
-        isCollapsed ? "text-center" : ""
-      )}>
-        {!isCollapsed && (
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
-              <span className="text-sm font-medium text-sidebar-accent-foreground">
-                {user?.name?.charAt(0) || "U"}
-              </span>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email || ""}</p>
-            </div>
-          </div>
-        )}
-        <Button
-          variant="ghost"
-          className={cn(
-            "flex items-center gap-2 w-full justify-start text-sidebar-foreground",
-            isCollapsed && "justify-center"
-          )}
-          onClick={logout}
-        >
-          <LogOut size={18} />
-          {!isCollapsed && <span>Sign out</span>}
-        </Button>
-      </div>
-    </>
-  );
-
-  // Mobile sidebar toggle button
+  // Mobile sidebar toggle
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const MobileToggle = () => (
     <Button
       variant="ghost"
       size="icon"
       className="md:hidden fixed top-4 left-4 z-50"
-      onClick={toggleMobileSidebar}
+      onClick={() => setIsMobileOpen((o) => !o)}
     >
-      <Menu />
+      <svg width={24} height={24} fill="none" stroke="#fff" strokeWidth="2"><rect width="20" height="2" x="2" y="5" rx="1" /><rect width="20" height="2" x="2" y="11" rx="1" /><rect width="20" height="2" x="2" y="17" rx="1" /></svg>
     </Button>
+  );
+
+  const sidebarContent = (
+    <div className={cn("flex flex-col h-full w-full", SIDEBAR_BG)}>
+      {/* Header: Brand and close on mobile */}
+      <div className="px-5 pt-7 pb-1 flex items-center gap-2 justify-between">
+        <div className="flex-1 flex gap-1 items-center text-[1.6rem] font-bold">
+          <span className={SIDEBAR_TITLE}>Ensar</span>
+          <span className={SIDEBAR_TITLE_ACCENT}>CRM</span>
+        </div>
+        {/* Collapse for desktop, close for mobile */}
+        {!isMobile ? null : (
+          <Button size="icon" variant="ghost" onClick={() => setIsMobileOpen(false)}>
+            <svg width={18} height={18} fill="none" stroke="#fff" strokeWidth="3"><path d="M4 4l10 10M4 14L14 4" /></svg>
+          </Button>
+        )}
+      </div>
+
+      {/* Premium card */}
+      <div className={cn(SIDEBAR_CARD_BG, SIDEBAR_CARD, "mt-2 mx-3 mb-5")}>
+        <div className="flex gap-3 items-center">
+          <span className="bg-gradient-to-br from-[#6698FF] to-[#8A72F7] w-11 h-11 rounded-full flex items-center justify-center">
+            {/* Sparkle/star icon */}
+            <svg width={28} height={28} viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="none"/><path d="M14 7v5m0 0l2.22 1.3m-2.22-1.3l-2.22 1.3m2.22-1.3v7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><circle cx="14" cy="17" r="1" fill="#fff"/></svg>
+          </span>
+          <div>
+            <div className="text-white font-semibold">Premium Plan</div>
+            <div className="text-xs text-[#B0BADB] mt-0.5">Active until Jul 2025</div>
+          </div>
+        </div>
+        <div className="pt-2 text-sm flex justify-between items-center text-[#B0BADB]">
+          <span>Usage</span>
+          <span className="font-semibold text-[#D1D7FF]">78%</span>
+        </div>
+        <div className={cn(SIDEBAR_USAGE_BAR_BG, "w-full rounded-lg h-2 mt-1 relative")}>
+          <div className={SIDEBAR_USAGE_BAR + " absolute top-0 left-0 h-2 rounded-lg"} style={{ width: "78%" }} />
+        </div>
+      </div>
+      
+      {/* Sections */}
+      <nav className="flex-1 flex flex-col gap-0 mt-2">
+        {menu.map((section, idx) => (
+          <div key={idx}>
+            {section.group && (
+              <div className={SIDEBAR_GROUP_LABEL}>{section.group}</div>
+            )}
+            <ul>
+              {section.items.map((item) => {
+                const isActive = location.pathname.startsWith(item.path);
+                return (
+                  <li key={item.key} className="relative">
+                    <Link
+                      to={item.path}
+                      className={cn(
+                        SIDEBAR_MENU,
+                        isActive ? SIDEBAR_MENU_ACTIVE : "text-white",
+                        isActive && item.isPremium ? "bg-gradient-to-r from-[#536BEB] to-[#4A95F7]" : "",
+                        "gap-3 my-1"
+                      )}
+                    >
+                      <item.icon className={cn("w-5 h-5", isActive ? "text-white" : SIDEBAR_MENU_INACTIVE_ICON)} />
+                      <span className={SIDEBAR_MENU_LABEL}>{item.label}</span>
+                      {item.badge && (
+                        <span className={SIDEBAR_BADGE}>{item.badge}</span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            {/* Divider after User/Management group */}
+            {section.group === "Role" || (section.group === "Management" && idx !== menu.length - 1) ? (
+              <div className={SIDEBAR_SECTION_DIVIDER}></div>
+            ) : null}
+          </div>
+        ))}
+      </nav>
+
+      {/* Help/support card */}
+      <div className={cn(SIDEBAR_HELP_CARD_BG, SIDEBAR_CARD, "mx-3 my-5 flex-row items-center gap-3 py-3 px-4")}>
+        <span className={SIDEBAR_HELP_ICON_BG}>
+          <HelpCircle className="w-6 h-6 text-[#A6B0D6]" />
+        </span>
+        <div>
+          <span className="text-white font-semibold block text-sm">Need Help?</span>
+          <span className="text-xs text-[#B0BADB] block mt-0.5">Contact support team</span>
+        </div>
+      </div>
+      
+      {/* Logout */}
+      <Button
+        variant="ghost"
+        className={cn("w-full flex items-center gap-2 justify-start mb-4 mt-auto px-6 py-3", SIDEBAR_LOGOUT)}
+        onClick={logout}
+      >
+        <LogOut className="w-5 h-5" />
+        <span className="text-base">Logout</span>
+      </Button>
+    </div>
   );
 
   if (isMobile) {
     return (
       <>
         <MobileToggle />
-        {/* Mobile sidebar - overlay style */}
         {isMobileOpen && (
-          <div className="fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar} />
+          <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileOpen(false)} />
         )}
-        <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 transform",
-            isMobileOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          {renderSidebarContent()}
+        <aside className={cn(
+          "fixed inset-y-0 left-0 z-50 w-72",
+          SIDEBAR_BG,
+          "transition-transform duration-300 transform",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}>
+          {sidebarContent}
         </aside>
       </>
     );
   }
 
   return (
-    <aside
-      className={cn(
-        "bg-sidebar border-r border-sidebar-border h-screen sticky top-0 overflow-y-auto transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
-      )}
-    >
-      {renderSidebarContent()}
+    <aside className={cn(
+      SIDEBAR_BG,
+      "w-72 min-h-screen h-full flex flex-col sticky top-0 z-30"
+    )}>
+      {sidebarContent}
     </aside>
   );
 }
+
+// ... no export default to avoid confusion
