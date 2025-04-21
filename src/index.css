@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,6 +33,16 @@
     --ring: 222.2 84% 4.9%;
  
     --radius: 0.5rem;
+
+    /* Add new sidebar custom colors */
+    --sidebar-background: 226 55% 12%; /* Vibrant deep blue */
+    --sidebar-foreground: 220 28% 98%;
+    --sidebar-primary: 232 96% 72%;
+    --sidebar-primary-foreground: 233 100% 97%;
+    --sidebar-accent: 227 82% 71%;
+    --sidebar-accent-foreground: 219 41% 95%;
+    --sidebar-border: 230 20% 30%;
+    --sidebar-ring: 213 54% 66%;
   }
  
   .dark {
@@ -79,4 +88,53 @@
 .required:after {
   content: " *";
   color: red;
+}
+
+/* Glow effect for sidebar */
+.sidebar-glow {
+  box-shadow: 0 0 40px 8px #5b73ff88, 0 2px 24px 0 #5b73ff30;
+  background: linear-gradient(180deg, #171f3a, #26346b 70%);
+}
+
+/* Premium card styles */
+.premium-card {
+  @apply rounded-2xl w-full bg-gradient-to-br from-[#4e63ea] to-[#8a98f7] text-white p-4 mb-4 flex flex-col gap-2;
+  box-shadow: 0 2px 16px 0 #7287ff33;
+  position: relative;
+}
+
+.premium-badge {
+  @apply flex items-center gap-2;
+  font-size: 1rem;
+}
+
+.premium-usage-bar-bg {
+  @apply w-full h-2 bg-white/30 rounded-full;
+}
+
+.premium-usage-bar {
+  @apply h-2 bg-white/70 rounded-full transition-all;
+}
+
+.premium-usage-label {
+  @apply mt-1 text-xs font-medium opacity-80;
+}
+
+/* Locked premium feature card */
+.premium-feature-locked {
+  @apply bg-white border border-dashed border-blue-200 rounded-2xl p-6 flex flex-col items-center gap-2 text-center shadow-md;
+  background: linear-gradient(120deg, #e9ecfc 60%, #fff 100%);
+  min-height: 180px;
+  justify-content: center;
+}
+
+.premium-feature-locked .lock-icon {
+  @apply text-blue-500 mb-2;
+  font-size: 2.5rem;
+}
+
+/* Chart gradient style */
+.chart-bar-gradient {
+  /* fallback for non-svg (will be overridden by SVG) */
+  fill: url(#chartBarGradient);
 }

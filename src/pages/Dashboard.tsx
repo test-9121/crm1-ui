@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
@@ -32,6 +31,15 @@ const leadsData = [
   { name: "Lost", value: 8, color: "#ef4444" },
 ];
 
+const barGradient = (
+  <defs>
+    <linearGradient id="chartBarGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#7893FF" />
+      <stop offset="100%" stopColor="#CCE0FF" />
+    </linearGradient>
+  </defs>
+);
+
 const Dashboard = () => {
   const { user } = useAuth();
   
@@ -45,7 +53,6 @@ const Dashboard = () => {
           </p>
         </section>
 
-        {/* Stats Overview */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -148,7 +155,6 @@ const Dashboard = () => {
           </Card>
         </section>
 
-        {/* Charts */}
         <section className="grid gap-4 md:grid-cols-2">
           <Card className="col-span-1">
             <CardHeader>
@@ -160,11 +166,12 @@ const Dashboard = () => {
             <CardContent className="pl-2">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  {barGradient}
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
-                  <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="amount" fill="url(#chartBarGradient)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -192,7 +199,7 @@ const Dashboard = () => {
                     labelLine={false}
                   >
                     {leadsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${index}`} fill="#6a85fa" />
                     ))}
                   </Pie>
                   <Legend />
@@ -203,7 +210,6 @@ const Dashboard = () => {
           </Card>
         </section>
 
-        {/* Recent Activity */}
         <section>
           <Card>
             <CardHeader>

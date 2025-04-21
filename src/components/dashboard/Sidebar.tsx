@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,7 +23,8 @@ import {
   Folder,
   UserCheck,
   Mail,
-  FileText
+  FileText,
+  Lock
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -79,6 +79,20 @@ const SidebarSubItem = ({ label, path, isCollapsed, isActive }: SidebarSubItemPr
   );
 };
 
+const PremiumCard = () => (
+  <div className="premium-card">
+    <div className="premium-badge font-semibold flex items-center gap-2">
+      <svg width="24" height="24" fill="none" className="mr-2"><circle cx="12" cy="12" r="12" fill="#6a85fa" /><Lock size={16} color="#fff" className="inline" /></svg>
+      Premium Plan
+    </div>
+    <div className="text-xs mt-1 opacity-90">Active until Jul 2025</div>
+    <div className="premium-usage-bar-bg mt-2">
+      <div className="premium-usage-bar" style={{ width: '78%' }} />
+    </div>
+    <div className="premium-usage-label">Usage <span className="font-semibold">78%</span></div>
+  </div>
+);
+
 export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();
@@ -132,6 +146,9 @@ export function Sidebar() {
 
   const renderSidebarContent = () => (
     <>
+      <div className="px-3 pt-5 pb-3 sidebar-glow">
+        <PremiumCard />
+      </div>
       <div className="px-3 py-4">
         <div className={cn(
           "flex items-center",
@@ -139,12 +156,12 @@ export function Sidebar() {
         )}>
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <Icons.logo className="h-6 w-6 text-sidebar-primary" />
-              <h1 className="text-xl font-bold text-sidebar-primary">Aura CRM</h1>
+              <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>Ensar</span>
+              <span className="text-2xl font-extrabold tracking-tighter text-white">CRM</span>
             </div>
           )}
           {isCollapsed && (
-            <Icons.logo className="h-6 w-6 text-sidebar-primary" />
+            <span className="text-2xl font-extrabold tracking-tighter" style={{ color: "#34faa2" }}>E</span>
           )}
           {!isMobile && (
             <Button
@@ -247,7 +264,6 @@ export function Sidebar() {
     </>
   );
 
-  // Mobile sidebar toggle button
   const MobileToggle = () => (
     <Button
       variant="ghost"
@@ -263,7 +279,6 @@ export function Sidebar() {
     return (
       <>
         <MobileToggle />
-        {/* Mobile sidebar - overlay style */}
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar} />
         )}

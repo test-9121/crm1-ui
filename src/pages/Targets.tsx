@@ -14,7 +14,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-// Target-related imports
 import { useTargets } from "@/modules/targets/hooks/useTargets";
 import { Target } from "@/modules/targets/types";
 import TargetForm from "@/modules/targets/components/TargetForm";
@@ -23,6 +22,7 @@ import TargetToolbar from "@/modules/targets/components/TargetToolbar";
 import TargetTable from "@/modules/targets/components/TargetTable";
 import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
 import TargetDetailsPanelContent from "@/modules/targets/components/TargetDetailsPanelContent";
+import { PremiumFeatureCard } from "@/components/dashboard/PremiumFeatureCard";
 
 const Targets = () => {
   const navigate = useNavigate();
@@ -48,7 +48,6 @@ const Targets = () => {
     deleteTarget
   } = useTargets();
 
-  // Effect to handle URL-based target editing
   useEffect(() => {
     if (id) {
       const currentTarget = getTargetById(id);
@@ -60,7 +59,6 @@ const Targets = () => {
         navigate("/targets", { replace: true });
       }
     } else {
-      // Only reset if we're not coming from the edit route
       if (!location.pathname.includes("/edit/")) {
         setTargetToEdit(null);
       }
@@ -85,7 +83,6 @@ const Targets = () => {
     setTargetToEdit(target);
     setShowTargetForm(true);
     
-    // Update URL to reflect editing state without creating a browser history entry
     navigate(`/targets/edit/${target.id}`, { replace: false });
   };
 
@@ -103,10 +100,8 @@ const Targets = () => {
   const handleFormClose = () => {
     setShowTargetForm(false);
     
-    // Navigate back to targets page with replace to avoid history stacking
     navigate("/targets", { replace: true });
     
-    // Reset the edit state after a short delay to prevent UI issues
     setTimeout(() => {
       setTargetToEdit(null);
     }, 100);
@@ -117,7 +112,6 @@ const Targets = () => {
     setIsDetailsPanelOpen(true);
   };
 
-  // Filter targets based on search term
   const filteredTargets = Array.isArray(targets)
     ? targets.filter(target => 
         target.accountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -172,7 +166,6 @@ const Targets = () => {
           </div>
         )}
 
-        {/* Side panel for displaying target details */}
         <DetailsSidePanel
           data={selectedTarget}
           open={isDetailsPanelOpen}
@@ -180,7 +173,12 @@ const Targets = () => {
           renderContent={(target) => <TargetDetailsPanelContent target={target} />}
         />
 
-        {/* Target Form */}
+        <div className="flex justify-end items-center">
+          <div style={{ width: 340 }}>
+            <PremiumFeatureCard />
+          </div>
+        </div>
+
         {showTargetForm && (
           <TargetForm
             open={showTargetForm}
@@ -189,7 +187,6 @@ const Targets = () => {
           />
         )}
 
-        {/* Delete Confirmation */}
         <AlertDialog open={targetToDelete !== null} onOpenChange={() => setTargetToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
