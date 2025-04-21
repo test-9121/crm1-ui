@@ -54,7 +54,10 @@ const LinkedInToolbar = ({
             </Button>
           )}
         </div>
-        <Button onClick={onNewProfile}>
+        <Button
+          className="bg-gradient-to-r from-[#22304a] via-[#22304a]/90 to-white/10 text-white hover:from-[#22304a]/80 hover:to-white/20"
+          onClick={onNewProfile}
+        >
           <Plus className="h-4 w-4 mr-1" />
           New Profile
         </Button>
@@ -62,5 +65,4 @@ const LinkedInToolbar = ({
     </div>
   );
 };
-
 export default LinkedInToolbar;

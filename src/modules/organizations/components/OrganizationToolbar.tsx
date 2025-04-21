@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PlusCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,10 @@ const OrganizationToolbar = ({
         />
       </div>
       <div className="flex justify-end">
-        <Button onClick={onNewOrganization}>
+        <Button
+          className="bg-gradient-to-r from-[#22304a] via-[#22304a]/90 to-white/10 text-white hover:from-[#22304a]/80 hover:to-white/20"
+          onClick={onNewOrganization}
+        >
           <PlusCircle className="mr-2 h-4 w-4" />
           New Organization
         </Button>

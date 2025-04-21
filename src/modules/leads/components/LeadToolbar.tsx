@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,11 @@ const LeadToolbar = ({ onSearchChange, onNewLead }: LeadToolbarProps) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <Button className="gap-2" variant="default" onClick={onNewLead}>
+        <Button
+          className="gap-2 bg-gradient-to-r from-[#22304a] via-[#22304a]/90 to-white/10 text-white hover:from-[#22304a]/80 hover:to-white/20"
+          variant="default"
+          onClick={onNewLead}
+        >
           <span>New lead</span>
           <ChevronDown className="h-4 w-4" />
         </Button>
