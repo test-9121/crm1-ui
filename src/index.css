@@ -64,7 +64,7 @@ button:hover, [type="button"]:hover, [type="submit"]:hover {
 
 /* Table tweaks for a cleaner look */
 table {
-  @apply rounded-lg overflow-hidden shadow soft bg-white/70;
+  @apply rounded-lg overflow-hidden shadow bg-white/70;
   border-radius: 1rem;
 }
 thead {
