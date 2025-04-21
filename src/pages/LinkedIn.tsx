@@ -28,6 +28,20 @@ export default function LinkedIn() {
       industry: "Technology",
       connections: 500,
       connectionsCount: 500,
+      createdDateTime: "2023-05-15T10:30:00Z",
+      lastUpdatedDateTime: null,
+      email: "john.doe@example.com",
+      status: "Active",
+      handledBy: {
+        id: "u1",
+        name: "Admin User",
+        email: "admin@example.com",
+        role: { id: "r1", name: "Admin" }
+      },
+      organization: {
+        id: "o1",
+        name: "Example Org"
+      }
     },
     {
       id: "2",
@@ -41,6 +55,20 @@ export default function LinkedIn() {
       industry: "SaaS",
       connections: 750,
       connectionsCount: 750,
+      createdDateTime: "2023-06-20T14:45:00Z",
+      lastUpdatedDateTime: null,
+      email: "jane.smith@example.com",
+      status: "Active",
+      handledBy: {
+        id: "u1",
+        name: "Admin User",
+        email: "admin@example.com",
+        role: { id: "r1", name: "Admin" }
+      },
+      organization: {
+        id: "o2",
+        name: "Tech Solutions Inc."
+      }
     },
   ]);
 

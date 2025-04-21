@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -22,7 +21,7 @@ import { useUsers, useDesignations, useOrganizations, useIndustries } from "@/mo
 import { leadService } from "@/modules/leads/services/leadService";
 import { ILead } from "@/modules/leads/types";
 import { LeadForm } from "@/modules/leads/components/LeadForm";
-import { LeadHeader } from "@/modules/leads/components/LeadHeader";
+import LeadHeader from "@/modules/leads/components/LeadHeader";
 import { LeadToolbar } from "@/modules/leads/components/LeadToolbar";
 import LeadTable from "@/modules/leads/components/LeadTable";
 import { adaptOrganizationsForLeads } from "@/modules/common/adapters/organizationAdapter";
@@ -155,11 +154,7 @@ const Leads = () => {
     <DashboardLayout>
       <div className="flex flex-col gap-6">
         <LeadToolbar 
-          onSearchChange={handleSearchChange}
-          onNewLead={() => {
-            setLeadToEdit(null);
-            setShowNewLeadForm(true);
-          }}
+          onCreate={handleNewLead}
         />
         
         <LeadHeader 
