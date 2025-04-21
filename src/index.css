@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,11 +79,4 @@
 .required:after {
   content: " *";
   color: red;
-}
-
-/* Add a custom gradient for blue and white */
-@layer utilities {
-  .blue-white-gradient {
-    @apply bg-gradient-to-br from-[#1eaedb] to-[#ffffff];
-  }
 }
