@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,6 +26,7 @@ import {
   FileText
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -86,9 +86,14 @@ export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['cms']);
+  const { toast } = useToast();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+    toast({
+      title: isCollapsed ? "Sidebar expanded" : "Sidebar collapsed",
+      duration: 1500
+    });
   };
 
   const toggleMobileSidebar = () => {
@@ -101,6 +106,22 @@ export function Sidebar() {
         ? prev.filter(id => id !== itemId) 
         : [...prev, itemId]
     );
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged out successfully",
+        description: "See you next time!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error logging out",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
   };
 
   const sidebarItems = [
@@ -134,24 +155,24 @@ export function Sidebar() {
     <>
       <div className="px-3 py-4">
         <div className={cn(
-          "flex items-center",
+          "flex items-center transition-all duration-300 ease-in-out",
           isCollapsed ? "justify-center" : "justify-between"
         )}>
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <Icons.logo className="h-6 w-6 text-sidebar-primary" />
+              <Icons.logo className="h-6 w-6 text-sidebar-primary animate-pulse" />
               <h1 className="text-xl font-bold text-sidebar-primary">Aura CRM</h1>
             </div>
           )}
           {isCollapsed && (
-            <Icons.logo className="h-6 w-6 text-sidebar-primary" />
+            <Icons.logo className="h-6 w-6 text-sidebar-primary animate-pulse" />
           )}
           {!isMobile && (
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground"
+              className="rounded-full p-0 h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent/20 transition-all duration-200"
             >
               {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </Button>
@@ -159,17 +180,17 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="space-y-1 px-3 py-2 flex-1">
+      <div className="space-y-1 px-3 py-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-sidebar-accent scrollbar-track-transparent">
         {sidebarItems.map((item) => (
           <div key={item.id} className="flex flex-col">
             {item.hasSubItems ? (
               <>
                 <div 
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md transition-all cursor-pointer",
+                    "flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 cursor-pointer",
                     location.pathname.includes(item.id.toLowerCase())
                       ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground hover:translate-x-1",
                     isCollapsed && "justify-center"
                   )}
                   onClick={() => !isCollapsed && toggleItemExpansion(item.id)}
@@ -181,7 +202,7 @@ export function Sidebar() {
                       <ChevronRight 
                         size={16} 
                         className={cn(
-                          "transition-transform",
+                          "transition-transform duration-200",
                           expandedItems.includes(item.id) && "transform rotate-90"
                         )}
                       />
@@ -189,7 +210,7 @@ export function Sidebar() {
                   )}
                 </div>
                 {!isCollapsed && expandedItems.includes(item.id) && (
-                  <div className="mt-1 space-y-1">
+                  <div className="mt-1 space-y-1 animate-accordion-down">
                     {item.subItems?.map((subItem) => (
                       <SidebarSubItem
                         key={subItem.path}
@@ -203,24 +224,26 @@ export function Sidebar() {
                 )}
               </>
             ) : (
-              <SidebarItem
-                icon={item.icon}
-                label={item.label}
-                path={item.path}
-                isCollapsed={isCollapsed}
-                isActive={location.pathname === item.path}
-              />
+              <div className="transition-transform duration-200 hover:translate-x-1">
+                <SidebarItem
+                  icon={item.icon}
+                  label={item.label}
+                  path={item.path}
+                  isCollapsed={isCollapsed}
+                  isActive={location.pathname === item.path}
+                />
+              </div>
             )}
           </div>
         ))}
       </div>
 
       <div className={cn(
-        "p-3 border-t border-sidebar-border mt-auto",
+        "p-3 border-t border-sidebar-border mt-auto transition-all duration-300",
         isCollapsed ? "text-center" : ""
       )}>
         {!isCollapsed && (
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-3 animate-fade-in">
             <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
               <span className="text-sm font-medium text-sidebar-accent-foreground">
                 {user?.name?.charAt(0) || "U"}
@@ -235,10 +258,10 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className={cn(
-            "flex items-center gap-2 w-full justify-start text-sidebar-foreground",
+            "flex items-center gap-2 w-full justify-start text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-200",
             isCollapsed && "justify-center"
           )}
-          onClick={logout}
+          onClick={handleLogout}
         >
           <LogOut size={18} />
           {!isCollapsed && <span>Sign out</span>}
@@ -247,7 +270,6 @@ export function Sidebar() {
     </>
   );
 
-  // Mobile sidebar toggle button
   const MobileToggle = () => (
     <Button
       variant="ghost"
@@ -263,7 +285,6 @@ export function Sidebar() {
     return (
       <>
         <MobileToggle />
-        {/* Mobile sidebar - overlay style */}
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar} />
         )}
