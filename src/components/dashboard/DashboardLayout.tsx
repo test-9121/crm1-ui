@@ -14,19 +14,28 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   
   // Add animations to all buttons in the application
   useEffect(() => {
-    addButtonAnimations();
-    
-    // Re-run animation when DOM changes (for dynamically added buttons)
-    const observer = new MutationObserver(() => {
+    // Wrap in a try/catch to prevent errors from breaking the app
+    try {
       addButtonAnimations();
-    });
-    
-    observer.observe(document.body, { 
-      childList: true, 
-      subtree: true 
-    });
-    
-    return () => observer.disconnect();
+      
+      // Re-run animation when DOM changes (for dynamically added buttons)
+      const observer = new MutationObserver(() => {
+        try {
+          addButtonAnimations();
+        } catch (error) {
+          console.error("Error applying button animations:", error);
+        }
+      });
+      
+      observer.observe(document.body, { 
+        childList: true, 
+        subtree: true 
+      });
+      
+      return () => observer.disconnect();
+    } catch (error) {
+      console.error("Error setting up button animations:", error);
+    }
   }, []);
 
   return (

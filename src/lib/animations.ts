@@ -44,15 +44,24 @@ export const addButtonAnimations = () => {
     
     // Add subtle click animation
     button.addEventListener('mousedown', () => {
-      button.style.transform = 'scale(0.97)';
+      // Use HTMLElement instead of Element to access style property
+      if (button instanceof HTMLElement) {
+        button.style.transform = 'scale(0.97)';
+      }
     });
     
     button.addEventListener('mouseup', () => {
-      button.style.transform = '';
+      // Use HTMLElement instead of Element to access style property
+      if (button instanceof HTMLElement) {
+        button.style.transform = '';
+      }
     });
     
     button.addEventListener('mouseleave', () => {
-      button.style.transform = '';
+      // Use HTMLElement instead of Element to access style property
+      if (button instanceof HTMLElement) {
+        button.style.transform = '';
+      }
     });
   });
 };
