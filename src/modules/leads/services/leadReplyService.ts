@@ -10,11 +10,11 @@ export const leadReplyService = {
   },
 
   createLeadReply: async (data: LeadReplyFormData): Promise<LeadReply> => {
-    const response = await api.post('/api/leads/replies', data);
+    const response = await api.post('/api/leadreplies/', data);
     return response.data;
   },
 
   deleteLeadReply: async (id: string): Promise<void> => {
-    await api.delete(`/api/leads/replies/${id}`);
+    await api.delete(`/api/leadreplies/${id}`);
   }
 };
