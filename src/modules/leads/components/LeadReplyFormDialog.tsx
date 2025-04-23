@@ -3,7 +3,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { leadReplyService } from "../services/leadReplyService";
@@ -126,8 +126,19 @@ export default function LeadReplyFormDialog({
           </Select>
         </div>
         <div className="flex gap-3 pt-3">
-          <Button type="submit" className="w-40" loading={loading} disabled={loading}>
-            Add Response
+          <Button 
+            type="submit" 
+            className="w-40" 
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Add Response"
+            )}
           </Button>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
