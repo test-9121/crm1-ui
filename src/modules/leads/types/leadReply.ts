@@ -11,11 +11,13 @@ export interface LeadReply {
   leadresponses?: LeadReply[]; // optional, recursive
 }
 
+// Remove `id` from create/update payload type - it's only included on backend responses.
 export interface LeadReplyFormData {
-  id: string;
   leadId: string;
   replyText: string;
   replyAt: string;
   replierId: string;
   replier: User;
+  // You might want to add a parentReplyId for threading/nesting (if supported)
+  parentReplyId?: string;
 }
