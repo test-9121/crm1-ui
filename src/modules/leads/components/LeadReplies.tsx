@@ -50,10 +50,19 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
       toast.error("Please fill in all fields");
       return;
     }
+    // Look up the full user for replier (as required in the payload)
+    const replierUser = users.find((u) => u.id === replierId);
+    if (!replierUser) {
+      toast.error("Invalid replier selected");
+      return;
+    }
     createReply({
-      reply,
+      id: "",
+      leadId,
+      replyText: reply,
+      replyAt: new Date().toISOString(),
       replierId,
-      leadId
+      replier: replierUser,
     });
   };
 
