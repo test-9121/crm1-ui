@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,7 +50,6 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
       toast.error("Please fill in all fields");
       return;
     }
-    
     createReply({
       reply,
       replierId,
@@ -61,13 +59,19 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
 
   return (
     <div className="space-y-8">
+      {/* Show all replies above the form */}
       <div className="space-y-4">
-        {replies.map((reply: LeadReply) => (
-          <div key={reply.id} className="bg-muted p-4 rounded-lg">
+        {replies.length === 0 && (
+          <p className="text-muted-foreground text-center">No replies yet.</p>
+        )}
+        {replies.map((replyObj: LeadReply) => (
+          <div key={replyObj.id} className="bg-muted p-4 rounded-lg">
             <p className="text-sm text-muted-foreground mb-2">
-              Replied by {reply.replier.email} | {format(new Date(reply.replyDate), "yyyy-MM-dd")}
+              Replied by {replyObj.replier.email || "Unknown"}
+              {" | "}
+              {replyObj.replyAt ? format(new Date(replyObj.replyAt), "yyyy-MM-dd") : ""}
             </p>
-            <p className="text-sm">{reply.reply}</p>
+            <p className="text-sm">{replyObj.replyText}</p>
           </div>
         ))}
       </div>

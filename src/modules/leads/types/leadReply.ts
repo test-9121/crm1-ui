@@ -4,10 +4,10 @@ import { User } from "@/modules/users/types";
 export interface LeadReply {
   id: string;
   leadId: string;
-  reply: string;
-  replyDate: string;
-  replier: User;
-  replierId: string;
+  replyText: string;
+  replyAt: string;       // Date string
+  replier: User;         // Full user object
+  leadresponses?: LeadReply[]; // optional, recursive
 }
 
 export interface LeadReplyFormData {

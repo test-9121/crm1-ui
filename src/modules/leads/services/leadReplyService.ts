@@ -4,9 +4,10 @@ import { LeadReply, LeadReplyFormData } from "../types/leadReply";
 
 export const leadReplyService = {
   getLeadReplies: async (leadId: string): Promise<LeadReply[]> => {
-    // Updated to use /api/lead/{leadId} rather than /api/leads/{leadId}/replies
-    const response = await api.get(`/api/lead/${leadId}`);
-    return response.data;
+    // Use new endpoint and extract data from response (leadReplies array)
+    const response = await api.get(`/api/lead/leadreplies/${leadId}`);
+    // The API returns { leadReplies: LeadReply[] }
+    return response.data.leadReplies;
   },
 
   createLeadReply: async (data: LeadReplyFormData): Promise<LeadReply> => {
