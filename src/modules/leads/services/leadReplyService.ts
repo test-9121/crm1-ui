@@ -1,12 +1,10 @@
-
 import { api } from "@/modules/common/services/api";
 import { LeadReply, LeadReplyFormData } from "../types/leadReply";
 
 export const leadReplyService = {
   getLeadReplies: async (leadId: string): Promise<LeadReply[]> => {
-    // Use new endpoint and extract data from response (leadReplies array)
-    const response = await api.get(`/api/lead/leadreplies/${leadId}`);
-    // The API returns { leadReplies: LeadReply[] }
+    // Updated endpoint path as requested
+    const response = await api.get(`/api/leadreplies/lead/${leadId}`);
     return response.data.leadReplies;
   },
 
