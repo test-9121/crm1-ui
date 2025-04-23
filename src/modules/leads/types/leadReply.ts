@@ -7,11 +7,15 @@ export interface LeadReply {
   replyText: string;
   replyAt: string;       // Date string
   replier: User;         // Full user object
+  replierId: string;     // ID of the replier
   leadresponses?: LeadReply[]; // optional, recursive
 }
 
 export interface LeadReplyFormData {
-  reply: string;
-  replierId: string;
+  id: string;
   leadId: string;
+  replyText: string;
+  replyAt: string;
+  replierId: string;
+  replier: User;
 }
