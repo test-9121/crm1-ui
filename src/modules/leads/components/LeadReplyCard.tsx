@@ -60,6 +60,7 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
 
   return (
     <div className="my-6 pl-2">
+      {/* Main reply content */}
       <div>
         <p className="font-bold text-lg mb-0">{reply.replyText}</p>
         <div className="flex flex-wrap items-center text-muted-foreground text-base gap-2">
@@ -84,24 +85,21 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
       </div>
 
       {/* Nested responses */}
-      <div className="border-l-2 border-muted pl-4 mt-6">
-        <h4 className="font-semibold text-xl mb-4">Responses</h4>
-        {reply.leadresponses && reply.leadresponses.length > 0 ? (
-          reply.leadresponses.map((resp) => (
-            <LeadReplyCard 
-              key={resp.id} 
-              reply={resp} 
-              users={users} 
-              leadId={leadId}
-              onReplyAdded={onReplyAdded}
-            />
-          ))
-        ) : (
-          <div className="text-muted-foreground italic">No responses.</div>
-        )}
-      </div>
+      {reply.leadresponses && reply.leadresponses.length > 0 && (
+        <div className="border-l-2 border-muted pl-4 mt-4">
+          <h4 className="font-semibold text-lg mb-2">Responses</h4>
+          {reply.leadresponses.map((response) => (
+            <div key={response.id} className="mb-4">
+              <p className="text-base">{response.response}</p>
+              <div className="text-sm text-muted-foreground">
+                {response.respondAt ? format(new Date(response.respondAt), "yyyy-MM-dd") : "No date"}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* Add Response Dialog */}
+      {/* Response Form Dialog */}
       <LeadReplyFormDialog
         open={responseOpen}
         onOpenChange={setResponseOpen}

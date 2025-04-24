@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { leadReplyService } from "../services/leadReplyService";
 import { useUsers } from "@/modules/common/hooks/useEntities";
 import { LeadReply } from "../types/leadReply";
-import { Button } from "@/components/ui/button";
 import LeadReplyCard from "./LeadReplyCard";
 import LeadReplyFormDialog from "./LeadReplyFormDialog";
 
@@ -13,7 +12,7 @@ interface LeadRepliesProps {
 }
 
 export function LeadReplies({ leadId }: LeadRepliesProps) {
-  const [addReplyOpen, setAddReplyOpen] = useState(false);
+  const [showNewReplyForm, setShowNewReplyForm] = useState(false);
   const queryClient = useQueryClient();
   const { users } = useUsers();
 
@@ -27,17 +26,19 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
     queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
   };
 
-  // Only show top-level replies (responses are nested in each)
   return (
     <div className="space-y-8">
+      {/* Add Reply Form at the top */}
+      <LeadReplyFormDialog
+        open={showNewReplyForm}
+        onOpenChange={setShowNewReplyForm}
+        leadId={leadId}
+        users={users}
+        onSuccess={handleRefetch}
+      />
+
+      {/* Display replies with nested responses */}
       <div>
-        <div className="flex items-center mb-6">
-          <h2 className="text-2xl font-bold flex-1">Lead Replies</h2>
-          <Button onClick={() => setAddReplyOpen(true)} variant="default">
-            Add Reply
-          </Button>
-        </div>
-        {/* Top-level replies */}
         {isLoading ? (
           <div className="text-center text-gray-400">Loading...</div>
         ) : replies.length === 0 ? (
@@ -54,14 +55,6 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
           ))
         )}
       </div>
-      {/* Add Reply Dialog */}
-      <LeadReplyFormDialog
-        open={addReplyOpen}
-        onOpenChange={setAddReplyOpen}
-        leadId={leadId}
-        users={users}
-        onSuccess={handleRefetch}
-      />
     </div>
   );
 }
