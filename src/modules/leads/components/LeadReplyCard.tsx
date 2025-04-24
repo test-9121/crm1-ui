@@ -54,13 +54,17 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
     }
   };
 
+  // Safe access to replier information with fallbacks
+  const replierEmail = reply.replier?.email || "Unknown User";
+  const replyDate = reply.replyAt ? format(new Date(reply.replyAt), "yyyy-MM-dd") : "";
+
   return (
     <div className="my-6 pl-2">
       <div>
         <p className="font-bold text-lg mb-0">{reply.replyText}</p>
         <div className="flex flex-wrap items-center text-muted-foreground text-base gap-2">
           <span>
-            Replied by <span className="font-medium">{reply.replier.email || "Unknown"}</span> | {reply.replyAt ? format(new Date(reply.replyAt), "yyyy-MM-dd") : ""}
+            Replied by <span className="font-medium">{replierEmail}</span> | {replyDate}
           </span>
           <Edit 
             size={20} 
