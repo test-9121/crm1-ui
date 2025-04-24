@@ -3,6 +3,16 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { Edit, Trash2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import LeadReplyFormDialog from "./LeadReplyFormDialog";
@@ -20,12 +30,11 @@ interface LeadReplyCardProps {
 export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: LeadReplyCardProps) {
   const [responseOpen, setResponseOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this reply?")) return;
-    
     setLoading(true);
     try {
       // Determine whether to delete as reply or response
@@ -36,6 +45,7 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
       }
       toast.success("Reply deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
+      setDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting reply:", error);
       toast.error("Failed to delete reply");
@@ -60,8 +70,7 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
           <Trash2 
             size={20} 
             className="mx-1 cursor-pointer text-muted-foreground hover:text-red-600" 
-            onClick={handleDelete}
-            style={{ opacity: loading ? 0.5 : 1 }}
+            onClick={() => setDeleteDialogOpen(true)}
           />
           <Button variant="link" className="ml-2 font-semibold text-base px-0 py-0" onClick={() => setResponseOpen(true)}>
             <MessageSquarePlus size={20} className="mr-1" />
@@ -75,39 +84,13 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
         <h4 className="font-semibold text-xl mb-4">Responses</h4>
         {reply.leadresponses && reply.leadresponses.length > 0 ? (
           reply.leadresponses.map((resp) => (
-            <div key={resp.id} className="mb-4">
-              <div className="text-lg">{resp.replyText}</div>
-              <div className="text-muted-foreground text-sm">
-                Response by: {resp.replier?.email || "Unknown"} | 
-                {resp.replyAt && format(new Date(resp.replyAt), "yyyy-MM-dd")}
-              </div>
-              <div className="flex gap-2 mt-2">
-                <Edit 
-                  size={18} 
-                  className="cursor-pointer hover:text-primary" 
-                  onClick={() => {
-                    // We could implement nested edit here or reuse the same component
-                    toast.info("Edit response feature coming soon");
-                  }}
-                />
-                <Trash2 
-                  size={18} 
-                  className="cursor-pointer hover:text-red-600"
-                  onClick={async () => {
-                    if (!confirm("Delete this response?")) return;
-                    
-                    try {
-                      await leadResponseService.deleteLeadResponse(resp.id);
-                      toast.success("Response deleted");
-                      queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
-                    } catch (error) {
-                      toast.error("Failed to delete response");
-                      console.error(error);
-                    }
-                  }}
-                />
-              </div>
-            </div>
+            <LeadReplyCard 
+              key={resp.id} 
+              reply={resp} 
+              users={users} 
+              leadId={leadId}
+              onReplyAdded={onReplyAdded}
+            />
           ))
         ) : (
           <div className="text-muted-foreground italic">No responses.</div>
@@ -121,7 +104,6 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
         leadId={leadId}
         users={users}
         parentReply={reply}
-        replierId={users.length > 0 ? users[0].id : ""}
         onSuccess={() => {
           onReplyAdded();
           queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
@@ -135,11 +117,32 @@ export default function LeadReplyCard({ reply, users, leadId, onReplyAdded }: Le
         leadId={leadId}
         users={users}
         initialData={reply}
-        replierId={reply.replierId}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
         }}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this {reply.parentReplyId ? 'response' : 'reply'}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -27,14 +27,14 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
     queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
   };
 
-  // Only show top-level replies (leadresponses are nested in each)
+  // Only show top-level replies (responses are nested in each)
   return (
     <div className="space-y-8">
       <div>
         <div className="flex items-center mb-6">
           <h2 className="text-2xl font-bold flex-1">Lead Replies</h2>
           <Button onClick={() => setAddReplyOpen(true)} variant="default">
-            Add Response
+            Add Reply
           </Button>
         </div>
         {/* Top-level replies */}
@@ -54,7 +54,7 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
           ))
         )}
       </div>
-      {/* Global Add Response dialog for top-level replies (no parentReply) */}
+      {/* Add Reply Dialog */}
       <LeadReplyFormDialog
         open={addReplyOpen}
         onOpenChange={setAddReplyOpen}
