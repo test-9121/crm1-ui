@@ -16,6 +16,8 @@ import { userTaskService } from "@/modules/user-tasks/services/userTaskService";
 import { eventService } from "@/modules/events/services/eventService";
 import { cmsContentService } from "@/modules/cms/services/cmsContentService";
 import { cmsMailService } from "@/modules/cms/services/cmsMailService";
+import { leadReplyService } from "@/modules/leads/services/leadReplyService";
+import { leadResponseService } from "@/modules/leads/services/leadResponseService";
 import { api } from "@/modules/common/services/api";
 
 // Re-export the services with legacy names for backward compatibility
@@ -32,6 +34,8 @@ export const userTasksApi = userTaskService;
 export const eventsApi = eventService;
 export const cmsContentApi = cmsContentService;
 export const cmsMailApi = cmsMailService;
+export const leadRepliesApi = leadReplyService;
+export const leadResponsesApi = leadResponseService;
 
 // Export CRM-related APIs for backward compatibility
 export const leadsApi = {

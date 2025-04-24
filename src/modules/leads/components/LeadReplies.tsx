@@ -17,6 +17,7 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
   const queryClient = useQueryClient();
   const { users } = useUsers();
 
+  // Use React Query for automatic cache management and refetching
   const { data: replies = [], isLoading } = useQuery({
     queryKey: ["leadReplies", leadId],
     queryFn: () => leadReplyService.getLeadReplies(leadId),

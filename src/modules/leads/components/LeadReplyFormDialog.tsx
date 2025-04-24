@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,7 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { leadReplyService } from "../services/leadReplyService";
+import { leadResponseService } from "../services/leadResponseService";
 import { toast } from "@/components/ui/sonner";
 import { LeadReplyFormData, LeadReply } from "../types/leadReply";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,26 +17,46 @@ interface LeadReplyFormDialogProps {
   onOpenChange: (open: boolean) => void;
   leadId: string;
   users: any[];
-  replierId?: string; // option to preselect
+  replierId?: string;
   parentReply?: LeadReply;
+  initialData?: LeadReply;
   onSuccess: () => void;
 }
 
 export default function LeadReplyFormDialog({
-  open, onOpenChange, leadId, users, replierId = "", parentReply, onSuccess,
+  open, 
+  onOpenChange, 
+  leadId, 
+  users, 
+  replierId = "", 
+  parentReply,
+  initialData,
+  onSuccess,
 }: LeadReplyFormDialogProps) {
   const [replyText, setReplyText] = useState("");
   const [selectedReplierId, setSelectedReplierId] = useState(replierId);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
+  const isEditing = !!initialData;
+  
+  // Initialize form with data when editing
+  useEffect(() => {
+    if (initialData && open) {
+      setReplyText(initialData.replyText);
+      setSelectedReplierId(initialData.replierId);
+      setDate(initialData.replyAt ? new Date(initialData.replyAt) : new Date());
+    }
+  }, [initialData, open]);
 
-  // Reset form when dialog opens
+  // Reset form when dialog opens/closes
   const handleOpenChange = (newOpen: boolean) => {
     // Only reset when closing the dialog
     if (!newOpen) {
-      setReplyText("");
-      setSelectedReplierId(replierId);
-      setDate(new Date());
+      if (!isEditing) {
+        setReplyText("");
+        setSelectedReplierId(replierId);
+        setDate(new Date());
+      }
     }
     onOpenChange(newOpen);
   };
@@ -46,27 +67,49 @@ export default function LeadReplyFormDialog({
       toast.error("Please fill in all fields");
       return;
     }
+    
     const replierUser = users.find((u) => u.id === selectedReplierId);
     if (!replierUser) {
       toast.error("Invalid replier selected");
       return;
     }
+
     setLoading(true);
+    
     try {
-      await leadReplyService.createLeadReply({
+      const formData: LeadReplyFormData = {
         leadId,
         replyText,
         replyAt: date.toISOString(),
         replierId: selectedReplierId,
         replier: replierUser,
         parentReplyId: parentReply?.id,
-      });
-      toast.success("Response added successfully");
-      onOpenChange(false);
-      setReplyText("");
+      };
+
+      if (isEditing) {
+        // Update existing reply or response
+        if (initialData?.parentReplyId) {
+          await leadResponseService.updateLeadResponse(initialData.id, formData);
+        } else {
+          await leadReplyService.updateLeadReply(initialData!.id, formData);
+        }
+        toast.success("Updated successfully");
+      } else {
+        // Create new reply or response
+        if (parentReply) {
+          await leadResponseService.createLeadResponse(formData);
+          toast.success("Response added successfully");
+        } else {
+          await leadReplyService.createLeadReply(formData);
+          toast.success("Reply added successfully");
+        }
+      }
+      
+      handleOpenChange(false);
       onSuccess();
     } catch (e) {
-      toast.error("Failed to add response");
+      console.error("Error saving:", e);
+      toast.error(`Failed to ${isEditing ? 'update' : 'add'} ${parentReply ? 'response' : 'reply'}`);
     } finally {
       setLoading(false);
     }
@@ -79,10 +122,12 @@ export default function LeadReplyFormDialog({
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6 w-full max-w-2xl mx-auto">
-        <h3 className="text-xl font-semibold">Add Response</h3>
+        <h3 className="text-xl font-semibold">
+          {isEditing ? 'Edit' : 'Add'} {parentReply ? 'Response' : 'Reply'}
+        </h3>
         <div>
           <Textarea
-            placeholder="Add a Response"
+            placeholder={`Add your ${parentReply ? 'response' : 'reply'} here`}
             value={replyText}
             onChange={e => setReplyText(e.target.value)}
             className="min-h-[100px]"
@@ -144,7 +189,7 @@ export default function LeadReplyFormDialog({
                 Loading...
               </>
             ) : (
-              "Add Response"
+              isEditing ? "Update" : "Add"
             )}
           </Button>
           <Button type="button" variant="secondary" onClick={() => handleOpenChange(false)}>
