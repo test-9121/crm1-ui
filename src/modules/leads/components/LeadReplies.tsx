@@ -1,15 +1,12 @@
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { leadReplyService } from "../services/leadReplyService";
 import { useUsers } from "@/modules/common/hooks/useEntities";
 import { LeadReply } from "../types/leadReply";
 import { Button } from "@/components/ui/button";
 import LeadReplyCard from "./LeadReplyCard";
 import LeadReplyFormDialog from "./LeadReplyFormDialog";
-
-// TypeScript: Remove the use of `id` in the form payload for create
-// Also, implement per design: list replies, button for Add Response, dialog appears as modal, show nested responses.
 
 interface LeadRepliesProps {
   leadId: string;

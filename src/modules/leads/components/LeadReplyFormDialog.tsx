@@ -29,13 +29,16 @@ export default function LeadReplyFormDialog({
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
 
-  // Reset form when opening
-  // (You could also listen for open and reset, but it's simple)
-  if (!open && (replyText || selectedReplierId || date !== undefined)) {
-    setReplyText("");
-    setSelectedReplierId(replierId);
-    setDate(new Date());
-  }
+  // Reset form when dialog opens
+  const handleOpenChange = (newOpen: boolean) => {
+    // Only reset when closing the dialog
+    if (!newOpen) {
+      setReplyText("");
+      setSelectedReplierId(replierId);
+      setDate(new Date());
+    }
+    onOpenChange(newOpen);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +72,12 @@ export default function LeadReplyFormDialog({
     }
   };
 
+  if (!open) {
+    return null;
+  }
+
   return (
-    <div className={open ? "" : "hidden"}>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6 w-full max-w-2xl mx-auto">
         <h3 className="text-xl font-semibold">Add Response</h3>
         <div>
@@ -140,7 +147,7 @@ export default function LeadReplyFormDialog({
               "Add Response"
             )}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="secondary" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
         </div>
