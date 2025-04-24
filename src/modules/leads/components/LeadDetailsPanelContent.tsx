@@ -1,5 +1,7 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeadReplies } from "./LeadReplies";
+import { Badge } from "@/components/ui/badge"; // Add this import
 
 export function LeadDetailsPanelContent({ lead }: { lead: any }) {
   return (
