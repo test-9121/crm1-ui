@@ -2,7 +2,7 @@
 import { User } from "@/modules/users/types";
 import { Organization } from "@/modules/organizations/types";
 
-export type TargetStatus = 'Active' | 'InActive' | 'On Hold';
+export type TargetStatus = 'Active' | 'InActive' | 'OnHold';
 
 export interface Target {
   id: string;

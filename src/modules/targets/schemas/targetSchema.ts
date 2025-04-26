@@ -9,7 +9,7 @@ export const targetSchema = z.object({
   noOfLeadsIdentified: z.coerce.number().int().nonnegative("Leads identified must be a positive number"),
   connectionsSent: z.coerce.number().int().nonnegative("Connections sent must be a positive number"),
   messagesSent: z.coerce.number().int().nonnegative("Messages sent must be a positive number"),
-  status: z.enum(["Active", "InActive", "On Hold"] as [TargetStatus, ...TargetStatus[]]),
+  status: z.enum(["Active", "InActive", "OnHold"] as [TargetStatus, ...TargetStatus[]]),
   followUps: z.coerce.number().int().nonnegative("Follow ups must be a positive number"),
   createdDate: z.string().min(1, "Created date is required"),
   inMailCount: z.coerce.number().int().nonnegative("InMail count must be a positive number"),

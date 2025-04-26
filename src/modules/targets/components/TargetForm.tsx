@@ -270,7 +270,7 @@ const TargetForm = ({ open, onOpenChange, initialData }: TargetFormProps) => {
                       <SelectContent>
                         <SelectItem value="Active">Active</SelectItem>
                         <SelectItem value="InActive">InActive</SelectItem>
-                        <SelectItem value="On Hold">On Hold</SelectItem>
+                        <SelectItem value="OnHold">On Hold</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

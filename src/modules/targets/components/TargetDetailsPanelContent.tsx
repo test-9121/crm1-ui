@@ -24,7 +24,7 @@ const TargetDetailsPanelContent = ({ target }: TargetDetailsPanelContentProps) =
     case "InActive":
       statusColor = "bg-blue-100 text-blue-800";
       break;
-    case "On Hold":
+    case "OnHold":
       statusColor = "bg-orange-100 text-orange-800";
       break;
     default:
