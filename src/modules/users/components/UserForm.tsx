@@ -89,11 +89,96 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
     }
   }, [initialData, form]);
 
-  const onSubmit = (values: UserFormValues) => {
-    if (isEditMode && initialData) {
-      updateUser.mutate({
-        id: initialData.id,
-        data: {
+  // const onSubmit = (values: UserFormValues) => {
+  //   if (isEditMode && initialData) {
+  //     updateUser.mutate({
+  //       id: initialData.id,
+  //       data: {
+  //         firstName: values.firstName,
+  //         lastName: values.lastName,
+  //         email: values.email,
+  //         roleId: values.roleId,
+  //         organizationId: values.organizationId,
+  //         phoneNumber: values.phoneNumber,
+  //         disabled: values.disabled,
+  //         verified: values.verified,
+  //         emailVerified: values.emailVerified,
+  //         department: values.department,
+  //         location: values.location,
+  //         jobTitle: values.jobTitle,
+  //         city: values.city,
+  //         state: values.state,
+  //         country: values.country,
+  //         address: values.address,
+  //         zipCode: values.zipCode,
+  //         company: values.company,
+  //         status: values.status,
+  //         avatarUrl: values.avatarUrl,
+  //         ...(values.password ? { password: values.password } : {}),
+  //       },
+  //     });
+  //   } else {
+  //     createUser.mutate({
+  //       firstName: values.firstName,
+  //       lastName: values.lastName,
+  //       email: values.email,
+  //       roleId: values.roleId,
+  //       organizationId: values.organizationId,
+  //       phoneNumber: values.phoneNumber,
+  //       disabled: values.disabled,
+  //       verified: values.verified,
+  //       emailVerified: values.emailVerified,
+  //       department: values.department,
+  //       location: values.location,
+  //       jobTitle: values.jobTitle,
+  //       city: values.city,
+  //       state: values.state,
+  //       country: values.country,
+  //       address: values.address,
+  //       zipCode: values.zipCode,
+  //       company: values.company,
+  //       status: values.status,
+  //       avatarUrl: values.avatarUrl,
+  //       ...(values.password ? { password: values.password } : {}),
+  //     });
+  //   }
+  //   // Close the dialog after submission
+  //   onOpenChange(false);
+  // };
+
+  const onSubmit = async (values: UserFormValues) => {
+    try {
+      if (isEditMode && initialData) {
+        // Update the user if in edit mode
+        await updateUser.mutateAsync({
+          id: initialData.id,
+          data: {
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            roleId: values.roleId,
+            organizationId: values.organizationId,
+            phoneNumber: values.phoneNumber,
+            disabled: values.disabled,
+            verified: values.verified,
+            emailVerified: values.emailVerified,
+            department: values.department,
+            location: values.location,
+            jobTitle: values.jobTitle,
+            city: values.city,
+            state: values.state,
+            country: values.country,
+            address: values.address,
+            zipCode: values.zipCode,
+            company: values.company,
+            status: values.status,
+            avatarUrl: values.avatarUrl,
+            ...(values.password ? { password: values.password } : {}),
+          },
+        });
+      } else {
+        // Create a new user if not in edit mode
+        await createUser.mutateAsync({
           firstName: values.firstName,
           lastName: values.lastName,
           email: values.email,
@@ -115,36 +200,21 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
           status: values.status,
           avatarUrl: values.avatarUrl,
           ...(values.password ? { password: values.password } : {}),
-        },
-      });
-    } else {
-      createUser.mutate({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        roleId: values.roleId,
-        organizationId: values.organizationId,
-        phoneNumber: values.phoneNumber,
-        disabled: values.disabled,
-        verified: values.verified,
-        emailVerified: values.emailVerified,
-        department: values.department,
-        location: values.location,
-        jobTitle: values.jobTitle,
-        city: values.city,
-        state: values.state,
-        country: values.country,
-        address: values.address,
-        zipCode: values.zipCode,
-        company: values.company,
-        status: values.status,
-        avatarUrl: values.avatarUrl,
-        ...(values.password ? { password: values.password } : {}),
-      });
+        });
+      }
+  
+      // Close the form after successful submission
+      onOpenChange(false);
+  
+      // Optionally reset the form if you need to clear it after submission
+      form.reset();
+  
+    } catch (error) {
+      console.error("Form submission error:", error);
+      // Keep form open if there's an error
     }
-    // Close the dialog after submission
-    onOpenChange(false);
   };
+  
 
   if (isLoading) {
     return (
@@ -335,11 +405,29 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
                 control={form.control}
                 name="status"
                 render={({ field }) => (
+                  // <FormItem>
+                  //   <FormLabel>Status</FormLabel>
+                  //   <FormControl>
+                  //     <Input placeholder="Enter status" {...field} />
+                  //   </FormControl>
+                  //   <FormMessage />
+                  // </FormItem>
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter status" {...field} />
-                    </FormControl>
+                    <FormLabel>Status *</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Enter Status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="InActive">In Active</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -40,6 +40,11 @@ const UserTaskTable = ({
         task.user ? `${task.user.firstName} ${task.user.lastName}` : 'Unassigned'
     },
     {
+      header: "Description",
+      accessorKey: "description",
+      cell: (task: UserTask) => <div className="truncate max-w-[400px]">{task.description}</div>
+    },
+    {
       header: "Status",
       accessorKey: "status",
       cell: (task: UserTask) => {
@@ -83,6 +88,11 @@ const UserTaskTable = ({
           </Badge>
         );
       }
+    },
+    {
+      header: "Start Date",
+      accessorKey: "startDate",
+      cell: (task: UserTask) => new Date(task.startDate).toLocaleDateString()
     },
     {
       header: "Due Date",

@@ -145,7 +145,7 @@ const UserTasks = () => {
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          tasksCount={filteredUserTasks.length}
+          userTasksCount={filteredUserTasks.length}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}

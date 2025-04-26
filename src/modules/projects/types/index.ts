@@ -18,8 +18,4 @@ export interface Project {
 export interface ProjectFormValues {
   name: string;
   description: string;
-  organizationId: string;
-  status: ProjectStatus;
-  startDate?: string | null;
-  endDate?: string | null;
 }

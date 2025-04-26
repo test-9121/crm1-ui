@@ -38,43 +38,7 @@ const ProjectTable = ({
       accessorKey: "description",
       cell: (project: Project) => <div className="truncate max-w-[400px]">{project.description}</div>
     },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: (project: Project) => {
-        if (!project.status) return null;
-        
-        const statusColorMap: Record<string, string> = {
-          "Planning": "bg-blue-100 text-blue-800 hover:bg-blue-200",
-          "In Progress": "bg-amber-100 text-amber-800 hover:bg-amber-200",
-          "Completed": "bg-green-100 text-green-800 hover:bg-green-200",
-          "On Hold": "bg-red-100 text-red-800 hover:bg-red-200",
-        };
-        
-        const statusColor = statusColorMap[project.status] || "bg-gray-100 text-gray-800 hover:bg-gray-200";
-        
-        return (
-          <Badge
-            className={`${statusColor} font-medium rounded-md whitespace-nowrap`}
-            variant="outline"
-          >
-            {project.status}
-          </Badge>
-        );
-      }
-    },
-    {
-      header: "Start Date",
-      accessorKey: "startDate",
-      cell: (project: Project) => project.startDate ? 
-        new Date(project.startDate).toLocaleDateString() : 'N/A'
-    },
-    {
-      header: "End Date",
-      accessorKey: "endDate",
-      cell: (project: Project) => project.endDate ? 
-        new Date(project.endDate).toLocaleDateString() : 'N/A'
-    }
+    
   ];
 
   return (

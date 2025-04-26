@@ -1,3 +1,4 @@
+
 import { api } from "@/modules/common/services/api";
 import { ILead } from "@/modules/leads/types";
 import { LeadFormValues } from "@/modules/leads/schemas/leadSchema";
@@ -8,13 +9,13 @@ export const leadService = {
     try {
       const response = await api.get("/api/leads/");
       const data = response.data;
-      
+
       if (Array.isArray(data)) {
         return data;
       } else if (data && typeof data === 'object' && Array.isArray(data.leads)) {
         return data.leads;
       }
-      
+
       return [];
     } catch (error) {
       console.error("Error fetching leads:", error);
@@ -23,70 +24,47 @@ export const leadService = {
     }
   },
 
-  createLead: async (leadData: LeadFormValues): Promise<ILead> => {
+  createLead: async (leadData: Partial<ILead>): Promise<ILead> => {
     try {
-      const apiData = {
+      // Transform the data to include both full objects and IDs
+      const payload = {
         ...leadData,
-        industryId: leadData.industry?.id,
+        // Handle designation relationship
+        designation: leadData.designation ? { id: leadData.designation.id } : undefined,
         designationId: leadData.designation?.id,
-        sentbyId: leadData.sentbyId,
-        organizationId: leadData.organization?.id || leadData.organizationId,
-        leaddate: leadData.leaddate.toISOString().split('T')[0],
+        
+        // // Handle sentby relationship
+        // sentby: leadData.sentby ? { id: leadData.sentby.id } : undefined,
+        // sentbyId: leadData.sentby?.id,
       };
-      
-      delete apiData.industry;
-      delete apiData.designation;
-      delete apiData.organization;
-      
-      const response = await api.post("/api/leads/", apiData);
-      toast.success("Created successfully");
+
+      const response = await api.post('/api/leads/', payload);
       return response.data;
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
-      throw error; // Re-throw to handle in the form
+      console.error("Error creating lead:", error);
+      throw error;
     }
   },
 
-  updateLead: async (id: string, leadData: Partial<LeadFormValues>): Promise<ILead> => {
+  updateLead: async (id: string, leadData: Partial<ILead>): Promise<ILead> => {
     try {
-      const apiData: any = { ...leadData };
-      
-      if (leadData.industry) {
-        apiData.industryId = leadData.industry.id;
-        delete apiData.industry;
-      }
-      
-      if (leadData.designation) {
-        apiData.designationId = leadData.designation.id;
-        delete apiData.designation;
-      }
-      
-      if (leadData.organization) {
-        apiData.organizationId = leadData.organization.id;
-        delete apiData.organization;
-      }
-      
-      if (leadData.leaddate) {
-        apiData.leaddate = leadData.leaddate.toISOString().split('T')[0];
-      }
-      
-      const response = await api.put(`/api/leads/${id}`, apiData);
-      toast.success("Updated successfully");
+      // Transform the data to include both full objects and IDs
+      const payload = {
+        ...leadData,
+        // Handle designation relationship
+        designation: leadData.designation ? { id: leadData.designation.id } : undefined,
+        designationId: leadData.designation?.id,
+      };
+
+      const response = await api.put(`/api/leads/${id}`, payload);
       return response.data;
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
-      throw error; // Re-throw to handle in the form
+      console.error(`Error updating lead with ID ${id}:`, error);
+      throw error;
     }
   },
 
   deleteLead: async (id: string): Promise<void> => {
-    try {
-      await api.delete(`/api/leads/${id}`);
-      toast.success("Deleted successfully");
-    } catch (error) {
-      console.error("Error deleting lead:", error);
-      toast.error("An error occurred. Please try again.");
-      throw error;
-    }
+    await api.delete(`/api/leads/${id}`);
   }
 };

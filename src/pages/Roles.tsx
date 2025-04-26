@@ -58,13 +58,14 @@ const Roles = () => {
         setShowRoleForm(true);
       } else {
         toast.error("Role not found");
-        navigate("/roles", { replace: true });
+        navigate("/roles");
       }
     } else {
       // Only reset if we're not coming from the edit route
-      if (!location.pathname.includes("/edit/")) {
-        setRoleToEdit(null);
-      }
+      // if (!location.pathname.includes("/edit/")) {
+      //   setRoleToEdit(null);
+      // }
+      setRoleToEdit(null);
     }
   }, [id, getRoleById, navigate, location.pathname]);
 
@@ -103,14 +104,15 @@ const Roles = () => {
 
   const handleFormClose = () => {
     setShowRoleForm(false);
+    setRoleToEdit(null);
     
     // Navigate back to roles page with replace to avoid history stacking
-    navigate("/roles", { replace: true });
+    if (id) {
+
+    navigate("/roles");
+    }
     
     // Reset the edit state after a short delay to prevent UI issues
-    setTimeout(() => {
-      setRoleToEdit(null);
-    }, 100);
   };
 
   const handleRowClick = (role: Role) => {

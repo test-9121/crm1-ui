@@ -11,7 +11,6 @@ interface LinkedInDetailsPanelContentProps {
 
 const LinkedInDetailsPanelContent = ({ profile }: LinkedInDetailsPanelContentProps) => {
   const openLinkedInProfile = () => {
-    // Use profileUrl if available, otherwise use a fallback
     const url = profile.profileUrl || `https://linkedin.com/in/${profile.accountName}`;
     window.open(url, '_blank');
   };

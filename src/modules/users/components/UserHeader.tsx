@@ -1,9 +1,10 @@
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { ChevronDown, Edit, Check, X, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { HexColorPicker } from "react-colorful";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface UserHeaderProps {
   tableName: string;
@@ -13,7 +14,7 @@ interface UserHeaderProps {
   usersCount: number;
   onTableUpdate: (name: string, color: string) => void;
   onCollapse: () => void;
-  onEditingChange: (value: boolean) => void;
+  onEditingChange: (editing: boolean) => void;
 }
 
 const UserHeader = ({
@@ -24,68 +25,101 @@ const UserHeader = ({
   usersCount,
   onTableUpdate,
   onCollapse,
-  onEditingChange,
+  onEditingChange
 }: UserHeaderProps) => {
-  const [name, setName] = useState(tableName);
-  const [color, setColor] = useState(tableColor);
-
-  const handleEdit = () => {
-    onEditingChange(true);
-  };
+  const [editName, setEditName] = useState(tableName);
+  const [editColor, setEditColor] = useState(tableColor);
 
   const handleSave = () => {
-    onTableUpdate(name, color);
+    onTableUpdate(editName, editColor);
   };
 
-  return (
-    <Card className="relative" style={{ borderLeft: `4px solid ${tableColor}` }}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            {isEditing ? (
-              <>
-                <Input
-                  className="max-w-[200px]"
-                  placeholder="Table name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+  const handleCancel = () => {
+    setEditName(tableName);
+    setEditColor(tableColor);
+    onEditingChange(false);
+  };
+
+  const headerContent = () => (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          {isEditing ? (
+            <div className="flex gap-3 items-center">
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="w-[200px]"
+              />
+              <div className="relative">
+                <div
+                  className="w-6 h-6 rounded cursor-pointer border"
+                  style={{ backgroundColor: editColor }}
                 />
-                <Input
-                  type="color"
-                  className="w-10 h-10 p-1 cursor-pointer"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                />
-                <Button size="sm" onClick={handleSave}>Save</Button>
-              </>
-            ) : (
-              <>
-                <h2 className="text-lg font-medium">{tableName}</h2>
-                <div className="px-2 py-1 bg-gray-100 rounded text-sm">
-                  {usersCount} {usersCount === 1 ? "User" : "Users"}
+                <div className="absolute top-8 z-10">
+                  <HexColorPicker color={editColor} onChange={setEditColor} />
                 </div>
-                <Button size="sm" variant="ghost" onClick={handleEdit}>
-                  <Edit2 className="h-4 w-4 mr-1" />
-                  Edit
+              </div>
+              <Button size="sm" variant="ghost" onClick={handleSave}>
+                <Check size={18} />
+              </Button>
+              <Button size="sm" variant="ghost" onClick={handleCancel}>
+                <X size={18} />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onCollapse}
+                  className="h-8 w-8 p-0 rounded-full"
+                >
+                  {isCollapsed ? (
+                    <ChevronRight className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                 </Button>
-              </>
-            )}
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onCollapse}
-            className="rounded-full"
-          >
-            {isCollapsed ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronUp className="h-4 w-4" />
-            )}
-          </Button>
+                <h3 className="text-lg font-medium" style={{ color: tableColor }}>
+                  {tableName}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2"
+                  onClick={() => onEditingChange(true)}
+                >
+                  <Edit size={14} />
+                </Button>
+              </div>
+              {isCollapsed && (
+                <div className="text-md text-gray-500">
+                  {usersCount} {usersCount === 1 ? 'user' : 'users'}
+                </div>
+              )}
+            </>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="relative">
+      {isCollapsed ? (
+        <Card className="relative" style={{ borderLeft: `4px solid ${tableColor}` }}>
+          <CardContent className="p-4">
+            {headerContent()}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="pl-2">
+          {headerContent()}
+        </div>
+      )}
+    </div>
   );
 };
 

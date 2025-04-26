@@ -70,27 +70,38 @@ const RoleForm = ({ open, onOpenChange, initialData }: RoleFormProps) => {
   const onSubmit = async (data: RoleFormValues) => {
     try {
       if (isEditMode && initialData) {
+        // If in edit mode, update the role
         await updateRole.mutateAsync({
           id: initialData.id,
           data: {
             roleName: data.roleName,
             roleDescription: data.roleDescription,
-            rolePermission: data.rolePermission
+            rolePermission: data.rolePermission,
           },
         });
+        onOpenChange(false);
       } else {
+        // If not in edit mode, create a new role
         await createRole.mutateAsync({
           roleName: data.roleName,
           roleDescription: data.roleDescription,
-          rolePermission: data.rolePermission
+          rolePermission: data.rolePermission,
         });
+        onOpenChange(false);
       }
-      onOpenChange(false);
+  
+      // Close the form after successful submission
+     
+
+      form.reset();
+  
     } catch (error) {
+      // Handle error and keep the form open
       toast.error("An error occurred while saving the role");
-      console.error(error);
+      console.error("Form submission error:", error);
     }
   };
+  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

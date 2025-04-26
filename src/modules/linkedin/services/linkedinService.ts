@@ -25,7 +25,13 @@ export const linkedinService = {
 
   create: async (data: LinkedInFormValues): Promise<LinkedInProfile> => {
     try {
-      const response = await api.post('/api/linkedin/', data);
+      // Transform the data to include both full objects and IDs
+      const payload = {
+        ...data,
+        handledBy: data.handledById ? { id: data.handledById } : undefined,
+      };
+      
+      const response = await api.post('/api/linkedin/', payload);
       return response.data;
     } catch (error) {
       console.error("Error creating LinkedIn profile:", error);
@@ -35,7 +41,13 @@ export const linkedinService = {
 
   update: async (id: string, data: LinkedInFormValues): Promise<LinkedInProfile> => {
     try {
-      const response = await api.put(`/api/linkedin/${id}`, data);
+      // Transform the data to include both full objects and IDs
+      const payload = {
+        ...data,
+        handledBy: data.handledById ? { id: data.handledById } : undefined,
+      };
+
+      const response = await api.put(`/api/linkedin/${id}`, payload);
       return response.data;
     } catch (error) {
       console.error(`Error updating LinkedIn profile with ID ${id}:`, error);

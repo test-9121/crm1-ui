@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Edit, Check, X } from "lucide-react";
+import { ChevronDown, Edit, Check, X, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { HexColorPicker } from "react-colorful";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface RoleHeaderProps {
   tableName: string;
@@ -24,22 +24,29 @@ const RoleHeader = ({
   rolesCount,
   onTableUpdate,
   onCollapse,
-  onEditingChange
+  onEditingChange,
 }: RoleHeaderProps) => {
-  const [editName, setEditName] = useState(tableName);
-  const [editColor, setEditColor] = useState(tableColor);
+  const [editName, setEditName] = useState("");
+  const [editColor, setEditColor] = useState("");
 
   const handleSave = () => {
     onTableUpdate(editName, editColor);
-  };
-
-  const handleCancel = () => {
-    setEditName(tableName);
-    setEditColor(tableColor);
     onEditingChange(false);
   };
 
-  return (
+  const handleCancel = () => {
+    setEditName("");
+    setEditColor("");
+    onEditingChange(false);
+  };
+
+  const handleStartEditing = () => {
+    setEditName(tableName);
+    setEditColor(tableColor);
+    onEditingChange(true);
+  };
+
+  const headerContent = () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -51,7 +58,7 @@ const RoleHeader = ({
                 className="w-[200px]"
               />
               <div className="relative">
-                <div 
+                <div
                   className="w-6 h-6 rounded cursor-pointer border"
                   style={{ backgroundColor: editColor }}
                 />
@@ -69,39 +76,56 @@ const RoleHeader = ({
           ) : (
             <>
               <div className="flex items-center">
-                <div 
-                  className="w-3 h-6 mr-2 rounded-sm"
-                  style={{ backgroundColor: tableColor }}
-                />
-                <h3 className="text-lg font-medium">{tableName}</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="ml-2" 
-                  onClick={() => onEditingChange(true)}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onCollapse}
+                  className="h-8 w-8 p-0 rounded-full"
+                >
+                  {isCollapsed ? (
+                    <ChevronRight className="h-4 w-4" />
+
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+                <h3 className="text-lg font-medium" style={{ color: tableColor }}>
+                  {tableName}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2"
+                  onClick={handleStartEditing}
                 >
                   <Edit size={14} />
                 </Button>
               </div>
-              <div className="text-sm text-gray-500">
-                {rolesCount} {rolesCount === 1 ? 'role' : 'roles'}
-              </div>
+              {isCollapsed && (
+                <div className="text-md text-gray-500">
+                  {rolesCount} {rolesCount === 1 ? "role" : "roles"}
+                </div>
+              )}
             </>
           )}
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onCollapse}
-          className="h-8 w-8 p-0 rounded-full"
-        >
-          {isCollapsed ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronUp className="h-4 w-4" />
-          )}
-        </Button>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="relative">
+      {isCollapsed ? (
+        <Card className="relative" style={{ borderLeft: `4px solid ${tableColor}` }}>
+          <CardContent className="p-4">
+            {headerContent()}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="pl-2">
+          {headerContent()}
+        </div>
+      )}
     </div>
   );
 };

@@ -35,7 +35,17 @@ export const eventService = {
   
   create: async (eventData: EventFormValues): Promise<Event> => {
     try {
-      const response = await api.post('/api/calendar/', eventData);
+      // Transform the data to include both full objects and IDs
+      const payload = {
+        ...eventData,
+        // Handle user relationship using userId
+        user: eventData.userId ? { id: eventData.userId } : undefined,
+        
+        // Handle lead relationship using leadId
+        lead: eventData.leadId ? { id: eventData.leadId } : undefined,
+      };
+      
+      const response = await api.post('/api/calendar/', payload);
       return response.data;
     } catch (error) {
       console.error("Error creating event:", error);
@@ -45,7 +55,17 @@ export const eventService = {
   
   update: async (id: string, eventData: EventFormValues): Promise<Event> => {
     try {
-      const response = await api.put(`/api/calendar/${id}`, eventData);
+      // Transform the data to include both full objects and IDs
+      const payload = {
+        ...eventData,
+        // Handle user relationship using userId
+        user: eventData.userId ? { id: eventData.userId } : undefined,
+        
+        // Handle lead relationship using leadId
+        lead: eventData.leadId ? { id: eventData.leadId } : undefined,
+      };
+      
+      const response = await api.put(`/api/calendar/${id}`, payload);
       return response.data;
     } catch (error) {
       console.error(`Error updating event with ID ${id}:`, error);

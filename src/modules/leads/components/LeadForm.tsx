@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { toast } from "@/components/ui/sonner";
+
 import { 
   ILead, 
   Industry, 
@@ -126,6 +126,7 @@ export function LeadForm({
         messagesent: initialData.messagesent || false,
         comments: initialData.comments || "",
         draftStatus: initialData.draftStatus || false,
+        industryId: initialData.industry?.id || "" 
       });
     } else {
       form.reset({
@@ -147,6 +148,7 @@ export function LeadForm({
         messagesent: false,
         comments: "",
         draftStatus: false,
+        industryId: "" 
       });
     }
   }, [initialData, form]);
@@ -268,7 +270,9 @@ export function LeadForm({
                           onValueChange={(value) => {
                             const industry = industries.find(i => i.id === value);
                             if (industry) {
+                              form.setValue('industryId', industry.id);
                               field.onChange({ id: industry.id, name: industry.name });
+                              
                             }
                           }}
                         >
@@ -314,40 +318,6 @@ export function LeadForm({
                             {designations.map((designation) => (
                               <SelectItem key={designation.id} value={designation.id}>
                                 {designation.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="organization"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organization</FormLabel>
-                        <Select
-                          value={field.value?.id || ""}
-                          onValueChange={(value) => {
-                            const organization = organizations.find(o => o.id === value);
-                            if (organization) {
-                              field.onChange({ id: organization.id, name: organization.name });
-                              form.setValue('organizationId', organization.id);
-                            }
-                          }}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select organization" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {organizations.map((org) => (
-                              <SelectItem key={org.id} value={org.id}>
-                                {org.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

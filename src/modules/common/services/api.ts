@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { toast } from 'sonner';
 
 // Create an Axios instance with default config
 export const api = axios.create({
@@ -26,10 +27,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Only handle authentication errors (401) by logging out
-    if (error.response?.status === 401 && window.location.pathname !== '/login') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    if (error.response?.status === 401) {
+
+      toast.error('An error occurred.');
+      // localStorage.removeItem('accessToken');
+      // localStorage.removeItem('user');
+      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Edit, Trash2, MoreHorizontal } from "lucide-react";
 import {
@@ -17,6 +18,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export type Column<T> = {
   header: string;
@@ -32,6 +42,7 @@ type DataTableProps<TData extends { id: string }> = {
   onEdit?: (item: TData) => void;
   onDelete?: (item: TData) => void;
   actions?: boolean;
+  pageSize?: number;
 };
 
 function DataTable<TData extends { id: string }>({
@@ -42,7 +53,11 @@ function DataTable<TData extends { id: string }>({
   onEdit,
   onDelete,
   actions = true,
+  pageSize = 5,
 }: DataTableProps<TData>) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
+
   if (isLoading) {
     return <LoadingTable columnCount={columns.length} />;
   }
@@ -57,6 +72,62 @@ function DataTable<TData extends { id: string }>({
     );
   }
 
+  // Calculate pagination values
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, data.length);
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  // Handle page changes
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePageSelect = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = (value: string) => {
+    const newRowsPerPage = parseInt(value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1); // Reset to first page when changing rows per page
+  };
+
+  // Generate page numbers for pagination
+  const generatePaginationItems = () => {
+    const items = [];
+    const maxDisplayPages = 5; // Max number of page numbers to show
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxDisplayPages - 1);
+    
+    // Adjust start page if end page is at max
+    if (endPage === totalPages) {
+      startPage = Math.max(1, endPage - maxDisplayPages + 1);
+    }
+
+    // Add pages
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink 
+            isActive={currentPage === i}
+            onClick={() => handlePageSelect(i)}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
+
   return (
     <Card className="relative" style={{ borderLeft: `4px solid ${tableColor}` }}>
       <CardContent className="p-0">
@@ -70,8 +141,9 @@ function DataTable<TData extends { id: string }>({
                 {actions && <TableHead className="w-[80px]">Actions</TableHead>}
               </TableRow>
             </TableHeader>
+            { paginatedData.length !== 0 ? (
             <TableBody>
-              {data.map((item) => (
+              {paginatedData.map((item) => (
                 <TableRow key={item.id}>
                   {columns.map((column, index) => (
                     <TableCell key={index}>
@@ -110,10 +182,63 @@ function DataTable<TData extends { id: string }>({
                   )}
                 </TableRow>
               ))}
-            </TableBody>
+            </TableBody>):
+            (
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={columns.length + (actions ? 1 : 0)} className="text-center">
+                    No data available.
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            )}
           </Table>
         </div>
       </CardContent>
+      {data.length > 0 && (
+        <CardFooter className="flex items-center justify-between px-6 py-4 border-t">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Rows per page</span>
+            <Select
+              value={rowsPerPage.toString()}
+              onValueChange={handleRowsPerPageChange}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={rowsPerPage} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-muted-foreground">
+              {startIndex + 1}-{endIndex} of {data.length}
+            </span>
+          </div>
+          
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={handlePreviousPage}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              
+              {generatePaginationItems()}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={handleNextPage}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </CardFooter>
+      )}
     </Card>
   );
 }

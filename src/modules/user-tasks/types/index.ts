@@ -4,7 +4,7 @@ import { ILead } from "@/modules/leads/types";
 import { Organization } from "@/modules/organizations/types";
 
 export type TaskPriority = 'Low' | 'Medium' | 'High';
-export type TaskStatus = 'Pending' | 'In Progress' | 'Completed' | 'Canceled';
+export type TaskStatus = 'Pending' | 'InProgress' | 'Completed' ;
 
 export interface UserTask {
   id: string;

@@ -26,6 +26,7 @@ export const leadFormSchema = z.object({
     name: z.string().optional(),
   }).optional(),
   organizationId: z.string().optional(),
+  industryId: z.string().optional(),
   sentbyId: z.string().min(1, "Sent by is required"),
   verified: z.boolean().default(false),
   messagesent: z.boolean().default(false),

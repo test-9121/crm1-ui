@@ -8,7 +8,7 @@ export interface Target {
   id: string;
   accountName: string;
   connectionsCount: number;
-  handledById: User | string; // Either full User object or just the ID
+  handledById: User | string; 
   noOfLeadsIdentified: number;
   connectionsSent: number;
   messagesSent: number;

@@ -40,6 +40,13 @@ const UserTable = ({
         </div>
       ),
     },
+    // {
+    //   header: "Email",
+    //   accessorKey: "user.email",
+    //   cell: (user) => (
+    //     <span className="font-medium text-sm capitalize">{user.email}</span>
+    //   ),
+    // },
     {
       header: "Role",
       accessorKey: "role.roleName",
@@ -65,47 +72,68 @@ const UserTable = ({
       ),
     },
     {
-      header: "Department",
-      accessorKey: "department",
-      cell: (user) => (
-        <span className="text-sm">{user.department || '-'}</span>
-      ),
-    },
-    {
-      header: "Job Title",
-      accessorKey: "jobTitle",
-      cell: (user) => (
-        <span className="text-sm">{user.jobTitle || '-'}</span>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "disabled",
-      cell: (user) => (
-        <div className="flex flex-col gap-1">
-          <Badge 
-            variant={user.disabled ? "outline" : "default"}
-            className={!user.disabled ? "bg-green-500" : ""}
-          >
-            {user.disabled ? "Inactive" : "Active"}
-          </Badge>
-          {user.verified && (
-            <Badge variant="default" className="bg-blue-500">
-              Verified
-            </Badge>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Last Login",
-      accessorKey: "lastLoginDateTime",
-      cell: (user) => (
-        <span className="text-sm">
-          {user.lastLoginDateTime ? formatDate(user.lastLoginDateTime) : "Never"}
-        </span>
-      ),
-    },
+          header: "Permission",
+          accessorKey: "rolePermission",
+          cell: (user) => {
+            let color = "";
+            switch (user.status) {
+              case "InActive":
+                color = "bg-red-100 text-red-800 hover:bg-red-200";
+                break;
+              case "Active":
+                color = "bg-green-100 text-green-800 hover:bg-green-200";
+                break;
+              default:
+                color = "bg-gray-100 text-gray-800 hover:bg-gray-200";
+            }
+    
+            return (
+              <Badge
+                className={`${color} font-medium rounded-md whitespace-nowrap`}
+                variant="outline"
+              >
+                {user.status}
+              </Badge>
+            );
+          }
+        },
+    // {
+    //   header: "Department",
+    //   accessorKey: "department",
+    //   cell: (user) => (
+    //     <span className="text-sm">{user.department || '-'}</span>
+    //   ),
+    // },
+    // {
+    //   header: "Job Title",
+    //   accessorKey: "jobTitle",
+    //   cell: (user) => (
+    //     <span className="text-sm">{user.jobTitle || '-'}</span>
+    //   ),
+    // },
+    // {
+    //   header: "Status",
+    //   accessorKey: "disabled",
+    //   cell: (user) => (
+    //     <div className="flex flex-col gap-1 w-[60px]">
+    //       <Badge 
+    //         // variant={user.status ? "outline" : "default"}
+    //         className={user.status ==="active" ? "bg-green-500" : ""}
+    //       >
+    //         {user.status}
+    //       </Badge>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   header: "Last Login",
+    //   accessorKey: "lastLoginDateTime",
+    //   cell: (user) => (
+    //     <span className="text-sm">
+    //       {user.lastLoginDateTime ? formatDate(user.lastLoginDateTime) : "Never"}
+    //     </span>
+    //   ),
+    // },
   ];
 
   return (

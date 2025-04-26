@@ -186,7 +186,7 @@ const UserTaskForm = ({ open, onOpenChange, initialData }: UserTaskFormProps) =>
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a lead (optional)" />
+                        <SelectValue placeholder="Select a lead" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -285,9 +285,8 @@ const UserTaskForm = ({ open, onOpenChange, initialData }: UserTaskFormProps) =>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="InProgress">In Progress</SelectItem>
                         <SelectItem value="Completed">Completed</SelectItem>
-                        <SelectItem value="Canceled">Canceled</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

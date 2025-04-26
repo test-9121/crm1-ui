@@ -61,6 +61,7 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
         accountName: initialData.accountName,
         email: initialData.email,
         designation: initialData.designation,
+        password: initialData.password,
         country: initialData.country,
         connectionsCount: initialData.connectionsCount,
         status: initialData.status,
@@ -149,7 +150,7 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                   )}
                 />
 
-                {!isEditing && (
+               
                   <FormField
                     control={form.control}
                     name="password"
@@ -163,7 +164,7 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                       </FormItem>
                     )}
                   />
-                )}
+                
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -256,31 +257,6 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                           {users?.map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               {user.firstName} {user.lastName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="organizationId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Organization *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select organization" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {organizations?.map((org) => (
-                            <SelectItem key={org.id} value={org.id}>
-                              {org.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
