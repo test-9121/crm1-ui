@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Deal, DealStage } from '../types';
 import DealCard from './DealCard';
@@ -20,6 +20,7 @@ interface BoardProps {
   onDeleteDeal: (id: string) => void;
   onAddDeal: () => void;
   onUpdateStage: (dealId: string, stage: string) => void;
+  isLoading?: boolean;
 }
 
 export const DealPipelineBoard: React.FC<BoardProps> = ({
@@ -29,6 +30,7 @@ export const DealPipelineBoard: React.FC<BoardProps> = ({
   onDeleteDeal,
   onAddDeal,
   onUpdateStage,
+  isLoading = false,
 }) => {
   const stageColumns: DealColumn[] = [
     { id: 'PROSPECTING', title: 'Prospecting', dealIds: [] },
@@ -65,6 +67,10 @@ export const DealPipelineBoard: React.FC<BoardProps> = ({
     const newStage = destination.droppableId as DealStage;
     onUpdateStage(draggableId, newStage);
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-64">Loading deals...</div>;
+  }
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>

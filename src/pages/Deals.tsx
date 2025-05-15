@@ -15,7 +15,6 @@ import {
   PieChart,
   Plus,
   Search,
-  X,
 } from 'lucide-react';
 import {
   Card,
@@ -41,7 +40,6 @@ import DealList from '@/modules/deals/components/DealList';
 import DealAnalytics from '@/modules/deals/components/DealAnalytics';
 import DealForm from '@/modules/deals/components/DealForm';
 import DealDetailsSidePanel from '@/modules/deals/components/DealDetailsSidePanel';
-import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
@@ -68,10 +66,10 @@ export default function Deals() {
   const [showFilters, setShowFilters] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dealToDelete, setDealToDelete] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const {
     deals,
+    allDeals,
     pagination,
     dealStats,
     selectedDeal,
@@ -144,7 +142,7 @@ export default function Deals() {
             <div className="text-sm text-muted-foreground">Total Pipeline Value</div>
             <div className="text-2xl font-bold">${(dealStats.totalPipelineValue).toLocaleString()}</div>
             <div className="text-xs text-muted-foreground">
-              Across {deals.filter(d => d.status === 'ACTIVE').length} active deals
+              Across {allDeals.filter(d => d.status === 'ACTIVE').length} active deals
             </div>
           </CardContent>
         </Card>
@@ -377,12 +375,13 @@ export default function Deals() {
         {view === 'board' && (
           <div className="mt-6">
             <DealPipelineBoard
-              deals={deals}
+              deals={allDeals}
               onOpenDetail={openDetailsSidePanel}
               onEditDeal={openEditDialog}
               onDeleteDeal={handleDeleteClick}
               onAddDeal={openCreateDialog}
               onUpdateStage={updateDealStage}
+              isLoading={isLoading}
             />
           </div>
         )}
@@ -407,7 +406,7 @@ export default function Deals() {
             <DealAnalytics
               stats={dealStats}
               isLoading={isStatsLoading}
-              deals={deals}
+              deals={allDeals}
             />
           </div>
         )}

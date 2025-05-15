@@ -21,6 +21,16 @@ export const dealsService = {
     }
   },
   
+  getAllDeals: async (): Promise<Deal[]> => {
+    try {
+      const response = await api.get("/api/deals/");
+      return response.data.deals || [];
+    } catch (error) {
+      console.error("Error fetching all deals:", error);
+      throw error;
+    }
+  },
+  
   getDeal: async (id: string): Promise<Deal> => {
     try {
       const response = await api.get(`/api/deals/${id}`);
@@ -74,7 +84,10 @@ export const dealsService = {
   getDealStats: async (): Promise<DealStats> => {
     try {
       const response = await api.get("/api/deals/stats");
-      return response.data;
+      return {
+        ...response.data,
+        totalDeals: response.data.totalDeals || 0
+      };
     } catch (error) {
       console.error("Error fetching deal stats:", error);
       throw error;
