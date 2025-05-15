@@ -31,7 +31,7 @@ export const DealPipelineBoard: React.FC<BoardProps> = ({
   onUpdateStage,
 }) => {
   const stageColumns: DealColumn[] = [
-    { id: 'LEAD', title: 'Lead', dealIds: [] },
+    { id: 'LEAD', title: 'New', dealIds: [] },
     { id: 'DISCOVERY', title: 'Discovery', dealIds: [] },
     { id: 'PROPOSAL', title: 'Proposal', dealIds: [] },
     { id: 'NEGOTIATION', title: 'Negotiation', dealIds: [] },
