@@ -1,15 +1,17 @@
-// import { Toaster } from "@/components/ui/toaster";
+
+import React from 'react';
+import { Toaster } from "@/components/ui/toaster";
 // import { Toaster as Sonner } from "@/components/ui/sonner";
-// import { TooltipProvider } from "@/components/ui/tooltip";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { AuthProvider } from "@/contexts/AuthContext";
-// import { ThemeProvider } from "@/contexts/ThemeContext";
-// import ProtectedRoute from "@/components/auth/ProtectedRoute";
-// import { RolePermission } from "@/modules/roles/types";
-// import { GoogleCallback } from "@/components/auth/GoogleCallback";
-// import { GitHubCallback } from "@/components/auth/GitHubCallback";
-// import LoadingSpinner from './pages/Loading';
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { RolePermission } from "@/modules/roles/types";
+import { GoogleCallback } from "@/components/auth/GoogleCallback";
+import { GitHubCallback } from "@/components/auth/GitHubCallback";
+import LoadingSpinner from './pages/Loading';
 
 // Lazy-loaded Pages
 const Landing = React.lazy(() => import("./pages/Landing"));

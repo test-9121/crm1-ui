@@ -1,5 +1,5 @@
 
-import { Lead } from "@/modules/leads/types";
+import { ILead } from "@/modules/leads/types";
 import { Organization } from "@/modules/organizations/types";
 
 export type DealStage = 
@@ -20,7 +20,7 @@ export interface Deal {
   createdDateTime: string;
   lastUpdatedDateTime: string | null;
   name: string;
-  leads: Lead;
+  leads: ILead;
   email: string;
   stage: DealStage;
   value: number;
