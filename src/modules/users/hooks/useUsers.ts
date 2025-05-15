@@ -3,15 +3,56 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/modules/users/services/userService";
 import { User, UserFormData } from "@/modules/users/types";
 import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
+import { PaginationMetadata } from "@/modules/targets/types";
 
 export const useUsers = () => {
   const queryClient = useQueryClient();
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 5
+  });
   
   // Fetch all users
-  const { data = [], isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: userService.getAll,
+  const { 
+    data, 
+    isLoading, 
+    isError,
+    refetch,
+    isFetching
+  } = useQuery({
+    queryKey: ["users", pagination.page, pagination.size],
+    queryFn: () => userService.getAll(pagination.page, pagination.size),
   });
+
+  // Handle both paginated and non-paginated responses
+  const users = Array.isArray(data) ? data : data?.data || [];
+  const paginationData = !Array.isArray(data) && data?.pagination ? data.pagination : {
+    pageNumber: 0,
+    pageSize: users.length,
+    totalElements: users.length,
+    totalPages: 1,
+    last: true,
+    first: true,
+    numberOfElements: users.length,
+    empty: users.length === 0,
+    size: users.length,
+    number: 0
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
 
   // Create a new user
   const createUser = useMutation({
@@ -53,22 +94,23 @@ export const useUsers = () => {
     },
   });
 
-  // Ensure usersArray is always a valid array
-  const usersArray = Array.isArray(data) ? data : [];
-
   // Helper function to get a user by id
   const getUserById = (id: string): User | undefined => {
-    return usersArray.find(user => user.id === id);
+    return users.find(user => user.id === id);
   };
 
   return {
-    users: usersArray, // Ensure users is always an array
-    isLoading,
+    users,
+    pagination: paginationData,
+    isLoading: isLoading || isFetching,
     isError,
-    isEmpty: usersArray.length === 0,
+    isEmpty: users.length === 0,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
   };
 };

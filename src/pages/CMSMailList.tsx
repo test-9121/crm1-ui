@@ -1,4 +1,3 @@
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { CMSMailHeader } from "@/modules/cms/components/CMSMailHeader";
 import { useCMSMail } from "@/modules/cms/hooks/useCMSMail";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
@@ -95,7 +94,7 @@ export default function CMSMailList() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <CMSMailHeader title="Mail List" />
 
@@ -212,6 +211,6 @@ export default function CMSMailList() {
         />
 
       </div>
-    </DashboardLayout>
+    </>
   );
 }

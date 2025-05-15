@@ -25,7 +25,7 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
   const form = useForm({
     defaultValues: {
       replyText: "",
-      replierId: users[0]?.id || "",
+      replierId: users.length > 0 ? users[0]?.id || "" : "",
     },
   });
 
@@ -52,12 +52,6 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
     onError: () => {
       toast.error("Failed to add reply");
     }
-    // onSuccess: (response) => {
-    //   if (response.success) {
-    //     queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
-    //     form.reset();
-    //   }
-    // }
   });
 
   const onSubmit = async (data: any) => {

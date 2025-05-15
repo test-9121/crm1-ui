@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { CMSMailForm } from "@/modules/cms/components/CMSMailForm";
@@ -49,7 +48,7 @@ export default function CMSMailEdit() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">
           {isCreating ? "Create a new mail" : "Edit mail"}
@@ -93,6 +92,6 @@ export default function CMSMailEdit() {
           />
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

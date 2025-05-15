@@ -2,13 +2,36 @@
 import { api } from "@/modules/common/services/api";
 import { Industry } from "@/modules/leads/types";
 import { toast } from "@/components/ui/sonner";
+import { PagedResponse, PaginationMetadata } from "@/modules/targets/types";
 
 export const industryService = {
-  getAll: async (): Promise<Industry[]> => {
+  getAll: async (page = 0, size = 10): Promise<Industry[] | { data: Industry[], pagination: PaginationMetadata }> => {
     try {
-      const response = await api.get('/api/industries');
+      const response = await api.get(`/api/industries?page=${page}&size=${size}`);
       const data = response.data;
       
+      // Handle the nested response structure
+      if (data && data.industries && data.industries.content) {
+        const pagedResponse = data.industries as PagedResponse<Industry>;
+        
+        return {
+          data: pagedResponse.content || [],
+          pagination: {
+            pageNumber: pagedResponse.number,
+            pageSize: pagedResponse.size,
+            totalElements: pagedResponse.totalElements,
+            totalPages: pagedResponse.totalPages,
+            last: pagedResponse.last,
+            first: pagedResponse.first,
+            numberOfElements: pagedResponse.numberOfElements,
+            empty: pagedResponse.empty,
+            size: pagedResponse.size,
+            number: pagedResponse.number
+          }
+        };
+      }
+      
+      // For backward compatibility, if there's no pagination, return the array directly
       if (Array.isArray(data)) {
         return data;
       } else if (data && data.industries && Array.isArray(data.industries)) {

@@ -3,24 +3,59 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { projectService } from "@/modules/projects/services/projectService";
 import { Project, ProjectFormValues } from "@/modules/projects/types";
 import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
 
 export const useProjects = () => {
   const queryClient = useQueryClient();
-
-  const { 
-    data = [], 
-    isLoading, 
-    error 
-  } = useQuery({
-    queryKey: ["projects"],
-    queryFn: projectService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 5
   });
 
-  const getProjectById = (id: string): Project | undefined => {
-    return data.find(project => project.id === id);
+  const { 
+    data,
+    isLoading, 
+    error,
+    refetch,
+    isFetching
+  } = useQuery({
+    queryKey: ["projects", pagination.page, pagination.size],
+    queryFn: () => projectService.getAll(pagination.page, pagination.size),
+  });
+
+  const projects = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
   };
 
-  const isEmpty = data.length === 0 && !isLoading;
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+  const getProjectById = (id: string): Project | undefined => {
+    return projects.find(project => project.id === id);
+  };
+
+  const isEmpty = projects.length === 0 && !isLoading && !isFetching;
 
   // Create project mutation
   const createProject = useMutation({
@@ -64,13 +99,17 @@ export const useProjects = () => {
   });
 
   return {
-    projects: Array.isArray(data) ? data : [],
-    isLoading,
+    projects,
+    pagination: paginationData,
+    isLoading: isLoading || isFetching,
     error,
     isEmpty,
     getProjectById,
     createProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
   };
 };

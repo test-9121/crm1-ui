@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription
-} from "@/components/ui/dialog";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 import {
   Form,
   FormControl,
@@ -19,42 +12,38 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 
-import { 
-  ILead, 
-  Industry, 
-  Designation, 
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/sonner";
+
+import {
+  ILead,
+  Industry,
+  Designation,
   User,
   Organization,
   Status,
-  Empcount 
+  Empcount
 } from "@/modules/leads/types";
 import { leadFormSchema, type LeadFormValues } from "@/modules/leads/schemas/leadSchema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeadReplies } from "./LeadReplies";
+import PaginatedAutocomplete from "@/components/shared/foreign-key";
+import { DialogHeader } from "@/components/ui/dialog";
+import { Field } from "@/components/hook-form";
+import { MenuItem } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 interface LeadFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: LeadFormValues) => void;
+  onSubmit: (data: LeadFormValues) => Promise<any>;
   initialData?: ILead | null;
   industries: Industry[];
   designations: Designation[];
@@ -62,16 +51,17 @@ interface LeadFormProps {
   organizations: Organization[];
 }
 
-export function LeadForm({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function LeadForm({
+  open,
+  onOpenChange,
+  onSubmit,
   initialData,
   industries,
   designations,
   users,
   organizations
 }: LeadFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
     defaultValues: {
@@ -109,9 +99,9 @@ export function LeadForm({
         empcount: initialData.empcount || "0-10",
         status: initialData.status || "New",
         leaddate: initialData.leaddate ? new Date(initialData.leaddate) : new Date(),
-        industry: initialData.industry ? { 
-          id: initialData.industry.id, 
-          name: initialData.industry.name 
+        industry: initialData.industry ? {
+          id: initialData.industry.id,
+          name: initialData.industry.name
         } : { id: "", name: "" },
         designation: initialData.designation ? {
           id: initialData.designation.id,
@@ -121,12 +111,12 @@ export function LeadForm({
           id: initialData.organization.id,
           name: initialData.organization.name
         } : { id: "", name: "" },
-        sentbyId: initialData.sentby.id || "",
+        sentbyId: initialData.sentby?.id || "",
         verified: initialData.verified || false,
         messagesent: initialData.messagesent || false,
         comments: initialData.comments || "",
         draftStatus: initialData.draftStatus || false,
-        industryId: initialData.industry?.id || "" 
+        industryId: initialData.industry?.id || ""
       });
     } else {
       form.reset({
@@ -148,30 +138,46 @@ export function LeadForm({
         messagesent: false,
         comments: "",
         draftStatus: false,
-        industryId: "" 
+        industryId: ""
       });
     }
   }, [initialData, form]);
 
   const handleSubmit = async (data: LeadFormValues) => {
     try {
-      await onSubmit(data);
-      form.reset();
-      onOpenChange(false);
-    } catch (error) {
+      setIsSubmitting(true);
+      const response = await onSubmit(data);
+
+      if (response && response.success) {
+        form.reset();
+        onOpenChange(false);
+        toast.success(initialData ? "Lead updated successfully" : "Lead created successfully");
+      } else {
+        if (response && response.error) {
+          toast.error(response.error);
+        } else {
+          toast.error("Failed to save lead. Please try again.");
+        }
+      }
+    } catch (error: any) {
       console.error("Form submission error:", error);
+      toast.error(error.message || "An error occurred while saving the lead");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDialogClose = (open: boolean) => {
-    if (!open) {
-      form.reset();
+    if (!isSubmitting) {
+      if (!open) {
+        form.reset();
+      }
+      onOpenChange(open);
     }
-    onOpenChange(open);
   };
 
   const employeeCountOptions: Empcount[] = [
-    'Self Employed', '0-10', '11-50', '51-100', '101-200', 
+    'Self Employed', '0-10', '11-50', '51-100', '101-200',
     '201-500', '501-1,000', '1,001-2,000', '2,001-3,000',
     '3,001-5,000', '5,001-10,000', '10,001+'
   ];
@@ -181,28 +187,30 @@ export function LeadForm({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {initialData ? "Edit Lead" : "Add New Lead"}
-          </DialogTitle>
-          <DialogDescription>
+     <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <Dialog open={open} onClose={() => handleDialogClose(false)}>
+      {/* <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto"> */}
+      <DialogHeader>
+        <DialogTitle>
+          {initialData ? "Edit Lead" : "Add New Lead"}
+        </DialogTitle>
+        {/* <DialogDescription>
             {initialData ? "Update the lead information below." : "Fill in the details to create a new lead."}
-          </DialogDescription>
-        </DialogHeader>
+          </DialogDescription> */}
+      </DialogHeader>
 
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Lead Details</TabsTrigger>
-            <TabsTrigger value="replies" disabled={!initialData}>Replies</TabsTrigger>
-          </TabsList>
-          
+      <Tabs defaultValue="details" className=" py-2 px-5 w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="details">Lead Details</TabsTrigger>
+          <TabsTrigger value="replies" disabled={!initialData}>Replies</TabsTrigger>
+        </TabsList>
+       
+
           <TabsContent value="details">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
-                  
+
                   <FormField
                     control={form.control}
                     name="firstname"
@@ -216,7 +224,7 @@ export function LeadForm({
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="lastname"
@@ -259,74 +267,32 @@ export function LeadForm({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="industry"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Industry *</FormLabel>
-                        <Select
-                          value={field.value.id}
-                          onValueChange={(value) => {
-                            const industry = industries.find(i => i.id === value);
-                            if (industry) {
-                              form.setValue('industryId', industry.id);
-                              field.onChange({ id: industry.id, name: industry.name });
-                              
-                            }
-                          }}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select industry" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {industries.map((industry) => (
-                              <SelectItem key={industry.id} value={industry.id}>
-                                {industry.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <FormField
-                    control={form.control}
-                    name="designation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Designation *</FormLabel>
-                        <Select
-                          value={field.value.id}
-                          onValueChange={(value) => {
-                            const designation = designations.find(d => d.id === value);
-                            if (designation) {
-                              field.onChange({ id: designation.id, name: designation.name });
-                            }
-                          }}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select designation" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {designations.map((designation) => (
-                              <SelectItem key={designation.id} value={designation.id}>
-                                {designation.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <FormItem>
+                    <FormLabel>Industry *</FormLabel>
+                    <PaginatedAutocomplete
+                      value={form.watch("industryId")}
+                      onChange={(val) => form.setValue("industryId", val)}
+                      endpoint="/api/industries"
+                      // placeholder="Select Industry"
+                      dataField="industries"
+                      getLabel={(industry) => `${industry.name}`}
+                      getValue={(industry) => industry.id}
+                    />
+                  </FormItem>
 
+                  <FormItem>
+                    <FormLabel>Designation *</FormLabel>
+                    <PaginatedAutocomplete
+                      value={form.watch("designation.id")}
+                      onChange={(val) => form.setValue("designation.id", val)}
+                      endpoint="/api/designations/"
+                      // placeholder="Select Designation"
+                      dataField="designations"
+                      getLabel={(designation) => `${designation.name}`}
+                      getValue={(designation) => designation.id}
+                    />
+                  </FormItem>
                   <FormField
                     control={form.control}
                     name="linkedin"
@@ -355,30 +321,17 @@ export function LeadForm({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="empcount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Company Size</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select company size" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {employeeCountOptions.map((size) => (
-                              <SelectItem key={size} value={size}>
-                                {size}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <FormItem>
+                    <FormLabel>Company Size</FormLabel>
+                    <Field.Select name="empcount" >
+                      {employeeCountOptions.map((size) => (
+                        <MenuItem key={size} value={size}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Field.Select>
+
+                  </FormItem>
 
                   <FormField
                     control={form.control}
@@ -394,94 +347,93 @@ export function LeadForm({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {statusOptions.map((status) => (
-                              <SelectItem key={status} value={status}>
-                                {status}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <FormField
-                    control={form.control}
-                    name="leaddate"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <FormField
-                    control={form.control}
-                    name="sentbyId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sent By *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Field.Select name="status" >
+                      {statusOptions.map((status) => (
+                        <MenuItem key={status} value={status}>
+                          {status}
+                        </MenuItem>
+                      ))}
+                    </Field.Select>
+                  </FormItem>
+
+                  {/* <FormField
+                  control={form.control}
+                  name="leaddate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select sender" />
-                            </SelectTrigger>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <SelectContent>
-                            {users.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {user.email}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+                  <FormItem>
+                    <FormLabel>Lead Date</FormLabel>
+                    <Controller
+                      name="leaddate"
+                      control={form.control}
+                      render={({ field }) => (
+                        <DatePicker
+                          // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
+                          value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
+                          onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              error: !!form.formState.errors.leaddate,
+                              helperText: form.formState.errors.leaddate?.message,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+                  </FormItem>
+
+                  <FormItem>
+                    <FormLabel>Sent By *</FormLabel>
+                    <PaginatedAutocomplete
+                      value={form.watch("sentbyId")}
+                      onChange={(val) => form.setValue("sentbyId", val)}
+                      endpoint="/api/auth/"
+                      // placeholder="Select User"
+                      dataField="users"
+                      getLabel={(user) => `${user.firstName} ${user.lastName}`}
+                      getValue={(user) => user.id}
+                    />
+                  </FormItem>
+
                 </div>
 
                 <div className="flex space-x-4">
@@ -540,7 +492,7 @@ export function LeadForm({
                 />
 
                 <div className="flex justify-end space-x-4">
-                  <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
+                  <Button type="button" variant="outline" onClick={() => handleDialogClose(false)} disabled={isSubmitting}>
                     Cancel
                   </Button>
                   <Button
@@ -550,22 +502,26 @@ export function LeadForm({
                       form.setValue('draftStatus', true);
                       form.handleSubmit(handleSubmit)();
                     }}
+                    disabled={isSubmitting}
                   >
                     Save as Draft
                   </Button>
-                  <Button type="submit">
-                    {initialData ? "Update Lead" : "Create Lead"}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : (initialData ? "Update Lead" : "Create Lead")}
                   </Button>
                 </div>
               </form>
             </Form>
           </TabsContent>
-          
+
           <TabsContent value="replies">
             {initialData && <LeadReplies leadId={initialData.id} />}
           </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+      </Tabs>
+    
+      
+      {/* </DialogContent> */ }
+    </Dialog >
+    </LocalizationProvider >
   );
 }

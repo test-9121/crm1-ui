@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { useCMSContent } from "@/modules/cms/hooks/useCMSContent";
@@ -29,12 +28,12 @@ export default function CMSContentView() {
 
   if (contentQuery.isError) {
     return (
-      <DashboardLayout>
+      <>
         <FetchErrorState 
           message="Failed to load content data. Please try again later." 
           onRetry={() => contentQuery.refetch()} 
         />
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -114,7 +113,7 @@ export default function CMSContentView() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -231,6 +230,6 @@ export default function CMSContentView() {
         onClose={() => setIsViewPanelOpen(false)}
         renderContent={renderContentPanel}
       />
-    </DashboardLayout>
+    </>
   );
 }

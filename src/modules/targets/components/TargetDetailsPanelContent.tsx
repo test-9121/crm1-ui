@@ -31,10 +31,10 @@ const TargetDetailsPanelContent = ({ target }: TargetDetailsPanelContentProps) =
       statusColor = "bg-gray-100 text-gray-800";
   }
   
-  // Get the handler name from either a User object or handle the ID-only case
+  // Get the handler name from the handledBy object
   const getHandlerName = () => {
-    if (typeof target.handledById === 'object' && target.handledById) {
-      return `${target.handledById.firstName} ${target.handledById.lastName || ''}`;
+    if (target.handledBy) {
+      return `${target.handledBy.firstName} ${target.handledBy.lastName || ''}`;
     }
     return 'Unknown';
   };

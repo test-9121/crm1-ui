@@ -3,7 +3,8 @@ import React from 'react';
 import { Calendar as ReactCalendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import { CalendarView, Event, CalendarProps } from '../types';
-import { COLOR_MAP } from './ColorPicker'; // Import our color map
+import { COLOR_MAP } from './ColorPicker';
+import { cn } from '@/lib/utils';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Initialize localizer
@@ -37,7 +38,10 @@ export const Calendar: React.FC<CalendarProps> = ({
   }));
 
   return (
-    <div className="h-[600px] bg-[#f8f9fb] rounded-lg p-2 shadow-sm">
+    <div className={cn(
+      "h-[600px] rounded-xl bg-card p-4 shadow-lg border border-border/20",
+      "transition-all duration-200 ease-in-out hover:shadow-xl"
+    )}>
       {loading ? (
         <div className="flex items-center justify-center h-full">
           <p className="text-muted-foreground">Loading events...</p>
@@ -48,7 +52,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           events={calendarEvents}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: '100%', background: "#f8f9fb", borderRadius: 16, border: "none" }}
+          style={{ height: '100%' }}
           view={viewMap[view]}
           date={date}
           onNavigate={onDateChange}
@@ -56,21 +60,32 @@ export const Calendar: React.FC<CalendarProps> = ({
           onSelectEvent={(event) => onEventSelect(event.resource)}
           onSelectSlot={({ start, end }) => onDateSelect({ start, end })}
           selectable
+          className="custom-calendar"
           eventPropGetter={(event) => ({
             style: {
               backgroundColor: event.resource?.color ? COLOR_MAP[event.resource.color] || "#9b87f5" : "#9b87f5",
               border: "none",
-              borderRadius: 8,
+              borderRadius: "6px",
               color: "#fff",
-              fontWeight: 600,
-              boxShadow: "0 2px 8px 0 rgba(0,0,0,0.04)",
-              padding: "0 6px"
+              fontWeight: 500,
+              padding: "2px 8px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+              '&:hover': {
+                transform: "translateY(-1px)",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.15)"
+              }
             },
           })}
-          // (Optional) enhance modern look further via components prop if needed
+          dayPropGetter={(date) => ({
+            style: {
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.2s ease',
+            },
+          })}
         />
       )}
     </div>
   );
 };
-

@@ -1,6 +1,7 @@
 
 import { api } from "@/modules/common/services/api";
 import { Event, EventFormValues } from "../types";
+import { toast } from "@/components/ui/sonner";
 
 export const eventService = {
   getAll: async (): Promise<Event[]> => {
@@ -9,6 +10,7 @@ export const eventService = {
       return response.data.events || [];
     } catch (error) {
       console.error("Error fetching events:", error);
+      toast.error("An error occurred. Please try again.");
       throw error;
     }
   },

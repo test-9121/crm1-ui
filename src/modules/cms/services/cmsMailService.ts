@@ -1,6 +1,7 @@
 
 import { api } from "@/modules/common/services/api";
 import { CMSMail, CMSMailFormValues } from "../types";
+import { toast } from "@/components/ui/sonner";
 
 export const cmsMailService = {
   getAll: async (): Promise<CMSMail[]> => {
@@ -9,6 +10,7 @@ export const cmsMailService = {
       return response.data.cmsMail || [];
     } catch (error) {
       console.error("Error fetching CMS mails:", error);
+      toast.error("An error occurred. Please try again.");
       throw error;
     }
   },

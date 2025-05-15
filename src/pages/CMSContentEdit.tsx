@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { CMSContentForm } from "@/modules/cms/components/CMSContentForm";
@@ -8,6 +7,7 @@ import { useCMSContent } from "@/modules/cms/hooks/useCMSContent";
 import { CMSContentFormValues } from "@/modules/cms/types";
 import { useState } from "react";
 import { FetchErrorState } from "@/components/shared/FetchErrorState";
+import { toast } from "@/hooks/use-toast";
 
 export default function CMSContentEdit() {
   const { id } = useParams<{ id: string }>();
@@ -24,12 +24,25 @@ export default function CMSContentEdit() {
     try {
       if (isCreating) {
         await createContent.mutateAsync({ values, coverImage });
+        toast({
+          title: "Success",
+          description: "Content created successfully",
+        });
       } else {
         await updateContent.mutateAsync({ id: id!, values, coverImage });
+        toast({
+          title: "Success",
+          description: "Content updated successfully",
+        });
       }
       navigate("/cms/list");
     } catch (error) {
       console.error("Error submitting content:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save content. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -37,17 +50,17 @@ export default function CMSContentEdit() {
 
   if (contentQuery.isError && !isCreating) {
     return (
-      <DashboardLayout>
+      <>
         <FetchErrorState 
           message="Failed to load content data. Please try again later." 
           onRetry={() => contentQuery.refetch()} 
         />
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">
           {isCreating ? "Create a new content" : "Edit content"}
@@ -93,6 +106,6 @@ export default function CMSContentEdit() {
           />
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

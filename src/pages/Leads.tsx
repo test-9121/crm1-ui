@@ -1,7 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -29,7 +29,7 @@ import { adaptOrganizationsForLeads } from "@/modules/common/adapters/organizati
 const Leads = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { id } = useParams(); // Get the lead ID from URL if it exists
+  const { id } = useParams();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -40,7 +40,11 @@ const Leads = () => {
   const [leadToEdit, setLeadToEdit] = useState<ILead | null>(null);
   const [leadToDelete, setLeadToDelete] = useState<string | null>(null);
 
-  const { leads, isLoading, isEmpty, getLeadById } = useLeads();
+  const { leads, isLoading, isEmpty, getLeadById, pagination, 
+    handlePageChange, 
+    handlePageSizeChange,
+    refetch } = useLeads();
+    
   const { users, loading: usersLoading } = useUsers();
   const { designations, loading: designationsLoading } = useDesignations();
   const { organizations, loading: organizationsLoading } = useOrganizations();
@@ -81,26 +85,22 @@ const Leads = () => {
     try {
       if (id) {
         // If we have an ID in the URL, this is an edit operation
-        await leadService.updateLead(id, data);
-        // toast.success("Lead updated successfully");
+        const response = await leadService.updateLead(id, data);
+        return { success: true, data: response };
       } else {
         // If no ID, this is a create operation
-        await leadService.createLead(data);
-        // toast.success("New lead added successfully");
+        const response = await leadService.createLead(data);
+        return { success: true, data: response };
       }
-      
-      // Invalidate the leads query to refetch the updated data
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
-      setShowNewLeadForm(false);
-      setLeadToEdit(null);
-      
-      // Clear the URL parameter after successful operation
-      if (id) {
-        navigate("/leads");
-      }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving lead:", error);
-      toast.error("Failed to save lead. Please try again later.");
+      return { 
+        success: false, 
+        error: error.message || "Failed to save lead. Please try again later." 
+      };
+    } finally {
+      // Always invalidate the query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
     }
   };
 
@@ -151,14 +151,15 @@ const Leads = () => {
   const adaptedOrganizations = adaptOrganizationsForLeads(organizations);
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6">
+    <>
+      <div className="flex flex-col gap-6 w-full max-w-full overflow-x-hidden">
         <LeadToolbar 
           onSearchChange={handleSearchChange}
           onNewLead={() => {
             setLeadToEdit(null);
             setShowNewLeadForm(true);
           }}
+          onRefresh={refetch}
         />
         
         <LeadHeader 
@@ -166,7 +167,7 @@ const Leads = () => {
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          leadsCount={filteredLeads.length}
+          leadsCount={pagination.totalElements}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}
@@ -174,6 +175,7 @@ const Leads = () => {
 
         {!isCollapsed && (
           <>
+          <div className="w-full overflow-x-auto">
             {pageIsLoading ? (
               <div className="flex justify-center items-center h-32">
                 <p className="text-gray-500">Loading data...</p>
@@ -191,8 +193,14 @@ const Leads = () => {
                 onEditLead={handleEditLead}
                 onDeleteLead={handleDeleteLead}
                 isLoading={pageIsLoading}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                // Add this dummy value to avoid the error since we made accessedLead optional
+                accessedLead={leads[0]}
               />
             )}
+            </div>
           </>
         )}
 
@@ -203,8 +211,7 @@ const Leads = () => {
           initialData={leadToEdit}
           industries={industries}
           designations={designations}
-          // Pass users but cast to the type expected by LeadForm
-          users={users as any} 
+          users={users}
           organizations={adaptedOrganizations}
         />
 
@@ -228,7 +235,7 @@ const Leads = () => {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

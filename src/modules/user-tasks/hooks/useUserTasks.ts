@@ -3,24 +3,59 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userTaskService } from "@/modules/user-tasks/services/userTaskService";
 import { UserTask } from "@/modules/user-tasks/types";
 import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
 
 export const useUserTasks = () => {
   const queryClient = useQueryClient();
-
-  const { 
-    data = [], 
-    isLoading, 
-    error 
-  } = useQuery({
-    queryKey: ["userTasks"],
-    queryFn: userTaskService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 5
   });
 
-  const getUserTaskById = (id: string): UserTask | undefined => {
-    return data.find(userTask => userTask.id === id);
+  const { 
+    data, 
+    isLoading, 
+    error,
+    refetch,
+    isFetching
+  } = useQuery({
+    queryKey: ["userTasks", pagination.page, pagination.size],
+    queryFn: () => userTaskService.getAll(pagination.page, pagination.size),
+  });
+
+  const userTasks = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
   };
 
-  const isEmpty = data.length === 0 && !isLoading;
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+  const getUserTaskById = (id: string): UserTask | undefined => {
+    return userTasks.find(userTask => userTask.id === id);
+  };
+
+  const isEmpty = userTasks.length === 0 && !isLoading && !isFetching;
 
   // Create user task mutation
   const createUserTask = useMutation({
@@ -64,13 +99,17 @@ export const useUserTasks = () => {
   });
 
   return {
-    userTasks: Array.isArray(data) ? data : [],
-    isLoading,
+    userTasks,
+    pagination: paginationData,
+    isLoading: isLoading || isFetching,
     error,
     isEmpty,
     getUserTaskById,
     createUserTask,
     updateUserTask,
-    deleteUserTask
+    deleteUserTask,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
   };
 };

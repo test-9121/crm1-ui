@@ -3,24 +3,60 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { organizationService } from "@/modules/organizations/services/organizationService";
 import { Organization } from "@/modules/organizations/types";
 import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
+import { PaginationMetadata } from "@/modules/targets/types";
 
 export const useOrganizations = () => {
   const queryClient = useQueryClient();
-
-  const { 
-    data = [], 
-    isLoading, 
-    error 
-  } = useQuery({
-    queryKey: ["organizations"],
-    queryFn: organizationService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10
   });
 
-  const getOrganizationById = (id: string): Organization | undefined => {
-    return data.find(org => org.id === id);
+  const { 
+    data, 
+    isLoading,
+    error,
+    refetch,
+    isFetching
+  } = useQuery({
+    queryKey: ["organizations", pagination.page, pagination.size],
+    queryFn: () => organizationService.getAll(pagination.page, pagination.size),
+  });
+
+  const organizations = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
   };
 
-  const isEmpty = data.length === 0 && !isLoading;
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+  const getOrganizationById = (id: string): Organization | undefined => {
+    return organizations.find(org => org.id === id);
+  };
+
+  const isEmpty = organizations.length === 0 && !isLoading && !isFetching;
 
   // Create organization mutation
   const createOrganization = useMutation({
@@ -64,13 +100,17 @@ export const useOrganizations = () => {
   });
 
   return {
-    organizations: data,
-    isLoading,
+    organizations,
+    pagination: paginationData,
+    isLoading: isLoading || isFetching,
     error,
     isEmpty,
     getOrganizationById,
     createOrganization,
     updateOrganization,
-    deleteOrganization
+    deleteOrganization,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
   };
 };

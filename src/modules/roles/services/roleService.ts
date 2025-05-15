@@ -1,4 +1,5 @@
 
+import { toast } from "@/components/ui/sonner";
 import { api } from "@/modules/common/services/api";
 import { Role } from "@/modules/roles/types";
 
@@ -9,6 +10,7 @@ export const roleService = {
       return response.data.roles || response.data;
     } catch (error) {
       console.error("Error fetching roles, using mock data:", error);
+      toast.error("An error occurred. Please try again.");
       return [];
     }
   },

@@ -19,18 +19,21 @@ interface CMSContentCardProps {
 
 export function CMSContentCard({ content, onDelete }: CMSContentCardProps) {
   const formattedDate = format(new Date(content.createdDateTime), "dd MMM yyyy");
+  
+  // Use a locally hosted fallback image instead of placeholder.com
+  const fallbackImage = "/placeholder.svg";
 
   return (
     <Card className="overflow-hidden mb-6">
       <div className="flex flex-col md:flex-row">
         <div className="h-48 md:w-64 overflow-hidden">
           <img 
-            src={content.coverUrl} 
+            src={content.coverUrl || fallbackImage} 
             alt={content.title} 
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = "https://via.placeholder.com/300x200?text=Image+Not+Found";
+              target.src = fallbackImage;
             }} 
           />
         </div>

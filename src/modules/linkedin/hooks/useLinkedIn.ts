@@ -9,14 +9,61 @@ export const useLinkedIn = () => {
   const queryClient = useQueryClient();
   const [selectedProfile, setSelectedProfile] = useState<LinkedInProfile | null>(null);
   const [profileDetailsOpen, setProfileDetailsOpen] = useState(false);
-
-  // Fetch all LinkedIn profiles
-  const { data: profiles, isLoading, error } = useQuery({
-    queryKey: ["linkedin-profiles"],
-    queryFn: linkedinService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 5
   });
 
-  const isEmpty = !isLoading && (!profiles || profiles.length === 0);
+   // Fetch all LinkedIn profiles
+  // const { data: profiles, isLoading, error } = useQuery({
+  //   queryKey: ["linkedin-profiles"],
+  //   queryFn: linkedinService.getAll,
+  // });
+
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+    isFetching
+  } = useQuery({
+    queryKey: ["linkedin-profiles", pagination.page, pagination.size],
+    queryFn: () => linkedinService.getAll(pagination.page, pagination.size),
+  });
+
+  const profiles = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+
+  const isEmpty = profiles.length === 0 && !isLoading && !isFetching;
+ 
+
+
 
   // Create a new LinkedIn profile
   const createProfile = useMutation({
@@ -33,7 +80,7 @@ export const useLinkedIn = () => {
 
   // Update a LinkedIn profile
   const updateProfile = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: LinkedInFormValues }) => 
+    mutationFn: ({ id, data }: { id: string; data: LinkedInFormValues }) =>
       linkedinService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["linkedin-profiles"] });
@@ -74,7 +121,8 @@ export const useLinkedIn = () => {
 
   return {
     profiles: Array.isArray(profiles) ? profiles : [],
-    isLoading,
+    pagination: paginationData,
+    isLoading : isLoading || isFetching,
     error,
     isEmpty,
     createProfile,
@@ -84,6 +132,9 @@ export const useLinkedIn = () => {
     selectedProfile,
     profileDetailsOpen,
     showProfileDetails,
-    hideProfileDetails
+    hideProfileDetails,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
   };
 };

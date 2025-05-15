@@ -3,23 +3,23 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/lib/api';
 import { jwtDecode } from 'jwt-decode';
+import { RolePermission } from '@/modules/roles/types';
+import { Role, User } from '@/modules/users/types';
+import { toast } from 'sonner';
 
-// Define user type
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  [key: string]: any; // Allow for additional properties
-}
 
 // Define auth context state
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  requires2FA: boolean;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (token: string) => Promise<void>;
+  githubLogin: (code: string) => Promise<void>;
+  verify2FA: (code: string) => Promise<void>;
   logout: () => void;
+  cancelAuth: () => void;
   error: string | null;
 }
 
@@ -31,6 +31,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [requires2FA, setRequires2FA] = useState<boolean>(false);
+  const [tempAuthData, setTempAuthData] = useState<any>(null);
   const navigate = useNavigate();
 
   // Check if user is already logged in on initial load
@@ -42,7 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (storedToken && storedUser) {
         try {
           // Validate token (check expiration)
-          const decodedToken = jwtDecode(storedToken);
+          const decodedToken = jwtDecode(storedToken) as any;
           const currentTime = Date.now() / 1000;
           
           if (decodedToken.exp && decodedToken.exp < currentTime) {
@@ -71,16 +73,113 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     try {
       const response = await authApi.login(email, password);
+      console.log('Login response:', response);
+      
+      // Check if 2FA is required
+      if (response.user.twoFactorEnabled) {
+        setRequires2FA(true);
+        // Store JWT token for 2FA verification
+        setTempAuthData({
+          sessionToken: response.accessToken,  // This will be the jwtToken for 2FA verification
+          user: response.user
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       const { accessToken, ...userData } = response;
       
       // Store token and user data
       localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(userData.user));
       
-      setUser(userData);
+      setUser(userData.user);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      toast.error(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 2FA verification
+  const verify2FA = async (code: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      if (!tempAuthData || !tempAuthData.sessionToken) {
+        throw new Error('Missing authentication data');
+      }
+      
+      // Call the verify2FA method with the sessionToken (JWT token) and verification code
+      await authApi.verify2FA(tempAuthData.sessionToken, code);
+      
+      // If verification is successful, complete the login process with the saved token
+      localStorage.setItem('accessToken', tempAuthData.sessionToken);
+      localStorage.setItem('user', JSON.stringify(tempAuthData.user));
+      
+      setUser(tempAuthData.user);
+      setRequires2FA(false);
+      setTempAuthData(null);
+      
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid verification code');
+      toast.error(err.response?.data?.message || 'Invalid verification code');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cancel authentication (for 2FA)
+  const cancelAuth = () => {
+    setRequires2FA(false);
+    setTempAuthData(null);
+    navigate('/login');
+  };
+
+  // Google login method
+  const googleLogin = async (token: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authApi.loggedInUser();
+      
+      // Store token and user data
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('Google login response:', response);
+      setUser(response.user);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to login with Google.');
+      toast.error(err.response?.data?.message || 'Failed to login with Google.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // GitHub login method
+  const githubLogin = async (code: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authApi.loggedInUser();
+      console.log('GitHub login response:', response.user);
+      // Store token and user data
+      localStorage.setItem('accessToken', code);
+      localStorage.setItem('user', JSON.stringify(response));
+      
+      setUser(response.user);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to login with GitHub.');
+      toast.error(err.response?.data?.message || 'Failed to login with GitHub.');
       throw err;
     } finally {
       setIsLoading(false);
@@ -99,8 +198,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     user,
     isAuthenticated: !!user,
     isLoading,
+    requires2FA,
     login,
+    googleLogin,
+    githubLogin,
+    verify2FA,
     logout,
+    cancelAuth,
     error,
   };
 

@@ -5,11 +5,23 @@ import { userService } from "@/modules/users/services/userService";
 import { designationService } from "@/modules/designations/services/designationService";
 import { organizationService } from "@/modules/organizations/services/organizationService";
 import { industryService } from "@/modules/industries/services/industryService";
+import { useState } from "react";
+import { PaginationMetadata } from "@/modules/targets/types";
+import { User } from "@/modules/users/types";
 
 export const useUsers = () => {
-  const { data: users = [], isLoading: loading } = useQuery({
-    queryKey: ["users"],
-    queryFn: userService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 100 // Get a larger batch for dropdowns
+  });
+
+  const {
+    data,
+    isLoading: loading,
+    refetch
+  } = useQuery({
+    queryKey: ["users", pagination.page, pagination.size],
+    queryFn: () => userService.getAll(pagination.page, pagination.size),
     meta: {
       onError: (error: Error) => {
         toast.error("Failed to fetch users");
@@ -18,13 +30,26 @@ export const useUsers = () => {
     }
   });
 
-  return { users, loading };
+  // Extract users array whether it's returned directly or in a paginated structure
+  const users = Array.isArray(data) ? data : (data?.data || []);
+
+  return { users, loading, refetch };
 };
 
 export const useDesignations = () => {
-  const { data: designations = [], isLoading: loading } = useQuery({
-    queryKey: ["designations"],
-    queryFn: designationService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10
+  });
+
+  const { 
+    data, 
+    isLoading: loading,
+    refetch,
+    isFetching 
+  } = useQuery({
+    queryKey: ["designations", pagination.page, pagination.size],
+    queryFn: () => designationService.getAll(pagination.page, pagination.size),
     meta: {
       onError: (error: Error) => {
         toast.error("Failed to fetch designations");
@@ -33,13 +58,58 @@ export const useDesignations = () => {
     }
   });
 
-  return { designations, loading };
+  const designations = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+  return { 
+    designations, 
+    pagination: paginationData,
+    loading: loading || isFetching,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
+  };
 };
 
 export const useOrganizations = () => {
-  const { data: organizations = [], isLoading: loading } = useQuery({
-    queryKey: ["organizations"],
-    queryFn: organizationService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10
+  });
+
+  const { 
+    data, 
+    isLoading: loading,
+    refetch,
+    isFetching 
+  } = useQuery({
+    queryKey: ["organizations", pagination.page, pagination.size],
+    queryFn: () => organizationService.getAll(pagination.page, pagination.size),
     meta: {
       onError: (error: Error) => {
         toast.error("Failed to fetch organizations");
@@ -48,13 +118,57 @@ export const useOrganizations = () => {
     }
   });
 
-  return { organizations, loading };
+  const organizations = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize
+    });
+  };
+
+  return { 
+    organizations, 
+    pagination: paginationData,
+    loading: loading || isFetching,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch
+  };
 };
 
 export const useIndustries = () => {
-  const { data: industries = [], isLoading: loading } = useQuery({
-    queryKey: ["industries"],
-    queryFn: industryService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 100 // Get a larger batch for dropdowns
+  });
+
+  const { 
+    data, 
+    isLoading: loading,
+    refetch 
+  } = useQuery({
+    queryKey: ["industries", pagination.page, pagination.size],
+    queryFn: () => industryService.getAll(pagination.page, pagination.size),
     meta: {
       onError: (error: Error) => {
         toast.error("Failed to fetch industries");
@@ -63,5 +177,8 @@ export const useIndustries = () => {
     }
   });
 
-  return { industries, loading };
+  // Extract industries array whether it's returned directly or in a paginated structure
+  const industries = Array.isArray(data) ? data : (data?.data || []);
+
+  return { industries, loading, refetch };
 };

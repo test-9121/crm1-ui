@@ -1,7 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -26,9 +24,7 @@ import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSi
 import RoleDetailsPanelContent from "@/modules/roles/components/RoleDetailsPanelContent";
 
 const Roles = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const location = useLocation();
+  // Removed useNavigate, useParams, useLocation, useEffect
   
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -45,29 +41,8 @@ const Roles = () => {
     roles = [],
     isLoading,
     isEmpty,
-    getRoleById,
     deleteRole
   } = useRoles();
-
-  // Effect to handle URL-based role editing
-  useEffect(() => {
-    if (id) {
-      const currentRole = getRoleById(id);
-      if (currentRole) {
-        setRoleToEdit(currentRole);
-        setShowRoleForm(true);
-      } else {
-        toast.error("Role not found");
-        navigate("/roles");
-      }
-    } else {
-      // Only reset if we're not coming from the edit route
-      // if (!location.pathname.includes("/edit/")) {
-      //   setRoleToEdit(null);
-      // }
-      setRoleToEdit(null);
-    }
-  }, [id, getRoleById, navigate, location.pathname]);
 
   const handleTableUpdate = (name: string, color: string) => {
     setTableName(name);
@@ -84,11 +59,9 @@ const Roles = () => {
   };
 
   const handleEditRole = (role: Role) => {
+    // Direct edit without navigation or API call
     setRoleToEdit(role);
     setShowRoleForm(true);
-    
-    // Update URL to reflect editing state without creating a browser history entry
-    navigate(`/roles/edit/${role.id}`, { replace: false });
   };
 
   const handleDeleteRole = (roleId: string) => {
@@ -105,14 +78,6 @@ const Roles = () => {
   const handleFormClose = () => {
     setShowRoleForm(false);
     setRoleToEdit(null);
-    
-    // Navigate back to roles page with replace to avoid history stacking
-    if (id) {
-
-    navigate("/roles");
-    }
-    
-    // Reset the edit state after a short delay to prevent UI issues
   };
 
   const handleRowClick = (role: Role) => {
@@ -130,7 +95,7 @@ const Roles = () => {
     : [];
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col gap-6 w-full max-w-full overflow-x-hidden">
         <RoleToolbar 
           onSearchChange={handleSearchChange}
@@ -214,7 +179,7 @@ const Roles = () => {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

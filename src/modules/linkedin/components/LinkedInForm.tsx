@@ -1,10 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+// import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import {
   Form,
   FormControl,
@@ -25,6 +28,11 @@ import { LinkedInFormValues, LinkedInProfile } from "../types";
 import { useLinkedIn } from "../hooks/useLinkedIn";
 import { useUsers, useOrganizations } from "@/modules/common/hooks/useEntities";
 import { toast } from "@/components/ui/sonner";
+import PaginatedAutocomplete from "@/components/shared/foreign-key";
+import { DialogDescription, DialogHeader } from "@/components/ui/dialog";
+import { Field } from "@/components/hook-form";
+import { MenuItem } from "@mui/material";
+
 
 interface LinkedInFormProps {
   open: boolean;
@@ -34,8 +42,6 @@ interface LinkedInFormProps {
 
 const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) => {
   const { createProfile, updateProfile } = useLinkedIn();
-  const { users } = useUsers();
-  const { organizations } = useOrganizations();
   const isEditing = !!initialData;
 
   // Set up form with validation schema
@@ -107,15 +113,13 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-[540px] overflow-y-auto">
+    <Dialog open={open} onClose={handleDialogClose} fullWidth>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Edit LinkedIn Profile" : "New LinkedIn Profile"}
           </DialogTitle>
-          <DialogDescription>
-            {isEditing ? "Update the profile information below." : "Fill in the details to create a new LinkedIn profile."}
-          </DialogDescription>
+          
         </DialogHeader>
 
         <div className="mt-4">
@@ -150,21 +154,19 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                   )}
                 />
 
-               
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password {isEditing ? '' : '*'}</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="Password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password {isEditing ? '' : '*'}</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -217,54 +219,29 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="In-Active">In-Active</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Field.Select name="status" >
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="InActive">In Active</MenuItem>
+                  <MenuItem value="OnHold">On Hold</MenuItem>
+                </Field.Select>
+              </FormItem>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="handledById"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Handled By *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select handler" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {users?.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.firstName} {user.lastName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel>Handled By *</FormLabel>
+                  <PaginatedAutocomplete
+                    value={form.watch("handledById")}
+                    onChange={(val) => form.setValue("handledById", val)}
+                    endpoint="/api/auth/"
+                    placeholder="Select User"
+                    dataField="users"
+                    getLabel={(user) => `${user.firstName} ${user.lastName}`}
+                    getValue={(user) => user.id}
+                  />
+                </FormItem>
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
@@ -275,7 +252,7 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
                 >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   type="submit"
                   disabled={createProfile.isPending || updateProfile.isPending}
                 >

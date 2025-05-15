@@ -69,7 +69,7 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
         email: initialData.email,
         roleId: initialData.role.id,
         organizationId: initialData.organization.id,
-        phoneNumber: initialData.phoneNumber,
+        phoneNumber: initialData.phoneNumber||"",
         disabled: initialData.disabled,
         verified: initialData.verified,
         emailVerified: initialData.emailVerified,
@@ -88,63 +88,6 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
       });
     }
   }, [initialData, form]);
-
-  // const onSubmit = (values: UserFormValues) => {
-  //   if (isEditMode && initialData) {
-  //     updateUser.mutate({
-  //       id: initialData.id,
-  //       data: {
-  //         firstName: values.firstName,
-  //         lastName: values.lastName,
-  //         email: values.email,
-  //         roleId: values.roleId,
-  //         organizationId: values.organizationId,
-  //         phoneNumber: values.phoneNumber,
-  //         disabled: values.disabled,
-  //         verified: values.verified,
-  //         emailVerified: values.emailVerified,
-  //         department: values.department,
-  //         location: values.location,
-  //         jobTitle: values.jobTitle,
-  //         city: values.city,
-  //         state: values.state,
-  //         country: values.country,
-  //         address: values.address,
-  //         zipCode: values.zipCode,
-  //         company: values.company,
-  //         status: values.status,
-  //         avatarUrl: values.avatarUrl,
-  //         ...(values.password ? { password: values.password } : {}),
-  //       },
-  //     });
-  //   } else {
-  //     createUser.mutate({
-  //       firstName: values.firstName,
-  //       lastName: values.lastName,
-  //       email: values.email,
-  //       roleId: values.roleId,
-  //       organizationId: values.organizationId,
-  //       phoneNumber: values.phoneNumber,
-  //       disabled: values.disabled,
-  //       verified: values.verified,
-  //       emailVerified: values.emailVerified,
-  //       department: values.department,
-  //       location: values.location,
-  //       jobTitle: values.jobTitle,
-  //       city: values.city,
-  //       state: values.state,
-  //       country: values.country,
-  //       address: values.address,
-  //       zipCode: values.zipCode,
-  //       company: values.company,
-  //       status: values.status,
-  //       avatarUrl: values.avatarUrl,
-  //       ...(values.password ? { password: values.password } : {}),
-  //     });
-  //   }
-  //   // Close the dialog after submission
-  //   onOpenChange(false);
-  // };
 
   const onSubmit = async (values: UserFormValues) => {
     try {
@@ -280,7 +223,8 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
                   </FormItem>
                 )}
               />
-              <FormField
+              {!isEditMode && (
+                <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
@@ -293,6 +237,7 @@ const UserForm = ({ open, onOpenChange, initialData }: UserFormProps) => {
                   </FormItem>
                 )}
               />
+              )}
 
               {/* Location Section */}
               <FormField

@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { useCMSMail } from "@/modules/cms/hooks/useCMSMail";
@@ -17,7 +16,7 @@ export default function CMSMailView() {
   const mailQuery = getMailById(id || "");
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -91,6 +90,6 @@ export default function CMSMailView() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

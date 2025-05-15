@@ -1,15 +1,62 @@
 
 import { api } from "@/modules/common/services/api";
-import { Target } from "../types";
+import { PagedResponse, PaginationMetadata, Target } from "../types";
+import { toast } from "@/components/ui/sonner";
 
 export const targetService = {
-  getAll: async (): Promise<Target[]> => {
+  getAll: async (page = 0, size = 5): Promise<{ data: Target[], pagination: PaginationMetadata }> => {
     try {
-      const response = await api.get('/api/targets/');
-      return response.data.targets || response.data;
+      const response = await api.get(`/api/targets/?page=${page}&size=${size}`);
+      
+      // Handle the nested response structure
+      if (response.data && response.data.targets) {
+        const { targets } = response.data;
+        
+        return {
+          data: targets.content || [],
+          pagination: {
+            pageNumber: targets.number,
+            pageSize: targets.size,
+            totalElements: targets.totalElements,
+            totalPages: targets.totalPages,
+            last: targets.last,
+            first: targets.first,
+            numberOfElements: targets.numberOfElements,
+            empty: targets.empty,
+            size: targets.size,
+            number: targets.number
+          }
+        };
+      }
+      
+      console.error("Unexpected API response format:", response.data);
+      return { data: [], pagination: {
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        first: true,
+        numberOfElements: 0,
+        empty: true,
+        size: 10,
+        number: 0
+      }};
     } catch (error) {
-      console.error("Error fetching targets, using mock data:", error);
-      return [];
+      console.error("Error fetching targets:", error);
+      toast.error("An error occurred. Please try again.");
+      return { data: [], pagination: {
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        first: true,
+        numberOfElements: 0,
+        empty: true,
+        size: 10,
+        number: 0
+      }};
     }
   },
 

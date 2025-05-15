@@ -17,24 +17,35 @@ export const useCMSContent = () => {
     return useQuery({
       queryKey: ["cms-content", id],
       queryFn: () => cmsContentService.getById(id),
-      enabled: !!id && id !== "new",
+      enabled: !!id && id !== "new" && id !== "create",
       retry: 1,
     });
   };
 
   const createContent = useMutation({
     mutationFn: async (data: { values: CMSContentFormValues; coverImage?: File }) => {
-      // First create the content
-      const content = await cmsContentService.create(data.values);
-      
-      // If there's a cover image, upload it separately
-      if (data.coverImage && content.id) {
-        const coverUrl = await cmsContentService.uploadCoverImage(content.id, data.coverImage);
-        // Return the updated content with cover URL
-        return { ...content, coverUrl };
+      try {
+        // First create the content
+        const content = await cmsContentService.create(data.values);
+        
+        // If there's a cover image, upload it separately
+        if (data.coverImage && content.id) {
+          try {
+            const coverUrl = await cmsContentService.uploadCoverImage(content.id, data.coverImage);
+            // Return the updated content with cover URL
+            return { ...content, coverUrl };
+          } catch (imageError) {
+            console.error("Failed to upload image but content was created", imageError);
+            // Return content without image if upload fails
+            return content;
+          }
+        }
+        
+        return content;
+      } catch (error) {
+        console.error("Error in createContent mutation:", error);
+        throw error;
       }
-      
-      return content;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cms-contents"] });
@@ -54,17 +65,28 @@ export const useCMSContent = () => {
 
   const updateContent = useMutation({
     mutationFn: async ({ id, values, coverImage }: { id: string; values: CMSContentFormValues; coverImage?: File }) => {
-      // First update the content data
-      const content = await cmsContentService.update(id, values);
-      
-      // If there's a cover image, upload it separately
-      if (coverImage) {
-        const coverUrl = await cmsContentService.uploadCoverImage(id, coverImage);
-        // Return the updated content with cover URL
-        return { ...content, coverUrl };
+      try {
+        // First update the content data
+        const content = await cmsContentService.update(id, values);
+        
+        // If there's a cover image, upload it separately
+        if (coverImage) {
+          try {
+            const coverUrl = await cmsContentService.uploadCoverImage(id, coverImage);
+            // Return the updated content with cover URL
+            return { ...content, coverUrl };
+          } catch (imageError) {
+            console.error("Failed to upload image but content was updated", imageError);
+            // Return updated content without new image if upload fails
+            return content;
+          }
+        }
+        
+        return content;
+      } catch (error) {
+        console.error("Error in updateContent mutation:", error);
+        throw error;
       }
-      
-      return content;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cms-contents"] });

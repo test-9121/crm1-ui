@@ -1,5 +1,4 @@
 
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { CMSContentHeader } from "@/modules/cms/components/CMSContentHeader";
 import { useCMSContent } from "@/modules/cms/hooks/useCMSContent";
 import { CMSContentCard } from "@/modules/cms/components/CMSContentCard";
@@ -59,7 +58,7 @@ export default function CMSContentList() {
   });
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <CMSContentHeader title="Content List" />
 
@@ -146,6 +145,6 @@ export default function CMSContentList() {
           </>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

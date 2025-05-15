@@ -8,7 +8,8 @@ export interface Target {
   id: string;
   accountName: string;
   connectionsCount: number;
-  handledById: User | string; 
+  handledById?: string; 
+  handledBy: User;
   noOfLeadsIdentified: number;
   connectionsSent: number;
   messagesSent: number;
@@ -22,4 +23,46 @@ export interface Target {
   organization: Organization;
   createdDateTime?: string;
   lastUpdatedDateTime?: string | null;
+}
+
+export interface PaginationMetadata {
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
+  size: number;
+  number: number;
+}
+
+export interface PagedResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      sorted: boolean;
+      unsorted: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
 }

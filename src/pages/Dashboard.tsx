@@ -1,253 +1,294 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { 
+import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  Legend
+  Legend,
+  LineChart,
+  Line,
+  Area,
+  AreaChart
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Calendar, CalendarIcon, CheckCircle, CheckSquare, Clock, FileText, Mail, MessageSquare, Target, TrendingUp, Users } from "lucide-react";
 
-const salesData = [
-  { name: "Jan", amount: 1200 },
-  { name: "Feb", amount: 900 },
-  { name: "Mar", amount: 1800 },
-  { name: "Apr", amount: 1400 },
-  { name: "May", amount: 2200 },
-  { name: "Jun", amount: 1900 },
-];
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { ActivityFeed } from "@/modules/common/ActivityFeed";
+import { ChartCard } from "@/modules/common/ChartCard";
+import { StatCard } from "@/modules/common/StatCard";
+import { useState } from "react";
+import { useTargets } from "@/modules/targets/hooks/useTargets";
+import { useEvents } from "@/modules/events/hooks/useEvents";
 
-const leadsData = [
-  { name: "New", value: 42, color: "#3b82f6" },
-  { name: "Contacted", value: 28, color: "#10b981" },
-  { name: "Qualified", value: 15, color: "#f59e0b" },
-  { name: "Lost", value: 8, color: "#ef4444" },
-];
+
+
+
+
 
 const Dashboard = () => {
   const { user } = useAuth();
-  
+  const { theme } = useTheme();
+
+  const {targets} = useTargets();
+
+  const {allEvents} = useEvents();
+
+  console.log("All Events", allEvents.data);
+
+  const [timeRange, setTimeRange] = useState("weekly");
+
+  const leadsData = targets.map((target) => ({
+    name: target.accountName,
+    data: [
+      {
+        name: target.accountName,
+        data: [
+          target.connectionsCount || 0, // Default to 0 if undefined
+          target.noOfLeadsIdentified || 0, // Default to 0 if undefined
+          target.connectionsSent || 0, // Default to 0 if undefined
+          target.messagesSent || 0, // Default to 0 if undefined
+          target.followUps || 0, // Default to 0 if undefined
+          target.meetingsScheduled || 0, // Default to 0 if undefined
+          target.inMailCount || 0, // Default to 0 if undefined
+          target.postings || 0, // Default to 0 if undefined
+        ],
+      },
+    ],
+  }));
+
+  const summaryCardsData = targets.reduce(
+    (acc, target) => {
+      // Accumulate the various metrics
+      acc.noOfLeadsIdentified += target.noOfLeadsIdentified || 0;
+      acc.connectionsCount += target.connectionsCount || 0;
+      acc.messagesSent += target.messagesSent || 0;
+      acc.followUps += target.followUps || 0;
+      acc.meetingsScheduled += target.meetingsScheduled || 0;
+      acc.inMailCount += target.inMailCount || 0;
+      acc.postings += target.postings || 0;
+      acc.connectionsSent += target.connectionsSent || 0;
+
+      // Track counts for active, inactive, and on hold targets
+      if (target.status === 'Active') {
+        acc.activeTargetsCount += 1;
+      } else if (target.status === 'InActive') {
+        acc.inactiveTargetsCount += 1;
+      } else if (target.status === 'OnHold') {
+        acc.onHoldTargetsCount += 1;
+      }
+      acc.totalTargetCount = acc.activeTargetsCount + acc.inactiveTargetsCount + acc.onHoldTargetsCount;
+      return acc;
+    },
+    {
+      noOfLeadsIdentified: 0,
+      connectionsCount: 0,
+      messagesSent: 0,
+      followUps: 0,
+      meetingsScheduled: 0,
+      inMailCount: 0,
+      postings: 0,
+      activeTargetsCount: 0,  // Initial count for active targets
+      inactiveTargetsCount: 0, // Initial count for inactive targets
+      onHoldTargetsCount: 0,   // Initial count for on hold targets
+      connectionsSent: 0,
+      totalTargetCount: 0,
+    } // initial value
+  );
+
+  const getRoleBadge = () => {
+    switch (user.role.rolePermission) {
+      case 'ROLE_SUPER_ADMIN':
+        return <Badge variant="outline" className="ml-2 bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 border-purple-200">Super Admin</Badge>;
+      case 'ROLE_ADMIN':
+        return <Badge variant="outline" className="ml-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-200">Admin</Badge>;
+      case 'ROLE_USER':
+        return <Badge variant="outline" className="ml-2 bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-200">User</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name || "User"}</h1>
-          <p className="text-muted-foreground">
-            Here's an overview of your CRM performance and key metrics.
-          </p>
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight flex items-center">
+                Welcome back, {user.firstName || "User"}
+                {getRoleBadge()}
+              </h1>
+              <p className="text-muted-foreground">
+                Here's an overview of your CRM performance and key metrics.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium">Today :</p>
+              <div className="text-sm font-semibold">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+            </div>
+            {/* <Card className="w-full md:w-auto">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="rounded-full bg-primary/10 p-3">
+                  <Clock className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Current Date</p>
+                  <p className="text-2xl font-semibold">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                </div>
+              </CardContent>
+            </Card> */}
+          </div>
         </section>
 
         {/* Stats Overview */}
-        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">93</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                +8% from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Active Deals</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                +12% from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="m16 6 4 14M12 6v14M8 8v12M4 4v16" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">18.3%</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                +2.5% from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <rect width="20" height="14" x="2" y="5" rx="2" />
-                <path d="M2 10h20" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$58,464</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                +18.2% from last month
-              </p>
-            </CardContent>
-          </Card>
-        </section>
+        <div className="p-2 space-y-8 animate-fade-in">
+          {/* <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Dashboard Overview</h1>
+              <p className="text-muted-foreground mt-1">Track your performance metrics and activities</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="px-3 py-1.5 bg-primary/5 hover:bg-primary/10">
+                Today
+              </Badge>
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button size="sm" variant="default" className="ml-2 bg-primary hover:bg-primary/90">
+                Export
+              </Button>
+            </div>
+          </div> */}
 
-        {/* Charts */}
-        <section className="grid gap-4 md:grid-cols-2">
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>Monthly Sales</CardTitle>
-              <CardDescription>
-                Your sales performance over the past 6 months
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
-                  <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <StatCard
+              title="No. of Leads Identified"
+              value={summaryCardsData.noOfLeadsIdentified}
+              icon={<Users size={20} />}
+              trend={{ value: 12, isPositive: true }}
+              className="bg-gradient-to-br from-card to-accent/5 hover:shadow-md transition-all duration-300"
+            />
+            <StatCard
+              title="Connections Sent"
+              value={summaryCardsData.connectionsSent}
+              icon={<MessageSquare size={20} />}
+              trend={{ value: 8, isPositive: true }}
+              className="bg-gradient-to-br from-card to-primary/5 hover:shadow-md transition-all duration-300"
+            />
+            <StatCard
+              title="Messages Sent"
+              value={summaryCardsData.messagesSent}
+              icon={<Mail size={20} />}
+              trend={{ value: 5, isPositive: true }}
+              className="bg-gradient-to-br from-card to-secondary/10 hover:shadow-md transition-all duration-300"
+            />
+            <StatCard
+              title="Follow Ups"
+              value={summaryCardsData.followUps}
+              icon={<CheckSquare size={20} />}
+              trend={{ value: 3, isPositive: false }}
+              className="bg-gradient-to-br from-card to-secondary/5 hover:shadow-md transition-all duration-300"
+            />
+            <StatCard
+              title="Meetings Scheduled"
+              value={summaryCardsData.meetingsScheduled}
+              icon={<Calendar size={20} />}
+              trend={{ value: 10, isPositive: true }}
+              className="bg-gradient-to-br from-card to-accent/5 hover:shadow-md transition-all duration-300"
+            />
+            <StatCard
+              title="InMail Count"
+              value={summaryCardsData.inMailCount}
+              icon={<FileText size={20} />}
+              trend={{ value: 2, isPositive: true }}
+              className="bg-gradient-to-br from-card to-primary/5 hover:shadow-md transition-all duration-300"
+            />
+          </div>
 
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>Lead Status</CardTitle>
-              <CardDescription>
-                Current distribution of leads by status
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={leadsData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {leadsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                  <Tooltip formatter={(value) => [value, "Leads"]} />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </section>
+          <ChartCard
+            title="Client Data Insights"
+            description="Visual representation of client data over time."
+            data={leadsData}
+            dataKey="data"
+          />
 
-        {/* Recent Activity */}
-        <section>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
-                The latest actions across your CRM
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <li key={i} className="flex items-start gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
-                    <div className={`w-2 h-2 mt-2 rounded-full ${
-                      i % 4 === 0 ? "bg-red-500" :
-                      i % 3 === 0 ? "bg-green-500" :
-                      i % 2 === 0 ? "bg-blue-500" : "bg-yellow-500"
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {i % 4 === 0 ? "Deal closed with Acme Inc." :
-                         i % 3 === 0 ? "New lead created: Sarah Johnson" :
-                         i % 2 === 0 ? "Meeting scheduled with potential client" :
-                         "Follow-up email sent to John Doe"}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {i % 4 === 0 ? "By Mark Wilson" :
-                         i % 3 === 0 ? "By Jennifer Adams" :
-                         i % 2 === 0 ? "By Robert Chen" :
-                         "By Emily Parker"}
-                         {" • "}
-                        {i % 4 === 0 ? "2 hours ago" :
-                         i % 3 === 0 ? "Yesterday" :
-                         i % 2 === 0 ? "2 days ago" :
-                         "3 days ago"}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* <ChartCard
+              title="No Of Leads Identified"
+              data={leadsData}
+              dataKey="value"
+              description="Daily lead identification analytics"
+            />
+            <ChartCard
+              title="Connections Sent"
+              data={connectionsData}
+              dataKey="value"
+              description="Connection requests analytics"
+            />
+            <ChartCard
+              title="Messages Sent"
+              data={messagesData}
+              dataKey="value"
+              type="line"
+              description="Message engagement analytics"
+            /> */}
+
+
+            {/* <ChartCard
+              title="Follow Ups"
+              data={followUpsData}
+              dataKey="value"
+              type="line"
+              description="Follow-up engagement analytics"
+            /> */}
+
+
+          </div>
+          <ActivityFeed activities={allEvents.data} />
+
+          {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ChartCard
+                  title="Meetings Scheduled"
+                  data={meetingsData}
+                  dataKey="value"
+                  description="Meeting scheduling analytics"
+                />
+                <ChartCard
+                  title="In Mail Count"
+                  data={inMailData}
+                  dataKey="value"
+                  description="InMail engagement analytics"
+                />
+              </div>
+            </div>
+           
+          </div> */}
+
+        </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

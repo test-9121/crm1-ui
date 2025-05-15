@@ -1,13 +1,19 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { RolePermission } from '@/modules/roles/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: string | string[];
+  requiredRole?: RolePermission | RolePermission[];
+  allowedOperations?: ('create' | 'read' | 'update' | 'delete')[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiredRole,
+  allowedOperations = ['create', 'read', 'update', 'delete']
+}) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
@@ -28,9 +34,47 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
 
   // Check role-based access if required
   if (requiredRole && user) {
-    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    const userRole = user.role.rolePermission;
+    const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     
-    if (!roles.includes(user.role)) {
+    // Check if the user has required role
+    const hasRequiredRole = requiredRoles.includes(userRole as RolePermission);
+
+    if(user.email !== 'owner@ensarsolutions.com'){
+      if (location.pathname.includes('/organizations') || location.pathname.includes('/roles')) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+    
+    // Specific rules for ROLE_USER
+    if (userRole === 'ROLE_USER' && hasRequiredRole) {
+      // If path is for restricted sections (users management)
+      if (location.pathname.includes('/users') || location.pathname.includes('/organizations') || location.pathname.includes('/roles')) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+      
+      // If path is for modules with limited operations
+      const limitedAccessPaths = ['/leads', '/targets', '/linkedin'];
+      const hasLimitedAccess = limitedAccessPaths.some(path => location.pathname.includes(path));
+      
+      // If editing/creating and the path has limited access for ROLE_USER
+      if (hasLimitedAccess && 
+          (location.pathname.includes('/edit/') || location.pathname.includes('/create/')) && 
+          !allowedOperations.includes('update')) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+    
+    // Check ROLE_ADMIN restrictions
+    if (userRole === 'ROLE_ADMIN' && hasRequiredRole) {
+      // Admin can't access user management
+      if (location.pathname.includes('/organizations') || location.pathname.includes('/roles') || location.pathname.includes('users/edit')) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+    
+    // If the user doesn't have required role at all
+    if (!hasRequiredRole) {
       // User doesn't have the required role
       return <Navigate to="/unauthorized" replace />;
     }

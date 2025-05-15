@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
 import { CalendarView, Event } from '@/modules/events/types';
 import { useEvents } from '@/modules/events/hooks/useEvents';
@@ -61,17 +60,17 @@ export default function Events() {
 
   if (allEvents.isError) {
     return (
-      <DashboardLayout>
+      <>
         <FetchErrorState 
           message="Failed to load events data. Please try again later." 
           onRetry={() => allEvents.refetch()} 
         />
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
@@ -149,6 +148,6 @@ export default function Events() {
           />
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

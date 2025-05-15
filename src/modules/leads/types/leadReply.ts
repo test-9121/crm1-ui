@@ -9,12 +9,7 @@ export interface LeadReply {
   replier: User;         // Full user object
   replierId?: string;    // ID of the replier
   parentReplyId?: string; // ID of parent reply if this is a response
-  leadresponses?: {
-    id: string;
-    replyId: string;
-    response: string;
-    respondAt: string | null;
-  }[]; // Responses array
+  leadresponses?: LeadResponse[]; // Responses array
 }
 
 // Form data type
@@ -25,4 +20,14 @@ export interface LeadReplyFormData {
   replierId: string;
   replier: User;
   parentReplyId?: string;
+}
+
+// New LeadResponse type definition
+export interface LeadResponse {
+  id: string;
+  replyId: string;
+  response: string;
+  respondAt: string | null;
+  responderId?: string;
+  responder?: User;
 }
