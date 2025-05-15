@@ -18,6 +18,7 @@ import { cmsContentService } from "@/modules/cms/services/cmsContentService";
 import { cmsMailService } from "@/modules/cms/services/cmsMailService";
 import { leadReplyService } from "@/modules/leads/services/leadReplyService";
 import { leadResponseService } from "@/modules/leads/services/leadResponseService";
+import { dealsService } from "@/modules/deals/services/dealService";
 import { api } from "@/modules/common/services/api";
 
 // Re-export the services with legacy names for backward compatibility
@@ -36,6 +37,7 @@ export const cmsContentApi = cmsContentService;
 export const cmsMailApi = cmsMailService;
 export const leadRepliesApi = leadReplyService;
 export const leadResponsesApi = leadResponseService;
+export const dealsApi = dealsService;
 
 // Export CRM-related APIs for backward compatibility
 export const leadsApi = {
@@ -48,13 +50,6 @@ export const leadsApi = {
 export const contactsApi = {
   getAll: async () => {
     const response = await api.get('/api/contacts/');
-    return response.data;
-  },
-};
-
-export const dealsApi = {
-  getAll: async () => {
-    const response = await api.get('/api/deals/');
     return response.data;
   },
 };

@@ -37,7 +37,7 @@ interface DealFormProps {
 const dealSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   email: z.string().email({ message: 'Invalid email' }).optional().or(z.literal('')),
-  stage: z.enum(['LEAD', 'DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']),
+  stage: z.enum(['PROSPECTING', 'LEAD', 'DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']),
   value: z.number().min(0, { message: 'Value must be positive' }),
   expectedCloseDate: z.date().nullable().optional(),
   actualCloseDate: z.date().nullable().optional(),
@@ -185,7 +185,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="LEAD">Lead</SelectItem>
+                        <SelectItem value="PROSPECTING">Prospecting</SelectItem>
+                        <SelectItem value="LEAD">New Lead</SelectItem>
                         <SelectItem value="DISCOVERY">Discovery</SelectItem>
                         <SelectItem value="PROPOSAL">Proposal</SelectItem>
                         <SelectItem value="NEGOTIATION">Negotiation</SelectItem>

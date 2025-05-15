@@ -3,6 +3,7 @@ import { ILead } from "@/modules/leads/types";
 import { Organization } from "@/modules/organizations/types";
 
 export type DealStage = 
+  | "PROSPECTING" 
   | "LEAD" 
   | "DISCOVERY" 
   | "PROPOSAL" 
