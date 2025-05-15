@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,7 +26,8 @@ import {
   Mail,
   FileText,
   Shield,
-  PanelLeftOpen
+  PanelLeftOpen,
+  DollarSign
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -189,13 +189,12 @@ export function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
   // Extract user role
-  const userRole = user.role.rolePermission || 'ROLE_USER';
-  const ownerMail =user.email;
+  const userRole = user.role?.rolePermission || 'ROLE_USER';
+  const ownerMail = user.email;
   const isSuperAdmin = userRole === 'ROLE_SUPER_ADMIN';
   const isAdmin = userRole === 'ROLE_ADMIN' || isSuperAdmin;
   const isUser = userRole === 'ROLE_USER';
   const isOwner = ownerMail === 'owner@ensarsolutions.com';
-
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -237,117 +236,6 @@ export function Sidebar() {
     </div>
   );
 
-  // const SidebarContent = () => {
-  //   const dashboardItem = {
-  //     icon: <LayoutDashboard size={20} />,
-  //     label: "Dashboard",
-  //     path: "/dashboard",
-  //   };
-
-  //   // Only show for admin and super admin roles
-  //   const adminManagementItems = [
-  //     { icon: <UserRound size={20} />, label: "Users", path: "/users", showFor: ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'] },
-  //     { icon: <Building size={20} />, label: "Organizations", path: "/organizations", showFor: ['ROLE_SUPER_ADMIN'] },
-  //     { icon: <Shield size={20} />, label: "Roles", path: "/roles", showFor: ['ROLE_SUPER_ADMIN'] },
-  //   ].filter(item => item.showFor.includes(userRole as RolePermission));
-
-  //   const managementItems = [
-  //     { icon: <Target size={20} />, label: "Targets", path: "/targets" },
-  //     { icon: <Folder size={20} />, label: "Projects", path: "/projects" },
-  //     { icon: <UserCheck size={20} />, label: "User Tasks", path: "/user-tasks" },
-  //     { icon: <PhoneCall size={20} />, label: "Leads", path: "/leads" },
-  //     { icon: <Linkedin size={20} />, label: "LinkedIn", path: "/linkedin" },
-  //     { icon: <Calendar size={20} />, label: "Events", path: "/calendar" },
-  //     {
-  //       icon: <FileText size={20} />, label: "CMS", path: "#", subItems: [
-  //         { label: "Content List", path: "/cms/list" },
-  //         { label: "Mail List", path: "/cms-mail/list" }
-  //       ]
-  //     },
-  //     // { icon: <BadgePercent size={20} />, label: "Deals", path: "/deals" },
-  //     // { icon: <BarChart size={20} />, label: "Reports", path: "/reports" },
-  //     // { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
-  //   ];
-
-  //   return (
-  //     <div
-  //       className="space-y-4 py-4 flex-1"
-  //       ref={sidebarRef}
-  //     >
-  //       {!isCollapsed && <PremiumPlanCard />}
-  //       <div className="px-3 animate-fade-in">
-  //         <SidebarItem
-  //           icon={dashboardItem.icon}
-  //           label={dashboardItem.label}
-  //           path={dashboardItem.path}
-  //           isCollapsed={isCollapsed}
-  //           isActive={location.pathname === dashboardItem.path}
-  //         />
-  //       </div>
-
-  //       {/* Only render User Management section if user is admin or super admin */}
-  //       {!isUser && adminManagementItems.length > 0 && (
-  //         <div>
-  //           <SidebarGroup icon={<Users size={20} />} label="User Management" isCollapsed={isCollapsed}>
-  //             <div className="mt-1 space-y-1 animate-fade-in">
-  //               {adminManagementItems.map((item) => (
-  //                 <SidebarItem
-  //                   key={item.path}
-  //                   icon={item.icon}
-  //                   label={item.label}
-  //                   path={item.path}
-  //                   isCollapsed={isCollapsed}
-  //                   isActive={location.pathname === item.path}
-  //                 />
-  //               ))}
-  //             </div>
-  //           </SidebarGroup>
-  //         </div>
-  //       )}
-
-  //       <div>
-  //         <SidebarGroup icon={<PanelLeftOpen size={20} />} label="Management" isCollapsed={isCollapsed}>
-  //           <div className="mt-1 space-y-1 animate-fade-in">
-  //             {managementItems.map((item) => (
-  //               <div key={item.path || item.label}>
-  //                 {item.subItems ? (
-  //                   <>
-  //                     {item.label === "CMS" && (
-  //                       <div className="ml-3">
-  //                         <SidebarGroup icon={<FileText size={20} />} label="CMS" isCollapsed={isCollapsed}>
-  //                           <div className="mt-1 space-y-1 animate-fade-in">
-  //                             {item.subItems.map((subItem) => (
-  //                               <SidebarSubItem
-  //                                 key={subItem.path}
-  //                                 label={subItem.label}
-  //                                 path={subItem.path}
-  //                                 isCollapsed={isCollapsed}
-  //                                 isActive={location.pathname === subItem.path}
-  //                               />
-  //                             ))}
-  //                           </div>
-  //                         </SidebarGroup>
-  //                       </div>
-  //                     )}
-  //                   </>
-  //                 ) : (
-  //                   <SidebarItem
-  //                     icon={item.icon}
-  //                     label={item.label}
-  //                     path={item.path}
-  //                     isCollapsed={isCollapsed}
-  //                     isActive={location.pathname === item.path}
-  //                   />
-  //                 )}
-  //               </div>
-  //             ))}
-  //           </div>
-  //         </SidebarGroup>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   const SidebarContent = () => {
     const dashboardItem = {
       icon: <LayoutDashboard size={20} />,
@@ -371,6 +259,7 @@ export function Sidebar() {
       { icon: <Folder size={20} />, label: "Projects", path: "/projects" },
       { icon: <UserCheck size={20} />, label: "User Tasks", path: "/user-tasks" },
       { icon: <PhoneCall size={20} />, label: "Leads", path: "/leads" },
+      { icon: <DollarSign size={20} />, label: "Deals", path: "/deals" },
       { icon: <Linkedin size={20} />, label: "LinkedIn", path: "/linkedin" },
       { icon: <Calendar size={20} />, label: "Events", path: "/calendar" },
       {
@@ -466,7 +355,6 @@ export function Sidebar() {
     );
   };
   
-
   const SidebarFooter = () => (
     <div className={cn("p-3 mt-auto", isCollapsed ? "text-center" : "")}>
       {/* {!isCollapsed && (
