@@ -26,12 +26,12 @@ import { format } from 'date-fns';
 import { Deal, DealFormValues } from '../types';
 import PaginatedAutocomplete from '@/components/shared/foreign-key';
 import { FormItem } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogTitle, FormControl, FormLabel, MenuItem } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Controller } from 'react-hook-form';
-import { FormProvider, Form } from '@/components/hook-form/form-provider';
+import { Form } from '@/components/hook-form/form-provider';
 
 interface DealFormProps {
   isOpen: boolean;
@@ -131,8 +131,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
           </DialogHeader>
           
-          <FormProvider methods={methods}>
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 py-2">
+          <Form methods={methods} onSubmit={handleSubmit(handleFormSubmit)}>
+            <div className="space-y-4 py-2">
               <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name" className="font-medium">Deal Name *</Label>
@@ -457,8 +457,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   {isEditMode ? 'Update Deal' : 'Create Deal'}
                 </Button>
               </DialogFooter>
-            </form>
-          </FormProvider>
+            </div>
+          </Form>
         </DialogContent>
       </Dialog>
     </LocalizationProvider>
