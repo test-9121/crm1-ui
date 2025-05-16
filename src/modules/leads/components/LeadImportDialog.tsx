@@ -95,13 +95,13 @@ export function LeadImportDialog({
     setImportResult(null);
   };
 
-  // Sample excel download link - to be updated with actual path
-  const sampleExcelLink = "/sample-leads-import.xlsx";
+  // Update the sample file link to CSV
+  const sampleFileLink = "/sample-leads-import.csv";
 
   const downloadSampleFile = () => {
     const link = document.createElement('a');
-    link.href = sampleExcelLink;
-    link.download = "sample-leads-import.xlsx";
+    link.href = sampleFileLink;
+    link.download = "sample-leads-import.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -126,14 +126,14 @@ export function LeadImportDialog({
         <Alert variant="destructive" className="mt-2 border-red-300 bg-red-50">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="flex flex-col">
-            <span className="text-red-600 font-medium">Use below sample excel structure for proper import</span>
+            <span className="text-red-600 font-medium">Use below sample CSV structure for proper import</span>
             <Button 
               variant="link" 
               className="text-red-600 p-0 h-auto text-sm font-medium flex items-center justify-start underline" 
               onClick={downloadSampleFile}
             >
               <Download className="h-4 w-4 mr-1" />
-              Download sample Excel template
+              Download sample CSV template
             </Button>
           </AlertDescription>
         </Alert>
