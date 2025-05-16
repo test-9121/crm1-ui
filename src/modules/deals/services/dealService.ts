@@ -43,7 +43,14 @@ export const dealsService = {
   
   createDeal: async (dealData: DealFormValues): Promise<Deal> => {
     try {
-      const response = await api.post("/api/deals/", dealData);
+      // Transform dates to ISO strings if they exist
+      const formattedData = {
+        ...dealData,
+        expectedCloseDate: dealData.expectedCloseDate ? new Date(dealData.expectedCloseDate).toISOString() : null,
+        actualCloseDate: dealData.actualCloseDate ? new Date(dealData.actualCloseDate).toISOString() : null,
+      };
+      
+      const response = await api.post("/api/deals/", formattedData);
       return response.data;
     } catch (error) {
       console.error("Error creating deal:", error);
@@ -53,7 +60,14 @@ export const dealsService = {
   
   updateDeal: async (id: string, dealData: DealFormValues): Promise<Deal> => {
     try {
-      const response = await api.put(`/api/deals/${id}`, dealData);
+      // Transform dates to ISO strings if they exist
+      const formattedData = {
+        ...dealData,
+        expectedCloseDate: dealData.expectedCloseDate ? new Date(dealData.expectedCloseDate).toISOString() : null,
+        actualCloseDate: dealData.actualCloseDate ? new Date(dealData.actualCloseDate).toISOString() : null,
+      };
+      
+      const response = await api.put(`/api/deals/${id}`, formattedData);
       return response.data;
     } catch (error) {
       console.error(`Error updating deal ${id}:`, error);

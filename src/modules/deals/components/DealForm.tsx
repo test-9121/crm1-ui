@@ -47,6 +47,8 @@ const dealSchema = z.object({
   nextStep: z.string().optional().or(z.literal('')),
   notes: z.string().optional().or(z.literal('')),
   probability: z.number().min(0).max(100).optional(),
+  leadId: z.string().optional().or(z.literal('')),
+  organizationId: z.string().optional().or(z.literal('')),
 });
 
 export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }: DealFormProps) {
@@ -65,6 +67,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
       nextStep: '',
       notes: '',
       probability: 0,
+      leadId: '',
+      organizationId: '',
     }
   });
 
@@ -83,6 +87,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
         nextStep: deal.nextStep || '',
         notes: deal.notes || '',
         probability: deal.probability || 0,
+        leadId: deal.leads?.id || '',
+        organizationId: deal.organization?.id || '',
       });
     } else {
       reset({
@@ -98,6 +104,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
         nextStep: '',
         notes: '',
         probability: 0,
+        leadId: '',
+        organizationId: '',
       });
     }
   }, [isEditMode, deal, reset]);

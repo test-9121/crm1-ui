@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dealsService } from "../services/dealService";
-import { Deal, DealFormValues, DealStats, DealStage } from "../types";
+import { Deal, DealFormValues, DealStats } from "../types";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationMetadata } from "@/types/pagination";
 
