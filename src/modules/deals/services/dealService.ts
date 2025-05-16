@@ -1,19 +1,34 @@
 
 import { api } from "@/modules/common/services/api";
-import { Deal, DealFormValues, DealStats } from "../types";
+import { Deal, DealFormValues, DealStats, DealFilters } from "../types";
 import { PaginationMetadata } from "@/types/pagination";
 
 export const dealsService = {
-  getDeals: async (page = 1, size = 10, search = "", filters = {}): Promise<{ data: Deal[], pagination: PaginationMetadata }> => {
+  getDeals: async (page = 1, size = 10, search = "", filters?: DealFilters): Promise<{ deals: Deal[], pagination: PaginationMetadata }> => {
     try {
-      const response = await api.get("/api/deals/", { 
-        params: { 
-          page, 
-          size, 
-          search,
-          ...filters 
-        } 
-      });
+      // Prepare query parameters
+      const params: Record<string, any> = { page: page - 1, size, search };
+      
+      // Add filters to params if they exist
+      if (filters) {
+        if (filters.stage && filters.stage.length > 0) {
+          params.stages = filters.stage.join(',');
+        }
+        if (filters.status && filters.status.length > 0) {
+          params.statuses = filters.status.join(',');
+        }
+        if (filters.priority && filters.priority.length > 0) {
+          params.priorities = filters.priority.join(',');
+        }
+        if (filters.minValue) {
+          params.minValue = filters.minValue;
+        }
+        if (filters.maxValue) {
+          params.maxValue = filters.maxValue;
+        }
+      }
+      
+      const response = await api.get("/api/deals/", { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching deals:", error);

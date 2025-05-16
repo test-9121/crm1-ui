@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dealsService } from "../services/dealService";
-import { Deal, DealFormValues, DealStats } from "../types";
+import { Deal, DealFormValues, DealStats, DealFilters } from "../types";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationMetadata } from "@/types/pagination";
 
-export const useDeals = (page = 1, size = 10, search = "", filters = {}) => {
+export const useDeals = (page = 1, size = 10, search = "", filters: DealFilters = {}) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);

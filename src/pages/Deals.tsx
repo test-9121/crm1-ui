@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Tabs,
   TabsContent,
@@ -42,6 +41,7 @@ import DealForm from '@/modules/deals/components/DealForm';
 import DealDetailsSidePanel from '@/modules/deals/components/DealDetailsSidePanel';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import { DealFilters } from '@/modules/deals/types';
 
 interface FiltersState {
   stage: string[];
@@ -87,9 +87,44 @@ export default function Deals() {
     updateDeal,
     deleteDeal,
     updateDealStage,
-  } = useDeals(page, pageSize, search);
+  } = useDeals(page, pageSize, search, filters as DealFilters);
 
-  console.log("dummy", deals)
+  // Apply filters to all deals for board view
+  const filteredAllDeals = React.useMemo(() => {
+    if (!allDeals.length) return [];
+    
+    return allDeals.filter(deal => {
+      // Filter by stage
+      if (filters.stage.length > 0 && !filters.stage.includes(deal.stage)) {
+        return false;
+      }
+      
+      // Filter by status
+      if (filters.status.length > 0 && !filters.status.includes(deal.status)) {
+        return false;
+      }
+      
+      // Filter by priority
+      if (filters.priority.length > 0 && !filters.priority.includes(deal.priority)) {
+        return false;
+      }
+      
+      // Filter by value range
+      const minValue = filters.minValue ? Number(filters.minValue) : 0;
+      const maxValue = filters.maxValue ? Number(filters.maxValue) : Infinity;
+      
+      if (deal.value < minValue || deal.value > maxValue) {
+        return false;
+      }
+      
+      // Filter by search term
+      if (search && !deal.name.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [allDeals, filters, search]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -224,6 +259,7 @@ export default function Deals() {
                 </div>
                 <Separator />
 
+                {/* Deal Stage Filter */}
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium">Deal Stage</h5>
                   <div className="grid grid-cols-2 gap-2">
@@ -254,6 +290,7 @@ export default function Deals() {
                   </div>
                 </div>
 
+                {/* Status Filter */}
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium">Status</h5>
                   <div className="grid grid-cols-2 gap-2">
@@ -284,6 +321,7 @@ export default function Deals() {
                   </div>
                 </div>
 
+                {/* Priority Filter */}
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium">Priority</h5>
                   <div className="grid grid-cols-3 gap-2">
@@ -314,6 +352,7 @@ export default function Deals() {
                   </div>
                 </div>
 
+                {/* Deal Value Filter */}
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium">Deal Value</h5>
                   <div className="grid grid-cols-2 gap-2">
@@ -377,7 +416,7 @@ export default function Deals() {
         {view === 'board' && (
           <div className="mt-6">
             <DealPipelineBoard
-              deals={allDeals}
+              deals={filteredAllDeals}
               onOpenDetail={openDetailsSidePanel}
               onEditDeal={openEditDialog}
               onDeleteDeal={handleDeleteClick}
@@ -408,7 +447,7 @@ export default function Deals() {
             <DealAnalytics
               stats={dealStats}
               isLoading={isStatsLoading}
-              deals={allDeals}
+              deals={filteredAllDeals}
             />
           </div>
         )}

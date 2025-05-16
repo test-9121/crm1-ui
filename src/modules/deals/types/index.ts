@@ -1,4 +1,3 @@
-
 import { ILead } from "@/modules/leads/types";
 import { Organization } from "@/modules/organizations/types";
 
@@ -21,6 +20,14 @@ export type DealSource =
   | "SOCIAL_MEDIA" 
   | "EVENT" 
   | "OTHER";
+
+export interface DealFilters {
+  stage?: string[];
+  status?: string[];
+  priority?: string[];
+  minValue?: string;
+  maxValue?: string;
+}
 
 export interface Deal {
   id: string;
