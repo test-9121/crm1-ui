@@ -89,6 +89,8 @@ export default function Deals() {
     updateDealStage,
   } = useDeals(page, pageSize, search);
 
+  console.log("dummy", deals)
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1);

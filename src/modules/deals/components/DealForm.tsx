@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,6 +25,12 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Deal, DealFormValues } from '../types';
+import PaginatedAutocomplete from '@/components/shared/foreign-key';
+import { FormItem } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogTitle, FormLabel, MenuItem } from '@mui/material';
+import { Field } from '@/components/hook-form/fields';
+import form from '@/components/form';
+import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
 
 interface DealFormProps {
   isOpen: boolean;
@@ -115,7 +121,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onClose={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
@@ -235,7 +241,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="priority" className="font-medium">Priority *</Label>
+                {/* <Label htmlFor="priority" className="font-medium">Priority *</Label>
                 <Controller
                   control={control}
                   name="priority"
@@ -251,7 +257,15 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                       </SelectContent>
                     </Select>
                   )}
-                />
+                /> */}
+                 <FormItem>
+                  <FormLabel>Priority *</FormLabel>
+                  <Field.Select name="priority" >
+                    <MenuItem value="Low">Low</MenuItem>
+                    <MenuItem value="Medium">Medium</MenuItem>
+                    <MenuItem value="High">High</MenuItem>
+                  </Field.Select>
+                </FormItem>
                 {errors.priority && (
                   <span className="text-sm text-red-500">{errors.priority.message}</span>
                 )}
@@ -389,12 +403,18 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             {/* These fields would typically connect to a dropdown or search component in a real implementation */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="leadId" className="font-medium">Lead Connection</Label>
-                <Input
-                  id="leadId"
-                  {...register('leadId')}
-                  placeholder="Select or enter lead ID"
-                />
+                <FormItem>
+            <FormLabel>Lead</FormLabel>
+            <PaginatedAutocomplete
+              value={form.watch("leadId")}
+              onChange={(val) => form.setValue("leadId", val)}
+              endpoint="/api/leads/"
+              placeholder="Select lead"
+              dataField="leads"
+              getLabel={(lead) => `${lead.firstname} ${lead.lastname}`}
+              getValue={(lead) => lead.id}
+            />
+          </FormItem>
               </div>
               
               <div className="grid gap-2">

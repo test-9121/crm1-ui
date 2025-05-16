@@ -202,7 +202,7 @@ export const useDeals = (page = 1, size = 10, search = "", filters = {}) => {
   const isLoading = isPaginatedLoading || isAllDealsLoading;
 
   return {
-    deals: dealsData?.data || [],
+    deals: dealsData?.deals || [],
     allDeals: allDeals,
     pagination: dealsData?.pagination as PaginationMetadata,
     dealStats,
