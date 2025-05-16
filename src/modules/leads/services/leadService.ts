@@ -1,3 +1,4 @@
+
 import { api } from "@/modules/common/services/api";
 import { ILead } from "@/modules/leads/types";
 import { LeadFormValues } from "@/modules/leads/schemas/leadSchema";
@@ -105,15 +106,53 @@ export const leadService = {
     await api.delete(`/api/leads/${id}`);
   },
 
-  // Updated export method to handle CSV data
+  // Updated export method to properly handle empcount data to prevent formatting as dates
   exportLeads: async (): Promise<Blob> => {
     try {
+      // Set responseType to 'text' instead of 'blob' to allow for data manipulation
       const response = await api.get("/api/leads/export", { 
-        responseType: 'blob'
+        responseType: 'text'
       });
       
-      console.log(response.data)
-      // Return the blob data as CSV
+      // Check if we have data to process
+      if (response.data) {
+        // Process the CSV data to ensure employee count is treated as text
+        const lines = response.data.split('\n');
+        
+        // Find the index of the employee count column
+        const headerLine = lines[0];
+        const headers = headerLine.split(',');
+        const empCountIndex = headers.findIndex(header => 
+          header.trim().toLowerCase() === 'company headcount' || 
+          header.trim().toLowerCase() === 'empcount');
+        
+        if (empCountIndex !== -1 && lines.length > 1) {
+          // Process each data row
+          for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue; // Skip empty lines
+            
+            const rowData = lines[i].split(',');
+            if (rowData.length > empCountIndex) {
+              // Ensure employee count is wrapped in quotes to prevent date formatting
+              const empCount = rowData[empCountIndex]?.trim();
+              if (empCount && !empCount.startsWith('"')) {
+                rowData[empCountIndex] = `"${empCount}"`;
+              }
+              lines[i] = rowData.join(',');
+            }
+          }
+        }
+        
+        // Rejoin the CSV data
+        const processedData = lines.join('\n');
+        
+        // Return the processed data as a CSV blob
+        return new Blob([processedData], { 
+          type: 'text/csv' 
+        });
+      }
+      
+      // Fallback to the original blob if no processing was done
       return new Blob([response.data], { 
         type: 'text/csv' 
       });
