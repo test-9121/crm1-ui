@@ -11,9 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
-import { FileText, Upload, X, Loader2, Check } from "lucide-react";
+import { FileText, Upload, X, Loader2, Check, Download, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LeadImportDialogProps {
   open: boolean;
@@ -94,6 +95,18 @@ export function LeadImportDialog({
     setImportResult(null);
   };
 
+  // Sample excel download link - to be updated with actual path
+  const sampleExcelLink = "/sample-leads-import.xlsx";
+
+  const downloadSampleFile = () => {
+    const link = document.createElement('a');
+    link.href = sampleExcelLink;
+    link.download = "sample-leads-import.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Dialog open={open} onOpenChange={(value) => {
       if (!isImporting) {
@@ -109,6 +122,21 @@ export function LeadImportDialog({
             Maximum file size is 10MB.
           </DialogDescription>
         </DialogHeader>
+        
+        <Alert variant="destructive" className="mt-2 border-red-300 bg-red-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="flex flex-col">
+            <span className="text-red-600 font-medium">Use below sample excel structure for proper import</span>
+            <Button 
+              variant="link" 
+              className="text-red-600 p-0 h-auto text-sm font-medium flex items-center justify-start underline" 
+              onClick={downloadSampleFile}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Download sample Excel template
+            </Button>
+          </AlertDescription>
+        </Alert>
         
         <div className="flex flex-col gap-4 py-4">
           {importResult ? (
