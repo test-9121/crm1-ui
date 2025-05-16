@@ -21,6 +21,7 @@ import { leadResponseService } from "@/modules/leads/services/leadResponseServic
 import { contactService } from "@/modules/contacts/services/contactService";
 import { accountService } from "@/modules/accounts/services/accountService";
 import { dealsService } from "@/modules/deals/services/dealService";
+import { leadService } from "@/modules/leads/services/leadService";
 
 // Re-export the services with legacy names for backward compatibility
 export const authApi = authService;
@@ -41,11 +42,4 @@ export const leadResponsesApi = leadResponseService;
 export const dealsApi = dealsService;
 export const contactsApi = contactService;
 export const accountsApi = accountService;
-
-// Export CRM-related APIs for backward compatibility
-export const leadsApi = {
-  getAll: async () => {
-    const response = await api.get('/api/leads/');
-    return response.data;
-  },
-};
+export const leadsApi = leadService;

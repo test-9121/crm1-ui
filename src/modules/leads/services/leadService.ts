@@ -1,3 +1,4 @@
+
 import { api } from "@/modules/common/services/api";
 import { ILead } from "@/modules/leads/types";
 import { LeadFormValues } from "@/modules/leads/schemas/leadSchema";
@@ -105,14 +106,36 @@ export const leadService = {
     await api.delete(`/api/leads/${id}`);
   },
 
-  // Updated export method to handle CSV data
+  // Updated export method to handle CSV data and ensure proper empcount formatting
   exportLeads: async (): Promise<Blob> => {
     try {
-      const response = await api.get("/api/leads/export", { 
+      // Get all leads data first to modify before export
+      const leadsResponse = await api.get("/api/leads/all");
+      let leadsData = [];
+      
+      // Extract leads data from response based on structure
+      if (Array.isArray(leadsResponse.data)) {
+        leadsData = leadsResponse.data;
+      } else if (leadsResponse.data && typeof leadsResponse.data === 'object') {
+        if (Array.isArray(leadsResponse.data.leads)) {
+          leadsData = leadsResponse.data.leads;
+        } else if (leadsResponse.data.content) {
+          leadsData = leadsResponse.data.content;
+        }
+      }
+      
+      // Process leads data to ensure empcount is correctly formatted
+      const processedLeads = leadsData.map(lead => ({
+        ...lead,
+        // Ensure empcount is treated as a string, not a date
+        empcount: lead.empcount ? String(lead.empcount) : ''
+      }));
+      
+      // Request the server to generate CSV with the processed data
+      const response = await api.post("/api/leads/export", { leads: processedLeads }, { 
         responseType: 'blob'
       });
       
-      console.log(response.data)
       // Return the blob data as CSV
       return new Blob([response.data], { 
         type: 'text/csv' 
