@@ -26,7 +26,7 @@ import { format } from 'date-fns';
 import { Deal, DealFormValues } from '../types';
 import PaginatedAutocomplete from '@/components/shared/foreign-key';
 import { FormItem } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogTitle, MenuItem } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, FormLabel, MenuItem } from '@mui/material';
 import { Field } from '@/components/hook-form/fields';
 import { Form } from '@/components/hook-form/form-provider';
 import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
@@ -144,7 +144,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   <span className="text-sm text-red-500">{errors.name.message}</span>
                 )}
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="email" className="font-medium">Contact Email</Label>
                 <Input
@@ -157,7 +157,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   <span className="text-sm text-red-500">{errors.email.message}</span>
                 )}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="value" className="font-medium">Deal Value *</Label>
@@ -173,7 +173,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     <span className="text-sm text-red-500">{errors.value.message}</span>
                   )}
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="probability" className="font-medium">Probability (%)</Label>
                   <Input
@@ -190,111 +190,66 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="stage" className="font-medium">Stage *</Label>
-                  <Controller
-                    control={control}
-                    name="stage"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={cn(errors.stage && "border-red-500")}>
-                          <SelectValue placeholder="Select stage" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PROSPECTING">Prospecting</SelectItem>
-                          <SelectItem value="LEAD">New Lead</SelectItem>
-                          <SelectItem value="DISCOVERY">Discovery</SelectItem>
-                          <SelectItem value="PROPOSAL">Proposal</SelectItem>
-                          <SelectItem value="NEGOTIATION">Negotiation</SelectItem>
-                          <SelectItem value="CLOSED_WON">Closed Won</SelectItem>
-                          <SelectItem value="CLOSED_LOST">Closed Lost</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.stage && (
-                    <span className="text-sm text-red-500">{errors.stage.message}</span>
-                  )}
+                  <FormItem>
+                    <FormLabel>Stage *</FormLabel>
+                    <Field.Select name="stage" >
+                      <MenuItem value="PROSPECTING">Prospecting</MenuItem>
+                      <MenuItem value="LEAD">New Lead</MenuItem>
+                      <MenuItem value="DISCOVERY">Discovery</MenuItem>
+                      <MenuItem value="PROPOSAL">Proposal</MenuItem>
+                      <MenuItem value="NEGOTIATION">Negotiation</MenuItem>
+                      <MenuItem value="CLOSED_WON">Closed Won</MenuItem>
+                      <MenuItem value="CLOSED_LOST">Closed Lost</MenuItem>
+                    </Field.Select>
+                  </FormItem>
                 </div>
-                
+
                 <div className="grid gap-2">
-                  <Label htmlFor="status" className="font-medium">Status *</Label>
-                  <Controller
-                    control={control}
-                    name="status"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={cn(errors.status && "border-red-500")}>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ACTIVE">Active</SelectItem>
-                          <SelectItem value="INACTIVE">Inactive</SelectItem>
-                          <SelectItem value="ON_HOLD">On Hold</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.status && (
-                    <span className="text-sm text-red-500">{errors.status.message}</span>
-                  )}
+
+
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Field.Select name="status" >
+                      <MenuItem value="ACTIVE">Active</MenuItem>
+                      <MenuItem value="INACTIVE">Inactive</MenuItem>
+                      <MenuItem value="ON_HOLD">On Hold</MenuItem>
+                    </Field.Select>
+                  </FormItem>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="priority" className="font-medium">Priority *</Label>
-                  <Controller
-                    control={control}
-                    name="priority"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={cn(errors.priority && "border-red-500")}>
-                          <SelectValue placeholder="Select priority" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="LOW">Low</SelectItem>
-                          <SelectItem value="MEDIUM">Medium</SelectItem>
-                          <SelectItem value="HIGH">High</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.priority && (
-                    <span className="text-sm text-red-500">{errors.priority.message}</span>
-                  )}
+                  <FormItem>
+                    <FormLabel>Priority *</FormLabel>
+                    <Field.Select name="priority" >
+                      <MenuItem value="LOW">Low</MenuItem>
+                      <MenuItem value="MEDIUM">Medium</MenuItem>
+                      <MenuItem value="HIGH">High</MenuItem>
+                    </Field.Select>
+                  </FormItem>
                 </div>
-                
+
                 <div className="grid gap-2">
-                  <Label htmlFor="source" className="font-medium">Lead Source *</Label>
-                  <Controller
-                    control={control}
-                    name="source"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={cn(errors.source && "border-red-500")}>
-                          <SelectValue placeholder="Select source" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="WEBSITE">Website</SelectItem>
-                          <SelectItem value="REFERRAL">Referral</SelectItem>
-                          <SelectItem value="COLD_CALL">Cold Call</SelectItem>
-                          <SelectItem value="EMAIL">Email</SelectItem>
-                          <SelectItem value="SOCIAL_MEDIA">Social Media</SelectItem>
-                          <SelectItem value="EVENT">Event</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.source && (
-                    <span className="text-sm text-red-500">{errors.source.message}</span>
-                  )}
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Field.Select name="status" >
+                      <MenuItem value="WEBSITE">Website</MenuItem>
+                      <MenuItem value="REFERRAL">Referral</MenuItem>
+                      <MenuItem value="COLD_CALL">Cold Call</MenuItem>
+                      <MenuItem value="EMAIL">Email</MenuItem>
+                      <MenuItem value="SOCIAL_MEDIA">Social Media</MenuItem>
+                      <MenuItem value="EVENT">Event</MenuItem>
+                      <MenuItem value="OTHER">Other</MenuItem>
+                    </Field.Select>
+                  </FormItem>
+
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label className="font-medium">Expected Close Date</Label>
@@ -332,7 +287,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     <span className="text-sm text-red-500">{errors.expectedCloseDate.message}</span>
                   )}
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label className="font-medium">Actual Close Date</Label>
                   <Controller
@@ -370,7 +325,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   )}
                 </div>
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="nextStep" className="font-medium">Next Step</Label>
                 <Input
@@ -382,7 +337,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   <span className="text-sm text-red-500">{errors.nextStep.message}</span>
                 )}
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="notes" className="font-medium">Notes</Label>
                 <Textarea
@@ -395,7 +350,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   <span className="text-sm text-red-500">{errors.notes.message}</span>
                 )}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="leadId" className="font-medium">Lead</Label>
@@ -412,7 +367,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     <span className="text-sm text-red-500">{errors.leadId.message}</span>
                   )}
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="organizationId" className="font-medium">Organization</Label>
                   <PaginatedAutocomplete
@@ -430,7 +385,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                 </div>
               </div>
             </div>
-            
+
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
