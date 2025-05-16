@@ -116,14 +116,14 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 py-2">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Deal Name</Label>
+              <Label htmlFor="name" className="font-medium">Deal Name *</Label>
               <Input
                 id="name"
                 {...register('name')}
@@ -136,7 +136,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="email">Contact Email</Label>
+              <Label htmlFor="email" className="font-medium">Contact Email</Label>
               <Input
                 id="email"
                 {...register('email')}
@@ -150,7 +150,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="value">Deal Value</Label>
+                <Label htmlFor="value" className="font-medium">Deal Value *</Label>
                 <Input
                   id="value"
                   type="number"
@@ -165,7 +165,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="probability">Probability (%)</Label>
+                <Label htmlFor="probability" className="font-medium">Probability (%)</Label>
                 <Input
                   id="probability"
                   type="number"
@@ -183,12 +183,12 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="stage">Stage</Label>
+                <Label htmlFor="stage" className="font-medium">Stage *</Label>
                 <Controller
                   control={control}
                   name="stage"
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className={cn(errors.stage && "border-red-500")}>
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
@@ -204,15 +204,18 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     </Select>
                   )}
                 />
+                {errors.stage && (
+                  <span className="text-sm text-red-500">{errors.stage.message}</span>
+                )}
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status" className="font-medium">Status *</Label>
                 <Controller
                   control={control}
                   name="status"
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className={cn(errors.status && "border-red-500")}>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
@@ -224,17 +227,20 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     </Select>
                   )}
                 />
+                {errors.status && (
+                  <span className="text-sm text-red-500">{errors.status.message}</span>
+                )}
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="priority">Priority</Label>
+                <Label htmlFor="priority" className="font-medium">Priority *</Label>
                 <Controller
                   control={control}
                   name="priority"
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className={cn(errors.priority && "border-red-500")}>
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
@@ -246,15 +252,18 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     </Select>
                   )}
                 />
+                {errors.priority && (
+                  <span className="text-sm text-red-500">{errors.priority.message}</span>
+                )}
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="source">Lead Source</Label>
+                <Label htmlFor="source" className="font-medium">Lead Source *</Label>
                 <Controller
                   control={control}
                   name="source"
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className={cn(errors.source && "border-red-500")}>
                         <SelectValue placeholder="Select source" />
                       </SelectTrigger>
@@ -270,12 +279,15 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                     </Select>
                   )}
                 />
+                {errors.source && (
+                  <span className="text-sm text-red-500">{errors.source.message}</span>
+                )}
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>Expected Close Date</Label>
+                <Label className="font-medium">Expected Close Date</Label>
                 <Controller
                   control={control}
                   name="expectedCloseDate"
@@ -294,21 +306,25 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                           {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value as Date}
                           onSelect={field.onChange}
                           initialFocus
+                          className={cn("p-3 pointer-events-auto")}
                         />
                       </PopoverContent>
                     </Popover>
                   )}
                 />
+                {errors.expectedCloseDate && (
+                  <span className="text-sm text-red-500">{errors.expectedCloseDate.message}</span>
+                )}
               </div>
               
               <div className="grid gap-2">
-                <Label>Actual Close Date</Label>
+                <Label className="font-medium">Actual Close Date</Label>
                 <Controller
                   control={control}
                   name="actualCloseDate"
@@ -327,41 +343,72 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                           {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value as Date}
                           onSelect={field.onChange}
                           initialFocus
+                          className={cn("p-3 pointer-events-auto")}
                         />
                       </PopoverContent>
                     </Popover>
                   )}
                 />
+                {errors.actualCloseDate && (
+                  <span className="text-sm text-red-500">{errors.actualCloseDate.message}</span>
+                )}
               </div>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="nextStep">Next Step</Label>
+              <Label htmlFor="nextStep" className="font-medium">Next Step</Label>
               <Input
                 id="nextStep"
                 {...register('nextStep')}
                 placeholder="Next action to take"
               />
+              {errors.nextStep && (
+                <span className="text-sm text-red-500">{errors.nextStep.message}</span>
+              )}
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes" className="font-medium">Notes</Label>
               <Textarea
                 id="notes"
                 {...register('notes')}
                 placeholder="Additional notes about this deal"
-                className="min-h-[80px]"
+                className="min-h-[100px]"
               />
+              {errors.notes && (
+                <span className="text-sm text-red-500">{errors.notes.message}</span>
+              )}
+            </div>
+            
+            {/* These fields would typically connect to a dropdown or search component in a real implementation */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="leadId" className="font-medium">Lead Connection</Label>
+                <Input
+                  id="leadId"
+                  {...register('leadId')}
+                  placeholder="Select or enter lead ID"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="organizationId" className="font-medium">Organization</Label>
+                <Input
+                  id="organizationId"
+                  {...register('organizationId')}
+                  placeholder="Select or enter organization ID"
+                />
+              </div>
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
