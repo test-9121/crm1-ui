@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Table,
@@ -606,12 +605,16 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
         <CardFooter className="border-t pt-4">
           <TablePagination
             totalItems={pagination?.totalElements || leads.length}
-            rowsPerPage={pagination?.pageSize || 5}
-            currentPage={pagination?.pageNumber + 1}
+            pageSize={pagination?.pageSize || pagination?.size || 5}
+            currentPage={pagination?.page || pagination?.pageNumber ? (pagination.pageNumber + 1) : 1}
+            totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || leads.length) / (pagination?.pageSize || pagination?.size || 5))}
             onPageChange={(page) => onPageChange(page - 1)}
-            onRowsPerPageChange={onPageSizeChange}
+            onPageSizeChange={onPageSizeChange}
             isDense={isDense}
             onDenseChange={setIsDense}
+            // For backward compatibility
+            rowsPerPage={pagination?.pageSize || pagination?.size || 5}
+            onRowsPerPageChange={onPageSizeChange}
           />
         </CardFooter>
       </Card>

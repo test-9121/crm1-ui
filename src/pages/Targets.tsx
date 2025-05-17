@@ -88,11 +88,14 @@ const Targets = () => {
 
   // Filter targets based on search term
   const filteredTargets = Array.isArray(targets) 
-    ? targets.filter(target => 
-        target.name?.toLowerCase?.().includes(searchTerm.toLowerCase()) ||
-        target.description?.toLowerCase?.().includes(searchTerm.toLowerCase()) ||
-        String(target.id)?.includes(searchTerm)
-      )
+    ? targets.filter(target => {
+        const targetName = target.name || '';
+        const targetDesc = target.description || '';
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        return targetName.toLowerCase().includes(lowerSearchTerm) || 
+               targetDesc.toLowerCase().includes(lowerSearchTerm) || 
+               String(target.id)?.includes(searchTerm);
+      })
     : [];
 
   return (
