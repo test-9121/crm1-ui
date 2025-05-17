@@ -13,12 +13,12 @@ import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 interface RHFSelectProps {
   name: string;
   label?: string;
-  options: { value: string; label: string }[];
+  options?: { value: string; label: string }[];
   placeholder?: string;
   [x: string]: any;
 }
 
-export function RHFSelect({ name, label, options, placeholder = "Select...", ...other }: RHFSelectProps) {
+export function RHFSelect({ name, label, options = [], placeholder = "Select...", ...other }: RHFSelectProps) {
   const { control } = useFormContext();
 
   return (

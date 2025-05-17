@@ -22,3 +22,15 @@ export const handleRowClick = <T,>(
     callback(item);
   }
 };
+
+// Add row click handler to components that need it
+export const withRowClick = <T,>(
+  rowElement: React.ReactElement,
+  item: T,
+  onRowClick: (item: T) => void
+): React.ReactElement => {
+  return React.cloneElement(rowElement, {
+    onClick: (e: React.MouseEvent<HTMLTableRowElement>) => handleRowClick(e, item, onRowClick),
+    className: `${rowElement.props.className || ''} cursor-pointer hover:bg-muted/50`,
+  });
+};

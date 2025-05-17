@@ -48,14 +48,14 @@ const Dashboard = () => {
       {
         name: target.accountName,
         data: [
-          target.connectionsCount || 0, // Default to 0 if undefined
-          target.noOfLeadsIdentified || 0, // Default to 0 if undefined
-          target.connectionsSent || 0, // Default to 0 if undefined
-          target.messagesSent || 0, // Default to 0 if undefined
-          target.followUps || 0, // Default to 0 if undefined
-          target.meetingsScheduled || 0, // Default to 0 if undefined
-          target.inMailCount || 0, // Default to 0 if undefined
-          target.postings || 0, // Default to 0 if undefined
+          target.connectionsCount || 0,
+          target.noOfLeadsIdentified || 0, 
+          target.connectionsSent || 0, 
+          target.messagesSent || 0, 
+          target.followUps || 0, 
+          target.meetingsScheduled || 0, 
+          target.inMailCount || 0, 
+          target.postings || 0, 
         ],
       },
     ],
@@ -93,12 +93,12 @@ const Dashboard = () => {
       meetingsScheduled: 0,
       inMailCount: 0,
       postings: 0,
-      activeTargetsCount: 0,  // Initial count for active targets
-      inactiveTargetsCount: 0, // Initial count for inactive targets
-      onHoldTargetsCount: 0,   // Initial count for on hold targets
       connectionsSent: 0,
+      activeTargetsCount: 0,  
+      inactiveTargetsCount: 0, 
+      onHoldTargetsCount: 0,   
       totalTargetCount: 0,
-    } // initial value
+    }
   );
   
   // Calculate the total after reduction

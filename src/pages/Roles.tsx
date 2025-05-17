@@ -84,6 +84,24 @@ const Roles = () => {
     setIsDetailsPanelOpen(true);
   };
 
+  // Create dummy pagination data for now
+  const dummyPagination = {
+    page: 1,
+    pageSize: 10,
+    totalPages: 1,
+    totalElements: roles.length
+  };
+
+  const handlePageChange = (page: number) => {
+    // This would be implemented if pagination was used
+    console.log("Page change requested:", page);
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    // This would be implemented if pagination was used
+    console.log("Page size change requested:", pageSize);
+  };
+
   // Filter roles based on search term
   const filteredRoles = Array.isArray(roles) 
     ? roles.filter(role => 
@@ -134,8 +152,10 @@ const Roles = () => {
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                // Remove the onRowClick prop as it doesn't exist in RoleTableProps
-                // Instead, implement the click handler inside the table component directly
+                accessedRole={roles[0] || null}
+                pagination={dummyPagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
               />
             )}
           </div>

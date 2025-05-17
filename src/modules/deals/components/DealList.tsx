@@ -21,6 +21,7 @@ import { getPriorityColor } from './DealCard';
 import { formatCurrency } from '@/utils/format-number';
 import { TablePagination } from '@/components/table-pagination';
 import { PaginationMetadata } from '@/types/pagination';
+import { handleRowClick } from '@/components/shared/TableRowClickHandler';
 
 interface DealListProps {
   deals: Deal[];
@@ -107,7 +108,8 @@ export const DealList: React.FC<DealListProps> = ({
           )}
           {!isLoading &&
             deals.map((deal) => (
-              <TableRow key={deal.id} className="cursor-pointer hover:bg-muted/50" onClick={() => onOpenDetail(deal)}>
+              <TableRow key={deal.id} className="cursor-pointer hover:bg-muted/50" 
+                onClick={(e) => handleRowClick(e, deal, onOpenDetail)}>
                 <TableCell className="font-medium">
                   <div>
                     <div className="font-medium">{deal.name}</div>
@@ -162,11 +164,11 @@ export const DealList: React.FC<DealListProps> = ({
       
       <TablePagination
         currentPage={pagination.page}
-        pageCount={pagination.totalPages}
-        perPage={pagination.pageSize}
-        total={pagination.totalElements}
+        totalPages={pagination.totalPages}
+        pageSize={pagination.pageSize}
+        totalItems={pagination.totalElements}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onPageSizeChange}
+        onPageSizeChange={onPageSizeChange}
       />
     </div>
   );

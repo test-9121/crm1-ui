@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -22,6 +23,7 @@ import LinkedInHeader from "@/modules/linkedin/components/LinkedInHeader";
 import LinkedInToolbar from "@/modules/linkedin/components/LinkedInToolbar";
 import LinkedInTable from "@/modules/linkedin/components/LinkedInTable";
 import LinkedInDetailsPanelContent from "@/modules/linkedin/components/LinkedInDetailsPanelContent";
+import { handleRowClick } from "@/components/shared/TableRowClickHandler";
 
 const LinkedIn = () => {
   const navigate = useNavigate();
@@ -149,11 +151,11 @@ const LinkedIn = () => {
                 tableColor={tableColor}
                 onEditProfile={handleEditProfile}
                 onDeleteProfile={handleDeleteProfile}
-                onProfileClick={showProfileDetails}
                 isLoading={isLoading}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
+                onRowClick={showProfileDetails}
               />
             )}
           </div>
