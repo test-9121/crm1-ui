@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface TablePaginationProps {
-  totalItems: number;
+  totalItems?: number;
+  totalElements?: number; // Support both naming conventions
   currentPage: number;
   totalPages: number;
   pageSize: number;
@@ -21,19 +22,21 @@ export interface TablePaginationProps {
 
 export const TablePagination: React.FC<TablePaginationProps> = ({
   totalItems,
+  totalElements,
   currentPage,
   totalPages,
   pageSize,
-  rowsPerPage, // Add backward compatibility prop
+  rowsPerPage, // Support backward compatibility
   onPageChange,
   onPageSizeChange,
-  onRowsPerPageChange, // Add backward compatibility prop
+  onRowsPerPageChange, // Support backward compatibility
   isDense,
   onDenseChange,
 }) => {
   const effectivePageSize = pageSize || rowsPerPage || 10;
-  const startItem = totalItems > 0 ? (currentPage - 1) * effectivePageSize + 1 : 0;
-  const endItem = Math.min(currentPage * effectivePageSize, totalItems);
+  const totalCount = totalItems || totalElements || 0;
+  const startItem = totalCount > 0 ? (currentPage - 1) * effectivePageSize + 1 : 0;
+  const endItem = Math.min(currentPage * effectivePageSize, totalCount);
 
   const handleRowsPerPageChange = (value: string) => {
     const newPageSize = Number(value);
@@ -76,7 +79,7 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
         </div>
 
         <span>
-          {startItem}–{endItem} of {totalItems}
+          {startItem}–{endItem} of {totalCount}
         </span>
 
         <div className="flex items-center space-x-1">

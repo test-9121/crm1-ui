@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
@@ -92,9 +93,9 @@ const LinkedIn = () => {
   // Filter profiles based on search term
   const filteredProfiles = Array.isArray(profiles) 
     ? profiles.filter(profile => 
-        (profile.name?.toLowerCase() || profile.profileName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        (profile.title?.toLowerCase() || profile.profileTitle?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        (profile.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+        ((profile.name || profile.profileName || '').toLowerCase()).includes(searchTerm.toLowerCase()) ||
+        ((profile.title || profile.profileTitle || '').toLowerCase()).includes(searchTerm.toLowerCase()) ||
+        ((profile.company || '').toLowerCase()).includes(searchTerm.toLowerCase())
       )
     : [];
 
@@ -144,11 +145,16 @@ const LinkedIn = () => {
                   totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
                   pageSize: pagination.pageSize || pagination.size,
                   totalItems: pagination.totalElements,
-                  currentPage: pagination.pageNumber !== undefined 
-                    ? pagination.pageNumber + 1 
-                    : pagination.number !== undefined 
-                      ? pagination.number + 1
-                      : 1,
+                  totalElements: pagination.totalElements, // Add for compatibility
+                  currentPage: pagination.currentPage !== undefined 
+                    ? pagination.currentPage 
+                    : pagination.pageNumber !== undefined 
+                      ? pagination.pageNumber + 1
+                      : pagination.number !== undefined 
+                        ? pagination.number + 1
+                        : pagination.page !== undefined
+                          ? pagination.page + 1
+                          : 1,
                   onPageChange: handlePageChange,
                   onPageSizeChange: handlePageSizeChange
                 }}

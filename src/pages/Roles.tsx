@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/components/ui/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,53 +13,52 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { useRoles } from "@/modules/roles/hooks/useRoles";
 import { Role } from "@/modules/roles/types";
-import { RoleForm } from "@/modules/roles/components/RoleForm";
 import RoleHeader from "@/modules/roles/components/RoleHeader";
 import RoleToolbar from "@/modules/roles/components/RoleToolbar";
 import RoleTable from "@/modules/roles/components/RoleTable";
-import { toast } from "@/components/ui/sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useNavigate } from "react-router-dom";
+import RoleForm from "@/modules/roles/components/RoleForm";
+import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
+import RoleDetailsPanelContent from "@/modules/roles/components/RoleDetailsPanelContent";
+import { PaginationMetadata } from "@/types/pagination";
 
 const Roles = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [tableName, setTableName] = useState("Roles");
-  const [tableColor, setTableColor] = useState("#0ea5e9"); // Cyan color
+  const [tableColor, setTableColor] = useState("#f43f5e"); // Rose color
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showRoleForm, setShowRoleForm] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
+  
+  // States for role details panel
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [roleDetailsOpen, setRoleDetailsOpen] = useState(false);
 
-  const useRolesData = useRoles();
-  const roles = useRolesData.roles;
-  const isLoading = useRolesData.isLoading;
-  const isEmpty = useRolesData.isEmpty;
-
-  // Add default pagination if it doesn't exist
-  const defaultPagination = {
+  // Create pagination state for roles
+  const [pagination, setPagination] = useState<PaginationMetadata>({
     page: 0,
     size: 10,
-    totalElements: roles.length,
-    totalPages: Math.ceil(roles.length / 10),
-    pageSize: 10,
-    currentPage: 1,
-  };
+    totalElements: 0,
+    totalPages: 0
+  });
   
-  const pagination = useRolesData.pagination || defaultPagination;
-  const handlePageChange = useRolesData.handlePageChange || ((page: number) => console.log('Page change', page));
-  const handlePageSizeChange = useRolesData.handlePageSizeChange || ((size: number) => console.log('Size change', size));
-  const refetch = useRolesData.refetch || (() => Promise.resolve());
-  const selectedRole = useRolesData.selectedRole || null;
-  const roleDetailsOpen = useRolesData.roleDetailsOpen || false;
-  const showRoleDetails = useRolesData.showRoleDetails || ((role: Role) => console.log('Show role details', role));
-  const hideRoleDetails = useRolesData.hideRoleDetails || (() => console.log('Hide role details'));
+  // Fetch roles
+  const {
+    roles = [],
+    isLoading,
+    isEmpty,
+    error,
+    createRole,
+    updateRole,
+    deleteRole,
+    getRoleById
+  } = useRoles();
 
+  // Handler functions
   const handleTableUpdate = (name: string, color: string) => {
     setTableName(name);
     setTableColor(color);
@@ -71,21 +73,23 @@ const Roles = () => {
     setSearchTerm(term);
   };
 
-  const handleNewRole = async (data: Role) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("New role data:", data);
-      toast.success("Role saved successfully");
-      setShowRoleForm(false);
-      return { success: true };
-    } catch (error) {
-      console.error("Error saving role:", error);
-      toast.error("Failed to save role. Please try again later.");
-      return { success: false };
-    } finally {
-      queryClient.invalidateQueries({ queryKey: ["roles"] });
-    }
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: newPage - 1 // Convert from 1-indexed UI to 0-indexed backend
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page: 0,
+      size: newSize
+    }));
+  };
+
+  const refetch = () => {
+    queryClient.invalidateQueries({ queryKey: ["roles"] });
   };
 
   const handleEditRole = (role: Role) => {
@@ -97,21 +101,20 @@ const Roles = () => {
     setRoleToDelete(roleId);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (roleToDelete) {
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("Deleting role with ID:", roleToDelete);
-        toast.success("Role deleted successfully");
-      } catch (error) {
-        console.error("Error deleting role:", error);
-        toast.error("Failed to delete role. Please try again later.");
-      } finally {
-        queryClient.invalidateQueries({ queryKey: ["roles"] });
-        setRoleToDelete(null);
-      }
+      deleteRole.mutate(roleId);
+      setRoleToDelete(null);
     }
+  };
+
+  const showRoleDetails = (role: Role) => {
+    setSelectedRole(role);
+    setRoleDetailsOpen(true);
+  };
+
+  const hideRoleDetails = () => {
+    setRoleDetailsOpen(false);
   };
 
   const handleFormClose = () => {
@@ -119,10 +122,25 @@ const Roles = () => {
     setRoleToEdit(null);
   };
 
-  const filteredRoles = roles.filter(role =>
-    role.roleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    role.roleDescription.toLowerCase().includes(searchTerm.toLowerCase())
+  // Update pagination with the roles length
+  if (Array.isArray(roles) && roles.length !== pagination.totalElements) {
+    setPagination(prev => ({
+      ...prev,
+      totalElements: roles.length,
+      totalPages: Math.ceil(roles.length / prev.size)
+    }));
+  }
+
+  // Filter roles based on search term
+  const filteredRoles = roles.filter(role => 
+    (role.roleName || role.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (role.roleDescription || role.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Calculate displayed roles based on pagination
+  const startIdx = pagination.page * pagination.size;
+  const endIdx = startIdx + pagination.size;
+  const displayedRoles = filteredRoles.slice(startIdx, endIdx);
 
   return (
     <>
@@ -133,16 +151,14 @@ const Roles = () => {
             setRoleToEdit(null);
             setShowRoleForm(true);
           }}
-          // Use the onRefresh prop correctly if available
-          onRefresh={refetch}
         />
-
-        <RoleHeader
+        
+        <RoleHeader 
           tableName={tableName}
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          rolesCount={roles.length}
+          rolesCount={filteredRoles.length}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}
@@ -162,33 +178,44 @@ const Roles = () => {
               </Alert>
             ) : (
               <RoleTable 
-                roles={filteredRoles}
+                roles={displayedRoles}
                 tableColor={tableColor}
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                accessedRole={roles[0] || {} as Role} // Provide a default
+                onRoleClick={showRoleDetails}
                 pagination={{
-                  totalElements: pagination.totalElements,
                   totalPages: pagination.totalPages,
-                  size: pagination.size,
-                  page: pagination.page,
-                  pageSize: pagination.size, // Use size as pageSize
+                  pageSize: pagination.size,
+                  totalItems: pagination.totalElements,
+                  totalElements: pagination.totalElements, // Add for compatibility
+                  currentPage: pagination.page + 1, // Convert to 1-indexed for UI
+                  onPageChange: handlePageChange,
+                  onPageSizeChange: handlePageSizeChange
                 }}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
               />
             )}
           </div>
         )}
 
-        <RoleForm
-          open={showRoleForm}
-          onOpenChange={handleFormClose}
-          onSubmit={handleNewRole}
-          initialData={roleToEdit}
+        {/* Side panel for displaying role details */}
+        <DetailsSidePanel
+          data={selectedRole}
+          open={roleDetailsOpen}
+          onClose={hideRoleDetails}
+          renderContent={(role) => <RoleDetailsPanelContent role={role} />}
         />
 
+        {/* Role Form */}
+        {showRoleForm && (
+          <RoleForm
+            open={showRoleForm}
+            onOpenChange={handleFormClose}
+            initialData={roleToEdit}
+          />
+        )}
+
+        {/* Delete Confirmation */}
         <AlertDialog open={roleToDelete !== null} onOpenChange={() => setRoleToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -199,7 +226,7 @@ const Roles = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
+              <AlertDialogAction 
                 onClick={confirmDelete}
                 className="bg-red-600 hover:bg-red-700"
               >

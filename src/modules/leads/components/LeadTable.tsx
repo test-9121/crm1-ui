@@ -606,15 +606,15 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
           <TablePagination
             totalItems={pagination?.totalElements || pagination?.totalItems || leads.length}
             pageSize={pagination?.pageSize || pagination?.size || 5}
-            currentPage={pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
-                      pagination?.currentPage !== undefined ? pagination.currentPage : 
-                      pagination?.number !== undefined ? pagination.number + 1 : 1}
+            currentPage={pagination?.currentPage !== undefined ? pagination.currentPage : 
+                      pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
+                      pagination?.number !== undefined ? pagination.number + 1 : 
+                      pagination?.page !== undefined ? pagination.page + 1 : 1}
             totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || pagination?.totalItems || leads.length) / (pagination?.pageSize || pagination?.size || 5))}
             onPageChange={(page) => onPageChange(page - 1)}
             onPageSizeChange={onPageSizeChange}
             isDense={isDense}
             onDenseChange={setIsDense}
-            // For backward compatibility
             rowsPerPage={pagination?.pageSize || pagination?.size || 5}
             onRowsPerPageChange={onPageSizeChange}
           />

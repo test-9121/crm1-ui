@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,7 +21,7 @@ import { Target } from "@/modules/targets/types";
 import TargetHeader from "@/modules/targets/components/TargetHeader";
 import TargetToolbar from "@/modules/targets/components/TargetToolbar";
 import TargetTable from "@/modules/targets/components/TargetTable";
-import { TargetForm } from "@/modules/targets/components/TargetForm";
+import TargetForm from "@/modules/targets/components/TargetForm";
 
 const Targets = () => {
   const queryClient = useQueryClient();
@@ -68,11 +69,11 @@ const Targets = () => {
     try {
       if (targetToEdit) {
         // If we have a target to edit, this is an update operation
-        await targetService.updateTarget(targetToEdit.id, data);
+        await targetService.update(targetToEdit.id, data);
         toast.success("Target updated successfully");
       } else {
         // If no target to edit, this is a create operation
-        await targetService.createTarget(data);
+        await targetService.create(data);
         toast.success("Target created successfully");
       }
       // Invalidate the targets query to refetch the updated data
@@ -97,10 +98,15 @@ const Targets = () => {
     setTargetToDelete(targetId);
   };
 
+  const handleTargetClick = (target: Target) => {
+    // This function would show the target details
+    console.log("Target clicked:", target);
+  };
+
   const confirmDelete = async () => {
     if (targetToDelete) {
       try {
-        await targetService.deleteTarget(targetToDelete);
+        await targetService.delete(targetToDelete);
         // Invalidate the targets query to refetch the updated data
         queryClient.invalidateQueries({ queryKey: ["targets"] });
         toast.success("Target deleted successfully");
@@ -164,11 +170,11 @@ const Targets = () => {
                 onEditTarget={handleEditTarget}
                 onDeleteTarget={handleDeleteTarget}
                 isLoading={isLoading}
-                accessedTarget={targets[0]} // Provide a default 
+                accessedTarget={targets[0]} 
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                onTargetSelection={() => {}} // Add a dummy function for required props
+                onTargetSelection={handleTargetClick}
               />
             )}
           </div>
