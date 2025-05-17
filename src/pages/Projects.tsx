@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
@@ -139,7 +138,7 @@ const Projects = () => {
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                onProjectClick={handleProjectClick} 
+                onProjectSelection={handleProjectClick}  // Changed from onProjectClick to onProjectSelection
               />
             )}
           </div>

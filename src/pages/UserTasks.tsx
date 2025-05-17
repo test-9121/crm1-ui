@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -16,10 +17,10 @@ import {
 
 // Import from restructured modules
 import { useUserTasks } from "@/modules/user-tasks/hooks/useUserTasks";
-import { useUsers, useProjects } from "@/modules/common/hooks/useEntities";
+import { useUsers } from "@/modules/common/hooks/useEntities";
 import { userTaskService } from "@/modules/user-tasks/services/userTaskService";
 import { UserTask } from "@/modules/user-tasks/types";
-import { UserTaskForm } from "@/modules/user-tasks/components/UserTaskForm";
+import UserTaskForm from "@/modules/user-tasks/components/UserTaskForm";
 import UserTaskHeader from "@/modules/user-tasks/components/UserTaskHeader";
 import UserTaskToolbar from "@/modules/user-tasks/components/UserTaskToolbar";
 import UserTaskTable from "@/modules/user-tasks/components/UserTaskTable";
@@ -38,13 +39,18 @@ const UserTasks = () => {
   const [userTaskToEdit, setUserTaskToEdit] = useState<UserTask | null>(null);
   const [userTaskToDelete, setUserTaskToDelete] = useState<string | null>(null);
 
-  const { tasks, isLoading, isEmpty, getUserTaskById, pagination, 
+  const { 
+    userTasks, 
+    isLoading, 
+    isEmpty, 
+    getUserTaskById, 
+    pagination, 
     handlePageChange, 
     handlePageSizeChange,
-    refetch } = useUserTasks();
+    refetch 
+  } = useUserTasks();
     
   const { users, loading: usersLoading } = useUsers();
-  const { projects, loading: projectsLoading } = useProjects();
   
   // Effect to handle URL-based userTask editing
   useEffect(() => {
@@ -81,11 +87,11 @@ const UserTasks = () => {
     try {
       if (id) {
         // If we have an ID in the URL, this is an edit operation
-        const response = await userTaskService.updateUserTask(id, data);
+        const response = await userTaskService.update(id, data);
         return { success: true, data: response };
       } else {
         // If no ID, this is a create operation
-        const response = await userTaskService.createUserTask(data);
+        const response = await userTaskService.create(data);
         return { success: true, data: response };
       }
     } catch (error: any) {
@@ -112,7 +118,7 @@ const UserTasks = () => {
   const confirmDelete = async () => {
     if (userTaskToDelete) {
       try {
-        await userTaskService.deleteUserTask(userTaskToDelete);
+        await userTaskService.delete(userTaskToDelete);
         // Invalidate the userTasks query to refetch the updated data
         queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
         toast.success("UserTask deleted successfully");
@@ -135,13 +141,13 @@ const UserTasks = () => {
     }
   };
 
-  const filteredTasks = tasks.filter(task => 
+  const filteredTasks = userTasks.filter(task => 
     `${task.taskName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     task.taskDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (task.assignedTo?.firstName && task.assignedTo.firstName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const pageIsLoading = usersLoading || projectsLoading || isLoading;
+  const pageIsLoading = usersLoading || isLoading;
 
   return (
     <>
@@ -152,7 +158,6 @@ const UserTasks = () => {
             setUserTaskToEdit(null);
             setShowNewUserTaskForm(true);
           }}
-          onRefresh={refetch}
         />
         
         <UserTaskHeader 
@@ -186,7 +191,7 @@ const UserTasks = () => {
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
                 isLoading={isLoading}
-                accessedUserTask={tasks[0]}
+                accessedUserTask={userTasks[0]}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
@@ -200,10 +205,7 @@ const UserTasks = () => {
         <UserTaskForm
           open={showNewUserTaskForm}
           onOpenChange={handleFormClose}
-          onSubmit={handleNewUserTask}
           initialData={userTaskToEdit}
-          users={users}
-          projects={projects}
         />
 
         <AlertDialog open={userTaskToDelete !== null} onOpenChange={() => setUserTaskToDelete(null)}>
@@ -211,7 +213,7 @@ const UserTasks = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the userTask.
+                This action cannot be undone. This will permanently delete the task.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

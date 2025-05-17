@@ -6,16 +6,20 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface TablePaginationProps {
-  totalItems?: number;
-  totalElements?: number; // Support both naming conventions
-  currentPage: number;
+  // Primary properties with consistent naming
   totalPages: number;
   pageSize: number;
+  currentPage: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  
+  // Optional properties
+  totalItems?: number;
+  totalElements?: number; // Support both naming conventions
   isDense?: boolean;
   onDenseChange?: (dense: boolean) => void;
-  // Add these for backward compatibility
+  
+  // For backward compatibility
   rowsPerPage?: number;
   onRowsPerPageChange?: (size: number) => void;
 }

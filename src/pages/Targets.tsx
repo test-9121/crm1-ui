@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -124,8 +123,8 @@ const Targets = () => {
   };
 
   const filteredTargets = targets.filter(target => 
-    (target.targetName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (target.targetDescription?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    (target.targetName || target.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (target.targetDescription || target.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -170,11 +169,11 @@ const Targets = () => {
                 onEditTarget={handleEditTarget}
                 onDeleteTarget={handleDeleteTarget}
                 isLoading={isLoading}
-                accessedTarget={targets[0]} 
+                accessedTarget={targets[0]}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                onTargetSelection={handleTargetClick}
+                onTargetClick={handleTargetClick}  // Changed from onTargetSelection to onTargetClick
               />
             )}
           </div>
@@ -183,7 +182,6 @@ const Targets = () => {
         <TargetForm
           open={showNewTargetForm}
           onOpenChange={handleFormClose}
-          onSubmit={handleNewTarget}
           initialData={targetToEdit}
         />
 

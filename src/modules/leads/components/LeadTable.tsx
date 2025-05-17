@@ -605,6 +605,7 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
         <CardFooter className="border-t pt-4">
           <TablePagination
             totalItems={pagination?.totalElements || pagination?.totalItems || leads.length}
+            totalElements={pagination?.totalElements || pagination?.totalItems || leads.length}
             pageSize={pagination?.pageSize || pagination?.size || 5}
             currentPage={pagination?.currentPage !== undefined ? pagination.currentPage : 
                       pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 

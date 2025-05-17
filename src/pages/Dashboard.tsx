@@ -144,8 +144,6 @@ const LinkedIn = () => {
                 pagination={{
                   totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
                   pageSize: pagination.pageSize || pagination.size,
-                  totalItems: pagination.totalElements,
-                  totalElements: pagination.totalElements, // Add for compatibility
                   currentPage: pagination.currentPage !== undefined 
                     ? pagination.currentPage 
                     : pagination.pageNumber !== undefined 
@@ -155,6 +153,8 @@ const LinkedIn = () => {
                         : pagination.page !== undefined
                           ? pagination.page + 1
                           : 1,
+                  totalItems: pagination.totalElements,
+                  totalElements: pagination.totalElements,
                   onPageChange: handlePageChange,
                   onPageSizeChange: handlePageSizeChange
                 }}

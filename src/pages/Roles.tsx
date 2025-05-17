@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -103,7 +102,7 @@ const Roles = () => {
 
   const confirmDelete = () => {
     if (roleToDelete) {
-      deleteRole.mutate(roleId);
+      deleteRole.mutate(roleToDelete);
       setRoleToDelete(null);
     }
   };
@@ -133,8 +132,8 @@ const Roles = () => {
 
   // Filter roles based on search term
   const filteredRoles = roles.filter(role => 
-    (role.roleName || role.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (role.roleDescription || role.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+    (role.roleName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (role.roleDescription || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate displayed roles based on pagination
@@ -183,13 +182,13 @@ const Roles = () => {
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                onRoleClick={showRoleDetails}
+                onRoleSelection={showRoleDetails}  // Changed from onRoleClick to onRoleSelection
                 pagination={{
                   totalPages: pagination.totalPages,
                   pageSize: pagination.size,
-                  totalItems: pagination.totalElements,
-                  totalElements: pagination.totalElements, // Add for compatibility
                   currentPage: pagination.page + 1, // Convert to 1-indexed for UI
+                  totalItems: pagination.totalElements,
+                  totalElements: pagination.totalElements,
                   onPageChange: handlePageChange,
                   onPageSizeChange: handlePageSizeChange
                 }}

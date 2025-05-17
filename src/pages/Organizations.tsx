@@ -165,10 +165,11 @@ const Organizations = () => {
                 onOrganizationClick={handleOpenOrganizationDetails}
                 pagination={{
                   totalPages: pagination.totalPages,
-                  pageSize: pagination.size,
+                  pageSize: pagination.size || pagination.pageSize,
+                  currentPage: (pagination.page !== undefined ? pagination.page + 1 : 
+                               pagination.currentPage !== undefined ? pagination.currentPage : 1),
+                  totalItems: pagination.totalElements,
                   totalElements: pagination.totalElements,
-                  totalItems: pagination.totalElements, // For backward compatibility
-                  currentPage: pagination.page + 1,
                   onPageChange: handlePageChange,
                   onPageSizeChange: handlePageSizeChange
                 }}
