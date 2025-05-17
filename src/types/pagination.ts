@@ -13,4 +13,5 @@ export interface PaginationMetadata {
   sort?: any;
   empty?: boolean;
   offset?: number;
+  number?: number;
 }
