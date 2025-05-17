@@ -165,7 +165,7 @@ export const DealList: React.FC<DealListProps> = ({
       <TablePagination
         currentPage={pagination.page}
         totalPages={pagination.totalPages}
-        pageSize={pagination.pageSize}
+        pageSize={pagination.size}
         totalItems={pagination.totalElements}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}

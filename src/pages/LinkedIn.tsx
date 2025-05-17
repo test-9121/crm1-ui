@@ -155,7 +155,7 @@ const LinkedIn = () => {
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                onRowClick={showProfileDetails}
+                onProfileClick={showProfileDetails}
               />
             )}
           </div>

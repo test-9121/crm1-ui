@@ -7,29 +7,30 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface TablePaginationProps {
   totalItems: number;
-  rowsPerPage: number;
   currentPage: number;
+  totalPages: number;
+  pageSize: number;
   onPageChange: (page: number) => void;
-  onRowsPerPageChange: (rpp: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
   isDense?: boolean;
   onDenseChange?: (dense: boolean) => void;
 }
 
 export const TablePagination: React.FC<TablePaginationProps> = ({
   totalItems,
-  rowsPerPage,
   currentPage,
+  totalPages,
+  pageSize,
   onPageChange,
-  onRowsPerPageChange,
+  onPageSizeChange,
   isDense,
   onDenseChange,
 }) => {
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
-  const startItem = totalItems > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0;
-  const endItem = Math.min(currentPage * rowsPerPage, totalItems);
+  const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
 
   const handleRowsPerPageChange = (value: string) => {
-    onRowsPerPageChange(Number(value));
+    onPageSizeChange(Number(value));
     onPageChange(1); // Reset to first page
   };
 
@@ -50,11 +51,11 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
         <div className="flex items-center space-x-2">
           <span>Rows per page:</span>
           <Select
-            value={String(rowsPerPage)}
+            value={String(pageSize)}
             onValueChange={handleRowsPerPageChange}
           >
             <SelectTrigger className="w-[70px] h-8">
-              <SelectValue placeholder={String(rowsPerPage)} />
+              <SelectValue placeholder={String(pageSize)} />
             </SelectTrigger>
             <SelectContent>
               {[5, 10, 25, 50, 100].map((option) => (

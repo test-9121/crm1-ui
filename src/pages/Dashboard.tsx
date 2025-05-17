@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import {
   BarChart,
@@ -61,9 +62,9 @@ const Dashboard = () => {
     ],
   }));
 
-  // Fix the summaryCardsData calculation
+  // Fix the summaryCardsData calculation with proper typing
   const summaryCardsData = targets.reduce(
-    (acc, target) => {
+    (acc: any, target) => {
       // Accumulate the various metrics
       acc.noOfLeadsIdentified += target.noOfLeadsIdentified || 0;
       acc.connectionsCount += target.connectionsCount || 0;

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
@@ -87,9 +88,16 @@ const Roles = () => {
   // Create dummy pagination data for now
   const dummyPagination = {
     page: 1,
-    pageSize: 10,
+    size: 10,
     totalPages: 1,
-    totalElements: roles.length
+    totalElements: roles.length,
+    pageNumber: 1,
+    last: true,
+    first: true,
+    numberOfElements: roles.length,
+    sort: null,
+    empty: roles.length === 0,
+    offset: 0
   };
 
   const handlePageChange = (page: number) => {
@@ -156,6 +164,7 @@ const Roles = () => {
                 pagination={dummyPagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
+                onRowClick={handleRowClick}
               />
             )}
           </div>
