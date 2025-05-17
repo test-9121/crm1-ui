@@ -606,7 +606,9 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
           <TablePagination
             totalItems={pagination?.totalElements || leads.length}
             pageSize={pagination?.pageSize || pagination?.size || 5}
-            currentPage={pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : pagination?.page !== undefined ? pagination.page + 1 : 1}
+            currentPage={pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
+                      pagination?.currentPage !== undefined ? pagination.currentPage : 
+                      pagination?.number !== undefined ? pagination.number + 1 : 1}
             totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || leads.length) / (pagination?.pageSize || pagination?.size || 5))}
             onPageChange={(page) => onPageChange(page - 1)}
             onPageSizeChange={onPageSizeChange}

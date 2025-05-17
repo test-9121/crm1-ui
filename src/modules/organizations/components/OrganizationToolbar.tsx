@@ -1,17 +1,19 @@
 
 import { useState } from "react";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface OrganizationToolbarProps {
   onSearchChange: (term: string) => void;
   onNewOrganization: () => void;
+  onRefresh?: () => void;
 }
 
 const OrganizationToolbar = ({ 
   onSearchChange, 
-  onNewOrganization 
+  onNewOrganization,
+  onRefresh
 }: OrganizationToolbarProps) => {
   const [searchInput, setSearchInput] = useState("");
 
@@ -32,7 +34,13 @@ const OrganizationToolbar = ({
           className="pl-9"
         />
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
+        {onRefresh && (
+          <Button variant="outline" onClick={onRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+        )}
         <Button onClick={onNewOrganization}>
           <PlusCircle className="mr-2 h-4 w-4" />
           New Organization

@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface TablePaginationProps {
+export interface TablePaginationProps {
   totalItems: number;
   currentPage: number;
   totalPages: number;

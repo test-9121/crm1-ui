@@ -40,7 +40,9 @@ const Organizations = () => {
     updateOrganization,
     createOrganization,
     deleteOrganization,
-    refetch
+    refetch,
+    handlePageChange,
+    handlePageSizeChange
   } = useOrganizations();
 
   const [organizationDetailsOpen, setOrganizationDetailsOpen] = useState(false);
@@ -59,16 +61,6 @@ const Organizations = () => {
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    // This will be provided by useOrganizations
-    console.log("Change to page:", newPage);
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    // This will be provided by useOrganizations
-    console.log("Change page size to:", newSize);
   };
 
   const [showOrganizationForm, setShowOrganizationForm] = useState(false);
@@ -138,6 +130,7 @@ const Organizations = () => {
             setOrganizationToEdit(null);
             setShowOrganizationForm(true);
           }}
+          onRefresh={refetch}
         />
         
         <OrganizationHeader 
@@ -172,13 +165,17 @@ const Organizations = () => {
                 isLoading={isLoading}
                 onOrganizationClick={handleOpenOrganizationDetails}
                 pagination={{
-                  ...pagination,
                   totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
                   pageSize: pagination.pageSize || pagination.size,
-                  currentPage: pagination.currentPage || pagination.page
+                  totalItems: pagination.totalElements,
+                  currentPage: pagination.pageNumber !== undefined 
+                    ? pagination.pageNumber + 1 
+                    : pagination.number !== undefined 
+                      ? pagination.number + 1
+                      : 1,
+                  onPageChange: handlePageChange,
+                  onPageSizeChange: handlePageSizeChange
                 }}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
               />
             )}
           </div>

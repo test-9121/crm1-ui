@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Organization } from '@/modules/organizations/types';
-import { formatDate } from '@/utils/format-time';
+import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 interface OrganizationDetailsPanelContentProps {

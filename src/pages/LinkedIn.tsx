@@ -93,8 +93,8 @@ const LinkedIn = () => {
   // Filter profiles based on search term
   const filteredProfiles = Array.isArray(profiles) 
     ? profiles.filter(profile => 
-        (profile.profileName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        (profile.profileTitle?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (profile.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
     : [];
@@ -142,13 +142,17 @@ const LinkedIn = () => {
                 isLoading={isLoading}
                 onProfileClick={handleOpenProfileDetails}
                 pagination={{
-                  ...pagination,
                   totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
                   pageSize: pagination.pageSize || pagination.size,
-                  currentPage: pagination.currentPage || pagination.page
+                  totalItems: pagination.totalElements,
+                  currentPage: pagination.pageNumber !== undefined 
+                    ? pagination.pageNumber + 1 
+                    : pagination.number !== undefined 
+                      ? pagination.number + 1
+                      : 1,
+                  onPageChange: handlePageChange,
+                  onPageSizeChange: handlePageSizeChange
                 }}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
               />
             )}
           </div>
