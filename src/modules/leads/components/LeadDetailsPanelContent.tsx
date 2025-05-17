@@ -3,9 +3,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeadReplies } from "./LeadReplies";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, Building2, MapPin } from "lucide-react";
+import { ILead } from "../types";
 
-export function LeadDetailsPanelContent({ lead }: { lead: any }) {
+interface LeadDetailsPanelContentProps {
+  lead: ILead;
+}
+
+export function LeadDetailsPanelContent({ lead }: LeadDetailsPanelContentProps) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "New": return "bg-orange-100 text-orange-800";
+      case "Contacted": return "bg-blue-100 text-blue-800";
+      case "Qualified": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <Tabs defaultValue="details" className="w-full">
       <TabsList className="w-full">
@@ -18,12 +32,7 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
           <div className="flex flex-col gap-2">
             <h2 className="text-2xl font-semibold">{`${lead.firstname} ${lead.lastname}`}</h2>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className={
-                lead.status === "New" ? "bg-orange-100 text-orange-800" :
-                lead.status === "Contacted" ? "bg-blue-100 text-blue-800" :
-                lead.status === "Qualified" ? "bg-green-100 text-green-800" :
-                "bg-gray-100 text-gray-800"
-              }>
+              <Badge className={getStatusColor(lead.status)}>
                 {lead.status}
               </Badge>
               {lead.designation?.name && (
@@ -45,7 +54,10 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium text-muted-foreground">Company</h3>
-              <p className="mt-1 font-medium">{lead.organization?.name || "Not specified"}</p>
+              <div className="flex items-center mt-1">
+                <Building2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <p className="font-medium">{lead.organization?.name || "Not specified"}</p>
+              </div>
             </div>
             <div>
               <h3 className="text-sm font-medium text-muted-foreground">Industry</h3>
@@ -57,7 +69,10 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
             </div>
             <div>
               <h3 className="text-sm font-medium text-muted-foreground">Region</h3>
-              <p className="mt-1 font-medium">{lead.region || "Not specified"}</p>
+              <div className="flex items-center mt-1">
+                <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                <p className="font-medium">{lead.region || "Not specified"}</p>
+              </div>
             </div>
           </div>
 
@@ -113,7 +128,7 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
         </div>
       </TabsContent>
 
-      <TabsContent value="replies" className="mt-4">
+      <TabsContent value="replies">
         <LeadReplies leadId={lead.id} />
       </TabsContent>
     </Tabs>
