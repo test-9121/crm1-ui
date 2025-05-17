@@ -127,8 +127,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog open={isOpen} onClose={onClose}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <Dialog open={isOpen} onClose={onClose} maxWidth="md">
+        <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }} className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
           </DialogHeader>
@@ -261,13 +261,11 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                         render={({ field }) => (
                           <DatePicker
                             sx={{ maxWidth: "210px" }}
-                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
-                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
-                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}
                             slotProps={{
                               textField: {
                                 size: "small",
-                                // fullWidth: true,
                                 error: !!methods.formState.errors.expectedCloseDate,
                                 helperText: methods.formState.errors.expectedCloseDate?.message,
                               },
@@ -287,13 +285,11 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                         render={({ field }) => (
                           <DatePicker
                             sx={{ maxWidth: "210px" }}
-                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
-                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
-                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}
                             slotProps={{
                               textField: {
                                 size: "small",
-                                // fullWidth: true,
                                 error: !!methods.formState.errors.actualCloseDate,
                                 helperText: methods.formState.errors.actualCloseDate?.message,
                               },

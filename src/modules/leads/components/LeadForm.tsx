@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 import {
   Form,
   FormControl,
@@ -138,7 +140,6 @@ export function LeadForm({
         messagesent: false,
         comments: "",
         draftStatus: false,
-        industryId: ""
       });
     }
   }, [initialData, form]);

@@ -105,7 +105,7 @@ const RoleForm = ({ open, onOpenChange, initialData }: RoleFormProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Role" : "Create a New Role"}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -164,8 +165,8 @@ export function EventModal({
   };
 
   return (
-    <Dialog open={isOpen} onClose={() => handleOpenChange(false)}>
-      {/* <DialogContent className=" max-h-[90vh] overflow-y-auto custom-scrollbar"> */}
+    <Dialog open={isOpen} onClose={() => handleOpenChange(false)} maxWidth="md">
+      <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }}>
       <DialogHeader>
         <DialogTitle>{isCreating ? "Add event" : "Edit event"}</DialogTitle>
       </DialogHeader>
@@ -311,7 +312,7 @@ export function EventModal({
           </DialogFooter>
         </form>
       </Form>
-      {/* </DialogContent> */}
+      </DialogContent>
     </Dialog>
   );
 }
