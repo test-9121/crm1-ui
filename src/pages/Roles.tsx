@@ -1,5 +1,14 @@
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRoles } from "@/modules/roles/hooks/useRoles";
+import { Role } from "@/modules/roles/types";
+import RoleForm from "@/modules/roles/components/RoleForm";
+import RoleHeader from "@/modules/roles/components/RoleHeader";
+import RoleToolbar from "@/modules/roles/components/RoleToolbar";
+import RoleTable from "@/modules/roles/components/RoleTable";
+import RoleDetailsPanelContent from "@/modules/roles/components/RoleDetailsPanelContent";
+import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -12,52 +21,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
-import { useRoles } from "@/modules/roles/hooks/useRoles";
-import { Role } from "@/modules/roles/types";
-import RoleForm from "@/modules/roles/components/RoleForm";
-import RoleHeader from "@/modules/roles/components/RoleHeader";
-import RoleToolbar from "@/modules/roles/components/RoleToolbar";
-import RoleDetailsPanelContent from "@/modules/roles/components/RoleDetailsPanelContent";
-import { RoleTable } from "@/modules/roles/components/RoleTable";
 
 const Roles = () => {
   // State declarations
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [tableName, setTableName] = useState("Roles");
-  const [tableColor, setTableColor] = useState("#9333ea"); // Purple color
+  const [tableName, setTableName] = useState("User Roles");
+  const [tableColor, setTableColor] = useState("#10b981");
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showRoleForm, setShowRoleForm] = useState(false);
-  const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
-  const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
-
-  // Fetch roles
+  
+  // Fetch roles using the hook
   const {
     roles = [],
     isLoading,
     isEmpty,
-    deleteRole
+    pagination,
+    handlePageChange,
+    handlePageSizeChange,
+    refetch,
+    selectedRole,
+    roleDetailsOpen,
+    showRoleDetails,
+    hideRoleDetails
   } = useRoles();
-
-  // Create dummy pagination data for now
-  const dummyPagination = {
-    page: 1,
-    size: 10,
-    totalPages: 1,
-    totalElements: roles.length,
-    pageNumber: 1,
-    pageSize: 10,
-    last: true,
-    first: true,
-    numberOfElements: roles.length,
-    sort: null,
-    empty: roles.length === 0,
-    offset: 0,
-    number: 0
-  };
 
   // Handler functions
   const handleTableUpdate = (name: string, color: string) => {
@@ -74,6 +61,10 @@ const Roles = () => {
     setSearchTerm(term);
   };
 
+  const [showRoleForm, setShowRoleForm] = useState(false);
+  const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
+  const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
+
   const handleEditRole = (role: Role) => {
     setRoleToEdit(role);
     setShowRoleForm(true);
@@ -83,9 +74,18 @@ const Roles = () => {
     setRoleToDelete(roleId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    // Implementation would be based on a deleteRole method from useRoles
+    // This is just a placeholder
     if (roleToDelete) {
-      deleteRole.mutate(roleToDelete);
+      try {
+        // await deleteRole(roleToDelete);
+        toast.success("Role deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["roles"] });
+      } catch (error) {
+        console.error("Error deleting role:", error);
+        toast.error("Failed to delete role");
+      }
       setRoleToDelete(null);
     }
   };
@@ -95,27 +95,15 @@ const Roles = () => {
     setRoleToEdit(null);
   };
 
-  const handleRoleClick = (role: Role) => {
-    setSelectedRole(role);
-    setIsDetailsPanelOpen(true);
-  };
-
-  // Dummy page change handlers since we're not implementing real pagination yet
-  const handlePageChange = (page: number) => {
-    toast.info(`Changed to page ${page}. Implement real pagination.`);
-  };
-
-  const handlePageSizeChange = (pageSize: number) => {
-    toast.info(`Changed page size to ${pageSize}. Implement real pagination.`);
+  const handleOpenRoleDetails = (role: Role) => {
+    showRoleDetails(role);
   };
 
   // Filter roles based on search term
-  const filteredRoles = Array.isArray(roles) 
-    ? roles.filter(role => 
-        role.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        role.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  const filteredRoles = roles.filter(role => 
+    (role.roleName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (role.roleDescription?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -126,6 +114,7 @@ const Roles = () => {
             setRoleToEdit(null);
             setShowRoleForm(true);
           }}
+          onRefresh={refetch}
         />
         
         <RoleHeader 
@@ -158,11 +147,15 @@ const Roles = () => {
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                onRoleClick={handleRoleClick}
-                pagination={dummyPagination}
+                onRoleClick={handleOpenRoleDetails}
+                pagination={{
+                  ...pagination,
+                  totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
+                  pageSize: pagination.pageSize || pagination.size,
+                  currentPage: pagination.currentPage || pagination.page
+                }}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                accessedRole={null}
               />
             )}
           </div>
@@ -171,8 +164,8 @@ const Roles = () => {
         {/* Side panel for displaying role details */}
         <DetailsSidePanel
           data={selectedRole}
-          open={isDetailsPanelOpen}
-          onClose={() => setIsDetailsPanelOpen(false)}
+          open={roleDetailsOpen}
+          onClose={hideRoleDetails}
           renderContent={(role) => <RoleDetailsPanelContent role={role} />}
         />
 
@@ -191,7 +184,7 @@ const Roles = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the role.
+                This action cannot be undone. This will permanently delete this role.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

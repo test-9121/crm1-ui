@@ -30,6 +30,7 @@ import { leadsApi } from "@/lib/api";
 import { ColorPicker, COLOR_MAP, ColorName } from "./ColorPicker";
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from "@mui/material/Dialog";
+import DialogContent from '@mui/material/DialogContent';
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import PaginatedAutocomplete from "@/components/shared/foreign-key";
 
@@ -119,8 +120,8 @@ export function EventModal({
         startDate: formatDate(event.startDate) || new Date().toISOString().slice(0, 16),
         endDate: formatDate(event.endDate) || new Date().toISOString().slice(0, 16),
         allDay: event.allDay || false,
-        leadId: event.lead.id || "",  // Bind the leadId
-        userId: event.user.id || "",  // Bind the userId
+        leadId: event.lead?.id || "",  // Add optional chaining
+        userId: event.user?.id || "",  // Add optional chaining
         color: event.color || "green"
       });
     } else {
@@ -167,102 +168,46 @@ export function EventModal({
   return (
     <Dialog open={isOpen} onClose={() => handleOpenChange(false)} maxWidth="md">
       <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }}>
-      <DialogHeader>
-        <DialogTitle>{isCreating ? "Add event" : "Edit event"}</DialogTitle>
-      </DialogHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 px-5 py-2">
+        <DialogHeader>
+          <DialogTitle>{isCreating ? "Add event" : "Edit event"}</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 px-5 py-2">
+
+            <FormItem>
+              <FormLabel>User *</FormLabel>
+              <PaginatedAutocomplete
+                value={form.watch("userId")}
+                onChange={(val) => form.setValue("userId", val)}
+                endpoint="/api/auth/"
+                dataField="users"
+                getLabel={(user) => `${user.firstName} ${user.lastName}`}
+                getValue={(user) => user.id}
+              />
+            </FormItem>
+
+            <FormItem>
+              <FormLabel>Lead</FormLabel>
+              <PaginatedAutocomplete
+                value={form.watch("leadId")}
+                onChange={(val) => form.setValue("leadId", val)}
+                endpoint="/api/leads/"
+                placeholder="Select lead"
+                dataField="leads"
+                getLabel={(lead) => `${lead.firstname} ${lead.lastname}`}
+                getValue={(lead) => lead.id}
+              />
+            </FormItem>
 
 
-          <FormItem>
-            <FormLabel>User *</FormLabel>
-            <PaginatedAutocomplete
-              value={form.watch("userId")}
-              onChange={(val) => form.setValue("userId", val)}
-              endpoint="/api/auth/"
-              // placeholder="Select User"
-              dataField="users"
-              getLabel={(user) => `${user.firstName} ${user.lastName}`}
-              getValue={(user) => user.id}
-            />
-          </FormItem>
-
-          <FormItem>
-            <FormLabel>Lead</FormLabel>
-            <PaginatedAutocomplete
-              value={form.watch("leadId")}
-              onChange={(val) => form.setValue("leadId", val)}
-              endpoint="/api/leads/"
-              placeholder="Select lead"
-              dataField="leads"
-              getLabel={(lead) => `${lead.firstname} ${lead.lastname}`}
-              getValue={(lead) => lead.id}
-            />
-          </FormItem>
-
-
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter event title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Enter event description" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="additionalNote"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Additional Note <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Enter additional notes" {...field} value={field.value || ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormItem>
-            <FormLabel>Event Color</FormLabel>
-            <ColorPicker
-              value={selectedColor}
-              onChange={(color) => {
-                setSelectedColor(color);
-                form.setValue("color", color);
-              }}
-            />
-          </FormItem>
-
-          <div className="space-y-4">
             <FormField
               control={form.control}
-              name="startDate"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input placeholder="Enter event title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -271,47 +216,101 @@ export function EventModal({
 
             <FormField
               control={form.control}
-              name="endDate"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>End Date</FormLabel>
+                  <FormLabel>Description <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Textarea placeholder="Enter event description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
 
-          <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            {!isCreating && (
+            <FormField
+              control={form.control}
+              name="additionalNote"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Note <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Enter additional notes" {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormItem>
+              <FormLabel>Event Color</FormLabel>
+              <ColorPicker
+                value={selectedColor}
+                onChange={(color) => {
+                  setSelectedColor(color);
+                  form.setValue("color", color);
+                }}
+              />
+            </FormItem>
+
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <DialogFooter className="gap-2">
               <Button
                 type="button"
-                variant="destructive"
-                onClick={handleDelete}
+                variant="outline"
+                onClick={onClose}
                 disabled={isSubmitting}
               >
-                Delete
+                Cancel
               </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={isSubmitting || isLoading}
-            >
-              {isSubmitting ? "Saving..." : isCreating ? "Save Changes" : "Update"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </Form>
+              {!isCreating && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                >
+                  Delete
+                </Button>
+              )}
+              <Button
+                type="submit"
+                disabled={isSubmitting || isLoading}
+              >
+                {isSubmitting ? "Saving..." : isCreating ? "Save Changes" : "Update"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

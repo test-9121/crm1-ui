@@ -19,7 +19,7 @@ import LinkedInHeader from "@/modules/linkedin/components/LinkedInHeader";
 import LinkedInToolbar from "@/modules/linkedin/components/LinkedInToolbar";
 import LinkedInDetailsPanelContent from "@/modules/linkedin/components/LinkedInDetailsPanelContent";
 import LinkedInForm from "@/modules/linkedin/components/LinkedInForm";
-import { LinkedInTable } from "@/modules/linkedin/components/LinkedInTable";
+import LinkedInTable from "@/modules/linkedin/components/LinkedInTable";
 
 const LinkedIn = () => {
   // State declarations
@@ -93,9 +93,9 @@ const LinkedIn = () => {
   // Filter profiles based on search term
   const filteredProfiles = Array.isArray(profiles) 
     ? profiles.filter(profile => 
-        profile.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.company?.toLowerCase().includes(searchTerm.toLowerCase())
+        (profile.profileName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.profileTitle?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
     : [];
 
@@ -141,7 +141,12 @@ const LinkedIn = () => {
                 onDeleteProfile={handleDeleteProfile}
                 isLoading={isLoading}
                 onProfileClick={handleOpenProfileDetails}
-                pagination={pagination}
+                pagination={{
+                  ...pagination,
+                  totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
+                  pageSize: pagination.pageSize || pagination.size,
+                  currentPage: pagination.currentPage || pagination.page
+                }}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
               />
@@ -154,7 +159,7 @@ const LinkedIn = () => {
           data={selectedProfile}
           open={profileDetailsOpen}
           onClose={hideProfileDetails}
-          renderContent={(profile) => <LinkedInDetailsPanelContent linkedInProfile={profile} />}
+          renderContent={(profile) => <LinkedInDetailsPanelContent profile={profile} />}
         />
 
         {/* LinkedIn Form */}
