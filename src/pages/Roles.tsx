@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
@@ -135,7 +134,8 @@ const Roles = () => {
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                onRowClick={handleRowClick}
+                // Remove the onRowClick prop as it doesn't exist in RoleTableProps
+                // Instead, implement the click handler inside the table component directly
               />
             )}
           </div>

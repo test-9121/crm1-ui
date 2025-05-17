@@ -1,5 +1,4 @@
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   BarChart,
   Bar,
@@ -19,7 +18,6 @@ import {
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, CalendarIcon, CheckCircle, CheckSquare, Clock, FileText, Mail, MessageSquare, Target, TrendingUp, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,11 +29,6 @@ import { StatCard } from "@/modules/common/StatCard";
 import { useState } from "react";
 import { useTargets } from "@/modules/targets/hooks/useTargets";
 import { useEvents } from "@/modules/events/hooks/useEvents";
-
-
-
-
-
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -68,6 +61,7 @@ const Dashboard = () => {
     ],
   }));
 
+  // Fix the summaryCardsData calculation
   const summaryCardsData = targets.reduce(
     (acc, target) => {
       // Accumulate the various metrics
@@ -88,7 +82,7 @@ const Dashboard = () => {
       } else if (target.status === 'OnHold') {
         acc.onHoldTargetsCount += 1;
       }
-      acc.totalTargetCount = acc.activeTargetsCount + acc.inactiveTargetsCount + acc.onHoldTargetsCount;
+      
       return acc;
     },
     {
@@ -106,6 +100,12 @@ const Dashboard = () => {
       totalTargetCount: 0,
     } // initial value
   );
+  
+  // Calculate the total after reduction
+  summaryCardsData.totalTargetCount = 
+    summaryCardsData.activeTargetsCount + 
+    summaryCardsData.inactiveTargetsCount + 
+    summaryCardsData.onHoldTargetsCount;
 
   const getRoleBadge = () => {
     switch (user.role.rolePermission) {

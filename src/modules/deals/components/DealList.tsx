@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Table,
@@ -162,7 +161,10 @@ export const DealList: React.FC<DealListProps> = ({
       </Table>
       
       <TablePagination
-        pagination={pagination}
+        currentPage={pagination.page}
+        pageCount={pagination.totalPages}
+        perPage={pagination.pageSize}
+        total={pagination.totalElements}
         onPageChange={onPageChange}
         onRowsPerPageChange={onPageSizeChange}
       />
