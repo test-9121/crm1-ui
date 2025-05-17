@@ -420,7 +420,9 @@ const initialProjectColumnDefinitions: ColumnConfig<Project>[] = useMemo(() => [
     label: 'Project Name', 
     accessor: 'name', 
     cell: (project: Project) => (
-      <div className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
+      <div 
+      onClick={() => handleProjectClick(project)}
+      className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
         {project.name}
       </div>
     )

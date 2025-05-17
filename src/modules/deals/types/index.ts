@@ -55,8 +55,8 @@ export interface DealFormValues {
   email?: string;
   stage: DealStage;
   value: number;
-  expectedCloseDate?: Date | null;
-  actualCloseDate?: Date | null;
+  expectedCloseDate?: string | null;
+  actualCloseDate?: string | null;
   status: DealStatus;
   priority: DealPriority;
   source: DealSource;

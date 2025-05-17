@@ -33,8 +33,8 @@
 // interface UserTaskTableProps {
 //   tasks: UserTask[];
 //   tableColor: string;
-//   onEditTask: (task: UserTask) => void;
-//   onDeleteTask: (taskId: string) => void;
+  // onEditTask: (task: UserTask) => void;
+  // onDeleteTask: (taskId: string) => void;
 //   isLoading: boolean;
 //   onRowClick: (task: UserTask) => void;
 //   pagination: PaginationMetadata;
@@ -296,10 +296,10 @@ const PREDEFINED_HEADER_COLORS = [
 ];
 
 interface UserTaskTableProps {
-  userTasks: UserTask[];
+  tasks: UserTask[];
   tableColor: string;
-  onEditUserTask: (userTask: UserTask) => void;
-  onDeleteUserTask: (userTaskId: string) => void;
+  onEditTask: (task: UserTask) => void;
+  onDeleteTask: (taskId: string) => void;
   isLoading?: boolean;
   accessedUserTask: UserTask;
   pagination: PaginationMetadata;
@@ -327,8 +327,8 @@ interface ColumnConfig<T> {
 const UserTaskTable = ({
   tasks,
   tableColor,
-  onEditUserTask,
-  onDeleteUserTask,
+  onEditTask,
+  onDeleteTask,
   isLoading = false,
   pagination,
   onPageChange,
@@ -401,7 +401,9 @@ const initialUserTaskColumnDefinitions: ColumnConfig<UserTask>[] = useMemo(() =>
     label: 'Task Name', 
     accessor: 'name', 
     cell: (task: UserTask) => (
-      <div className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
+      <div 
+      onClick={()=> handleUserTaskClick(task)}
+      className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
         {task.name}
       </div>
     )
@@ -508,12 +510,12 @@ const initialUserTaskColumnDefinitions: ColumnConfig<UserTask>[] = useMemo(() =>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEditUserTask(task)}>
+            <DropdownMenuItem onClick={() => onEditTask(task)}>
               <EditIcon className="mr-2 h-4 w-4" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onDeleteUserTask(task.id)} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={() => onDeleteTask(task.id)} className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>

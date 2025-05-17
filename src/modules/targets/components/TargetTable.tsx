@@ -101,10 +101,10 @@
 // //   const generatePaginationItems = () => {
 // //     const items = [];
 // //     const maxDisplayPages = 5; // Max number of page numbers to show
-    
+
 // //     let startPage = Math.max(0, pagination.pageNumber - 2);
 // //     let endPage = Math.min(pagination.totalPages - 1, startPage + maxDisplayPages - 1);
-    
+
 // //     // Adjust start page if end page is at max
 // //     if (endPage === pagination.totalPages - 1) {
 // //       startPage = Math.max(0, endPage - maxDisplayPages + 1);
@@ -134,7 +134,7 @@
 // //       "InActive": "bg-orange-100 text-orange-800 hover:bg-orange-200",
 // //       "OnHold": "bg-orange-100 text-orange-800 hover:bg-orange-200",
 // //     };
-    
+
 // //     return statusColorMap[status] || "bg-gray-100 text-gray-800 hover:bg-gray-200";
 // //   };
 
@@ -235,7 +235,7 @@
 // //               : '0-0 of 0'}
 // //           </span>
 // //         </div>
-        
+
 // //         <Pagination>
 // //           <PaginationContent>
 // //             <PaginationItem>
@@ -244,9 +244,9 @@
 // //                 className={pagination.first ? "pointer-events-none opacity-50" : "cursor-pointer"}
 // //               />
 // //             </PaginationItem>
-            
+
 // //             {generatePaginationItems()}
-            
+
 // //             <PaginationItem>
 // //               <PaginationNext 
 // //                 onClick={() => onPageChange(pagination.pageNumber + 1)}
@@ -325,7 +325,7 @@
 //     const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 //     const [selectedTarget, setSelectedTarget] = useState<Target | null>(null);
 //     const [detailsPanelOpen, setDetailsPanelOpen] = useState(false);
-  
+
 //     const baseInitialTargetColumnConfig: Omit<ColumnConfig<Target>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = [
 //   { defaultVisible: true, canHide: false, isFixed: 'left', stickyOffset: '0px', width: '40px', thClassName: 'sticky left-0 top-0 z-30 bg-slate-50 dark:bg-slate-800', tdClassName: 'sticky left-0 z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted' },
 //   { defaultVisible: true, canHide: false, isFixed: 'left', stickyOffset: '40px', minWidth: '200px', thClassName: 'sticky left-[40px] top-0 z-30 bg-slate-50 dark:bg-slate-800', tdClassName: 'sticky left-[40px] z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted' },
@@ -394,12 +394,12 @@
 //   )}
 // ];
 
-  
+
 //     const handleTargetClick = (target: Target) => {
 //       setSelectedTarget(target);
 //       setDetailsPanelOpen(true);
 //     };
-  
+
 //     // Checkbox component 
 //     const Checkbox = ({ checked, onCheckedChange, className, disabled, ...props }: { 
 //       checked?: boolean; 
@@ -419,11 +419,11 @@
 //         />
 //       );
 //     };
-  
+
 //     const renderTargetDetails = (target: Target) => {
 //       return <TargetDetailsPanelContent target={target} />;
 //     };
-  
+
 //     return (
 //       <>
 //         <DataTable
@@ -447,7 +447,7 @@
 //           isDense={isDense}
 //           onDenseChange={setIsDense}
 //         />
-  
+
 //         <DetailsSidePanel
 //           data={selectedTarget}
 //           open={detailsPanelOpen}
@@ -1084,7 +1084,7 @@
 //   ], [currentSelectedRows, accessedTarget.role.rolePermission]);
 
 //   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig<Target>[]>(initialColumnDefinitions);
-  
+
 //   useEffect(() => {
 //     setColumnConfigs(initialColumnDefinitions);
 //   }, [initialColumnDefinitions]);
@@ -1098,7 +1098,7 @@
 //   }, [columnConfigs]);
 
 //   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(initialVisibility);
-  
+
 //   useEffect(() => {
 //     setColumnVisibility(prevVisibility => {
 //       const newCalculatedVisibility: Record<string, boolean> = {};
@@ -1130,7 +1130,7 @@
 //   const visibleColumns = useMemo(() => {
 //     return columnConfigs.filter(col => columnVisibility[col.id]);
 //   }, [columnConfigs, columnVisibility]);
-  
+
 //   const toggleMainColumnVisibility = (columnId: string) => {
 //     setColumnVisibility(prev => ({
 //       ...prev,
@@ -1150,7 +1150,7 @@
 //       toast({ title: "Header Updated", description: `Header changed to "${newLabel}"`});
 //     }
 //   };
-  
+
 //   const handleRemoveColumn = (columnIdToRemove: string) => {
 //     const column = columnConfigs.find(c => c.id === columnIdToRemove);
 //     if (column && column.canHide) {
@@ -1174,7 +1174,7 @@
 //         defaultVisible: true, 
 //         canHide: true, 
 //       };
-      
+
 //       const originalIndex = columnConfigs.findIndex(c => c.id === columnIdToDuplicate);
 //       const newConfigs = [...columnConfigs];
 //       newConfigs.splice(originalIndex + 1, 0, newColumn); 
@@ -1308,7 +1308,7 @@
 //             </div>
 //           )}
 //         </div>
-        
+
 //         <div className="flex items-center gap-1">
 //           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
 //             <ChevronDown size={18} className="mr-1"/> View: All Targets
@@ -1630,181 +1630,157 @@ const TargetTable = ({
 
 
   const baseInitialTargetColumnConfig: Omit<ColumnConfig<Target>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = [
-  { 
-    defaultVisible: true, 
-    canHide: false, 
-    isFixed: 'left', 
-    stickyOffset: '0px', 
-    width: '32px', 
-    thClassName: 'sticky left-0 top-0 bg-slate-50 dark:bg-slate-800 border-r-0', 
-    tdClassName: 'sticky left-0 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted border-r-0' 
-  },
-  { defaultVisible: true, canHide: false, isFixed: 'left', stickyOffset: '23px', minWidth: '200px', thClassName: 'sticky left-[40px] top-0 z-30 bg-slate-50 dark:bg-slate-800 border-r dark:border-r-gray-700', tdClassName: 'sticky left-[40px] z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted border-r dark:border-r-gray-700' },
-  { defaultVisible: true, canHide: true, minWidth: '220px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-  { defaultVisible: true, canHide: true, minWidth: '150px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-  { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-  { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
-  { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-  { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-  { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
-  { 
-    defaultVisible: true, 
-    canHide: false, 
-    isFixed: 'right', 
-    stickyOffset: '0px', 
-    width: '50px', 
-    thClassName: 'sticky right-0 top-0 z-30 bg-slate-50 dark:bg-slate-800', 
-    tdClassName: 'sticky right-0 z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted' 
-  },
-];
+    {
+      defaultVisible: true,
+      canHide: false,
+      isFixed: 'left',
+      stickyOffset: '0px',
+      width: '32px',
+      thClassName: 'sticky left-0 top-0 bg-slate-50 dark:bg-slate-800 border-r-0',
+      tdClassName: 'sticky left-0 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted border-r-0'
+    },
+    { defaultVisible: true, canHide: false, isFixed: 'left', stickyOffset: '23px', minWidth: '200px', thClassName: 'sticky left-[40px] top-0 z-30 bg-slate-50 dark:bg-slate-800 border-r dark:border-r-gray-700', tdClassName: 'sticky left-[40px] z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted border-r dark:border-r-gray-700' },
+    { defaultVisible: true, canHide: true, minWidth: '220px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
+    { defaultVisible: true, canHide: true, minWidth: '150px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
+    { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
+    { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
+    { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
+    { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
+    { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
+    {
+      defaultVisible: true,
+      canHide: false,
+      isFixed: 'right',
+      stickyOffset: '0px',
+      width: '50px',
+      thClassName: 'sticky right-0 top-0 z-30 bg-slate-50 dark:bg-slate-800',
+      tdClassName: 'sticky right-0 z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted'
+    },
+  ];
 
-const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
-  { 
-    ...baseInitialTargetColumnConfig[0], 
-    id: 'checkbox', 
-    label: '', 
-    accessor: 'id', 
-    cell: (target: Target) => (
-      <Checkbox 
-        checked={!!currentSelectedRows[target.id]} 
-        onCheckedChange={(checked) => setCurrentSelectedRows(prev => ({ ...prev, [target.id]: Boolean(checked) }))} 
-        aria-labelledby={`target-name-${target.id}`} 
-        className="border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
-      />
-    ) 
-  },
-  // { 
-  //       ...baseInitialTargetColumnConfig[1], 
-  //       id: 'accountName', 
-  //       label: 'Name', 
-  //       accessor: (target: Target) => `${target.accountName}`, 
-  //       cell: (target: Target) => (
-  //         <div className="flex items-center gap-2">
-  //           {/* <Avatar className="h-8 w-8">
-  //             <AvatarImage src={`https://picsum.photos/seed/${target.id}/100/100`} alt={`${target.accountName} ${target.lastName}`} />
-  //             <AvatarFallback>{target.accountName?.substring(0,1)}</AvatarFallback>
-  //           </Avatar> */}
-  //           <div 
-  //             className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer"
-  //             onClick={() => handleTargetClick(target)}
-  //           >
-  //             {`${target.accountName}`}
-  //           </div>
-  //         </div>
-  //       ),
-  //       icon: UserCog, 
-  //     },
-   { ...baseInitialTargetColumnConfig[1], id: 'name', label: 'Name', accessor: (target: Target) => `${target.accountName}`, 
-          cell: (target: Target) => (
-            <div className="flex items-center gap-2">
-              {/* <Avatar className="h-8 w-8">
-                <AvatarImage src={target.avatarUrl || `https://picsum.photos/seed/${target.id}/100/100`} alt={`${target.firstName} ${target.lastName}`} />
-                <AvatarFallback>{target.firstName?.substring(0,1)}{target.lastName?.substring(0,1)}</AvatarFallback>
-              </Avatar> */}
-              <div 
-                className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer"
-                onClick={() => handleTargetClick(target)}
-              >
-                {`${target.accountName}`}
-              </div>
-            </div>
-          ),
-          icon: UserCog, 
-        },
-  { 
-    ...baseInitialTargetColumnConfig[2], 
-    id: 'connectionsCount', 
-    label: 'Connections Count', 
-    accessor: 'connectionsCount', 
-    cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.connectionsCount}</span> 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[3], 
-    id: 'handledBy', 
-    label: 'Handled By', 
-    accessor: (target: Target) => target.handledBy.firstName + " " + target.handledBy.lastName, 
-    cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{target.handledBy.firstName} {target.handledBy.lastName}</span> 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[4], 
-    id: 'noOfLeadsIdentified', 
-    label: 'Leads Identified', 
-    accessor: 'noOfLeadsIdentified', 
-    cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.noOfLeadsIdentified}</span> 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[5], 
-    id: 'status', 
-    label: 'Status', 
-    accessor: 'status', 
-    cell: (target: Target) => (
-      <Badge 
-        variant={target.status === 'Active' ? 'default' : target.status === 'InActive' ? 'secondary' : 'outline'} 
-        className={target.status === 'Active' ? 'bg-green-600 text-primary-foreground hover:bg-green-600/90' : target.status === 'InActive' ? 'bg-slate-500 text-primary-foreground hover:bg-slate-500/90' : 'bg-orange-600 text-primary-foreground hover:bg-orange-600/90'}
-      >
-        {target.status}
-      </Badge>
-    ) 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[6], 
-    id: 'createdDate', 
-    label: 'Created Date', 
-    accessor: 'createdDate', 
-    cell: (target: Target) => (
-      <span className="text-gray-700 dark:text-gray-300">{format(parseISO(target.createdDate), 'MMM d, yyyy')}</span>
-    )
-  },
-  { 
-    ...baseInitialTargetColumnConfig[7], 
-    id: 'meetingsScheduled', 
-    label: 'Meetings Scheduled', 
-    accessor: 'meetingsScheduled', 
-    cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.meetingsScheduled}</span> 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[8], 
-    id: 'responseReceived', 
-    label: 'Response Received', 
-    accessor: 'responseReceived', 
-    cell: (target: Target) => (
-      <span className="text-gray-700 dark:text-gray-300">{target.responseReceived ? 'Yes' : 'No'}</span>
-    ) 
-  },
-  { 
-    ...baseInitialTargetColumnConfig[9], 
-    id: 'actions', 
-    label: '', 
-    accessor: 'id', 
-    cell: (target: Target) => (
-      (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEditTarget(target)}>
-              <EditIcon className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onDeleteTarget(target.id)} className="text-destructive focus:text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) 
-    )
-  },
-], [currentSelectedRows]);
+  const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
+    {
+      ...baseInitialTargetColumnConfig[0],
+      id: 'checkbox',
+      label: '',
+      accessor: 'id',
+      cell: (target: Target) => (
+        <Checkbox
+          checked={!!currentSelectedRows[target.id]}
+          onCheckedChange={(checked) => setCurrentSelectedRows(prev => ({ ...prev, [target.id]: Boolean(checked) }))}
+          aria-labelledby={`target-name-${target.id}`}
+          className="border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+        />
+      )
+    },
+    {
+      ...baseInitialTargetColumnConfig[1], id: 'name', label: 'Name', accessor: (target: Target) => `${target.accountName}`,
+      cell: (target: Target) => (
+        <div className="flex items-center gap-2">
+          <div
+            className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer"
+            onClick={() => handleTargetClick(target)}
+          >
+            {`${target.accountName}`}
+          </div>
+        </div>
+      ),
+      icon: UserCog,
+    },
+    {
+      ...baseInitialTargetColumnConfig[2],
+      id: 'connectionsCount',
+      label: 'Connections Count',
+      accessor: 'connectionsCount',
+      cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.connectionsCount}</span>
+    },
+    {
+      ...baseInitialTargetColumnConfig[3],
+      id: 'handledBy',
+      label: 'Handled By',
+      accessor: (target: Target) => target.handledBy.firstName + " " + target.handledBy.lastName,
+      cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{target.handledBy.firstName} {target.handledBy.lastName}</span>
+    },
+    {
+      ...baseInitialTargetColumnConfig[4],
+      id: 'noOfLeadsIdentified',
+      label: 'Leads Identified',
+      accessor: 'noOfLeadsIdentified',
+      cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.noOfLeadsIdentified}</span>
+    },
+    {
+      ...baseInitialTargetColumnConfig[5],
+      id: 'status',
+      label: 'Status',
+      accessor: 'status',
+      cell: (target: Target) => (
+        <Badge
+          variant={target.status === 'Active' ? 'default' : target.status === 'InActive' ? 'secondary' : 'outline'}
+          className={target.status === 'Active' ? 'bg-green-600 text-primary-foreground hover:bg-green-600/90' : target.status === 'InActive' ? 'bg-slate-500 text-primary-foreground hover:bg-slate-500/90' : 'bg-orange-600 text-primary-foreground hover:bg-orange-600/90'}
+        >
+          {target.status}
+        </Badge>
+      )
+    },
+    {
+      ...baseInitialTargetColumnConfig[6],
+      id: 'createdDate',
+      label: 'Created Date',
+      accessor: 'createdDate',
+      cell: (target: Target) => (
+        <span className="text-gray-700 dark:text-gray-300">{format(parseISO(target.createdDate), 'MMM d, yyyy')}</span>
+      )
+    },
+    {
+      ...baseInitialTargetColumnConfig[7],
+      id: 'meetingsScheduled',
+      label: 'Meetings Scheduled',
+      accessor: 'meetingsScheduled',
+      cell: (target: Target) => <span className="text-gray-700 dark:text-gray-300">{target.meetingsScheduled}</span>
+    },
+    {
+      ...baseInitialTargetColumnConfig[8],
+      id: 'responseReceived',
+      label: 'Response Received',
+      accessor: 'responseReceived',
+      cell: (target: Target) => (
+        <span className="text-gray-700 dark:text-gray-300">{target.responseReceived ? 'Yes' : 'No'}</span>
+      )
+    },
+    {
+      ...baseInitialTargetColumnConfig[9],
+      id: 'actions',
+      label: '',
+      accessor: 'id',
+      cell: (target: Target) => (
+        (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEditTarget(target)}>
+                <EditIcon className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onDeleteTarget(target.id)} className="text-destructive focus:text-destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      )
+    },
+  ], [currentSelectedRows]);
 
 
 
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig<Target>[]>(initialTargetColumnDefinitions);
-  
+
   useEffect(() => {
     setColumnConfigs(initialTargetColumnDefinitions);
   }, [initialTargetColumnDefinitions]);
@@ -1818,7 +1794,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
   }, [columnConfigs]);
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(initialVisibility);
-  
+
   useEffect(() => {
     setColumnVisibility(prevVisibility => {
       const newCalculatedVisibility: Record<string, boolean> = {};
@@ -1850,7 +1826,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
   const visibleColumns = useMemo(() => {
     return columnConfigs.filter(col => columnVisibility[col.id]);
   }, [columnConfigs, columnVisibility]);
-  
+
   const toggleMainColumnVisibility = (columnId: string) => {
     setColumnVisibility(prev => ({
       ...prev,
@@ -1867,10 +1843,10 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
       const newLabel = editInputRef.current.value;
       setColumnConfigs(prev => prev.map(c => c.id === editingHeader.id ? { ...c, label: newLabel } : c));
       setEditingHeader(null);
-      toast({ title: "Header Updated", description: `Header changed to "${newLabel}"`});
+      toast({ title: "Header Updated", description: `Header changed to "${newLabel}"` });
     }
   };
-  
+
   const handleRemoveColumn = (columnIdToRemove: string) => {
     const column = columnConfigs.find(c => c.id === columnIdToRemove);
     if (column && column.canHide) {
@@ -1889,19 +1865,19 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
         ...colToDuplicate,
         id: newColId,
         label: `${colToDuplicate.label} (Copy)`,
-        isFixed: undefined, 
+        isFixed: undefined,
         stickyOffset: undefined,
-        defaultVisible: true, 
-        canHide: true, 
+        defaultVisible: true,
+        canHide: true,
       };
-      
+
       const originalIndex = columnConfigs.findIndex(c => c.id === columnIdToDuplicate);
       const newConfigs = [...columnConfigs];
-      newConfigs.splice(originalIndex + 1, 0, newColumn); 
+      newConfigs.splice(originalIndex + 1, 0, newColumn);
 
       setColumnConfigs(newConfigs);
-      setColumnVisibility(prev => ({...prev, [newColId]: true})); 
-      toast({ title: "Column Duplicated", description: `"${newColumn.label}" added.`});
+      setColumnVisibility(prev => ({ ...prev, [newColId]: true }));
+      toast({ title: "Column Duplicated", description: `"${newColumn.label}" added.` });
     }
   };
 
@@ -1912,7 +1888,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
 
   const cellPaddingClass = isDense ? 'px-2 py-1' : 'px-3 py-2';
   const addTargetRowFirstCellStickyClasses = columnConfigs[0]?.isFixed === 'left' && columnVisibility[columnConfigs[0].id]
-    ? 'sticky left-0 z-20' 
+    ? 'sticky left-0 z-20'
     : '';
 
   const renderTargetDetails = (target: Target) => {
@@ -1938,8 +1914,8 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                 <TableHead
                   key={col.id}
                   className={cn(
-                    "border-r dark:border-r-gray-700 text-sm font-medium text-gray-600 dark:text-gray-400 group", 
-                    (col.id === 'checkbox') ? (isDense ? 'px-1 py-1' : 'px-1 py-2') : cellPaddingClass, 
+                    "border-r dark:border-r-gray-700 text-sm font-medium text-gray-600 dark:text-gray-400 group",
+                    (col.id === 'checkbox') ? (isDense ? 'px-1 py-1' : 'px-1 py-2') : cellPaddingClass,
                     col.thClassName
                   )}
                   style={{
@@ -1948,14 +1924,14 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                     position: col.isFixed ? 'sticky' : undefined,
                     left: col.isFixed === 'left' ? col.stickyOffset : undefined,
                     right: col.isFixed === 'right' ? col.stickyOffset : undefined,
-                    top: 0, 
-                    backgroundColor: col.headerColor || (col.thClassName?.includes('bg-slate-50') ? 'hsl(var(--muted))' : 'hsl(var(--background))'), 
+                    top: 0,
+                    backgroundColor: col.headerColor || (col.thClassName?.includes('bg-slate-50') ? 'hsl(var(--muted))' : 'hsl(var(--background))'),
                   }}
                 >
                   <div className={cn(
                     "flex items-center",
                     (col.id === 'checkbox' && !col.label) || (col.id === 'actions' && !col.label) || (col.icon && !col.label && !['name', 'email', 'role', 'organization', 'status', 'lastLogin', 'createdAt', 'verified'].includes(col.id))
-                      ? 'justify-center' 
+                      ? 'justify-center'
                       : 'justify-between'
                   )}>
                     {editingHeader?.id === col.id ? (
@@ -1967,7 +1943,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                         className={cn("h-8 text-sm", isDense && "h-7")}
                       />
                     ) : (
-                      (col.id !== 'checkbox' || col.label) && ( 
+                      (col.id !== 'checkbox' || col.label) && (
                         <div className="flex items-center gap-1.5 truncate" title={col.label}>
                           {col.icon && <col.icon className="h-4 w-4 flex-shrink-0" />}
                           <span className="truncate">{col.label}</span>
@@ -2003,7 +1979,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    ) : col.canHide ? ( 
+                    ) : col.canHide ? (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className={cn("h-6 w-6 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity", isDense && "h-5 w-5")}>
@@ -2022,7 +1998,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                               <DropdownMenuSubContent>
                                 {PREDEFINED_HEADER_COLORS.map(colorOpt => (
                                   <DropdownMenuItem key={colorOpt.name} onClick={() => handleChangeHeaderColor(col.id, colorOpt.value)}>
-                                    {(col.headerColor === undefined && colorOpt.value === undefined) || col.headerColor === colorOpt.value ? <Check className="mr-2 h-4 w-4" /> : <span className="mr-2 h-4 w-4"/>}
+                                    {(col.headerColor === undefined && colorOpt.value === undefined) || col.headerColor === colorOpt.value ? <Check className="mr-2 h-4 w-4" /> : <span className="mr-2 h-4 w-4" />}
                                     {colorOpt.name}
                                   </DropdownMenuItem>
                                 ))}
@@ -2052,7 +2028,7 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                     key={col.id}
                     className={cn(
                       "border-r dark:border-r-gray-700",
-                      (col.id === 'checkbox') ? (isDense ? 'px-1 py-1' : 'px-1 py-2') : cellPaddingClass, 
+                      (col.id === 'checkbox') ? (isDense ? 'px-1 py-1' : 'px-1 py-2') : cellPaddingClass,
                       col.id === 'checkbox' ? 'border-l-4 border-transparent' : '',
                       col.tdClassName,
                       (col.isFixed && col.id === 'checkbox') && 'bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted',
@@ -2064,8 +2040,8 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                       position: col.isFixed ? 'sticky' : undefined,
                       left: col.isFixed === 'left' ? col.stickyOffset : undefined,
                       right: col.isFixed === 'right' ? col.stickyOffset : undefined,
-                      backgroundColor: (col.isFixed && (col.id === 'checkbox' || col.id === 'name')) ? 
-                        (currentSelectedRows[target.id] ? 'hsl(var(--muted))' : (col.tdClassName?.includes('dark:group-hover:bg-slate-800') ? undefined : 'hsl(var(--background))')) : 
+                      backgroundColor: (col.isFixed && (col.id === 'checkbox' || col.id === 'name')) ?
+                        (currentSelectedRows[target.id] ? 'hsl(var(--muted))' : (col.tdClassName?.includes('dark:group-hover:bg-slate-800') ? undefined : 'hsl(var(--background))')) :
                         (col.isFixed ? 'hsl(var(--background))' : undefined),
                     }}
                   >
@@ -2079,24 +2055,24 @@ const initialTargetColumnDefinitions: ColumnConfig<Target>[] = useMemo(() => [
                 className={cn(
                   "border-r dark:border-r-gray-700 border-l-4 border-transparent",
                   (isDense ? 'px-1 py-1' : 'px-1 py-2'),
-                  addTargetRowFirstCellStickyClasses, 
-                  "bg-slate-50 dark:bg-slate-800 group-hover:bg-slate-100 dark:group-hover:bg-slate-700" 
+                  addTargetRowFirstCellStickyClasses,
+                  "bg-slate-50 dark:bg-slate-800 group-hover:bg-slate-100 dark:group-hover:bg-slate-700"
                 )}
                 style={{
                   left: columnConfigs[0]?.isFixed === 'left' && columnVisibility[columnConfigs[0].id] ? columnConfigs[0]?.stickyOffset : undefined,
-                  position: columnConfigs[0]?.isFixed && columnVisibility[columnConfigs[0].id] ? 'sticky' : undefined, 
+                  position: columnConfigs[0]?.isFixed && columnVisibility[columnConfigs[0].id] ? 'sticky' : undefined,
                   backgroundColor: 'hsl(var(--muted))'
                 }}
               >
-                <Checkbox disabled className="border-gray-300 dark:border-gray-600"/>
+                <Checkbox disabled className="border-gray-300 dark:border-gray-600" />
               </TableCell>
-              <TableCell 
-                colSpan={visibleColumns.filter(c => c.id !== 'checkbox').length > 0 ? visibleColumns.filter(c => c.id !== 'checkbox').length : 1} 
+              <TableCell
+                colSpan={visibleColumns.filter(c => c.id !== 'checkbox').length > 0 ? visibleColumns.filter(c => c.id !== 'checkbox').length : 1}
                 className={cn(
                   cellPaddingClass,
                   "bg-slate-50 dark:bg-slate-800 group-hover:bg-slate-100 dark:group-hover:bg-slate-700"
                 )}
-                style={{backgroundColor: 'hsl(var(--muted))'}}
+                style={{ backgroundColor: 'hsl(var(--muted))' }}
               >
                 {/* <Link href="#/targets/add" passHref>
                   <Button variant="ghost" className="text-gray-500 dark:text-gray-400 hover:text-primary p-0 h-auto font-normal text-sm">

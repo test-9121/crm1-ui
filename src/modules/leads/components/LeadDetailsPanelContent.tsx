@@ -2,6 +2,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeadReplies } from "./LeadReplies";
 import { Badge } from "@/components/ui/badge"; // Add this import
+import { Button } from "@mui/material";
+import { Mail, Phone } from "lucide-react";
 
 export function LeadDetailsPanelContent({ lead }: { lead: any }) {
   return (
@@ -10,18 +12,28 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
         <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
         <TabsTrigger value="replies" className="flex-1">Replies</TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="details">
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            <h2 className="text-2xl font-semibold">{`${lead.firstname} ${lead.lastname}`}</h2>
+        <div className="flex-1">
+          <h2 className="text-2xl font-semibold">{`${lead.firstname} ${lead.lastname}`}</h2>
+          <div className=" py-2 flex space-x-2">
+            <Button size="small" variant="outlined">
+              <Phone className="mr-2 h-4 w-4" />
+              Call
+            </Button>
+            <Button size="small" variant="outlined">
+              <Mail className="mr-2 h-4 w-4" />
+              Email
+            </Button>
+          </div>
+          <div className="flex items-start gap-4">
             <p className="text-muted-foreground">{lead.designation?.name}</p>
           </div>
           <Badge variant="secondary" className={
             lead.status === "New" ? "bg-orange-100 text-orange-800" :
-            lead.status === "Contacted" ? "bg-blue-100 text-blue-800" :
-            lead.status === "Qualified" ? "bg-green-100 text-green-800" :
-            "bg-gray-100 text-gray-800"
+              lead.status === "Contacted" ? "bg-blue-100 text-blue-800" :
+                lead.status === "Qualified" ? "bg-green-100 text-green-800" :
+                  "bg-gray-100 text-gray-800"
           }>
             {lead.status}
           </Badge>
@@ -79,14 +91,14 @@ export function LeadDetailsPanelContent({ lead }: { lead: any }) {
               <p className="text-sm">{lead.comments}</p>
             </div>
           )}
-          
+
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-muted-foreground">Assigned To</h3>
             <p className="text-sm">{`${lead.sentby?.firstName || ''} ${lead.sentby?.lastName || ''}`}</p>
           </div>
         </div>
       </TabsContent>
-      
+
       <TabsContent value="replies" className="mt-4">
         <LeadReplies leadId={lead.id} />
       </TabsContent>

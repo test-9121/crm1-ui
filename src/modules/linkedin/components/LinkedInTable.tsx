@@ -338,8 +338,8 @@ const PREDEFINED_HEADER_COLORS = [
 interface LinkedInTableProps {
   profiles: LinkedInProfile[];
   tableColor: string;
-  onEditLinkedIn: (linkedIn: LinkedInProfile) => void;
-  onDeleteLinkedIn: (linkedInId: string) => void;
+  onEditProfile: (profile: LinkedInProfile) => void;
+  onDeleteProfile: (profileId: string) => void;
   isLoading?: boolean;
   accessedLinkedIn: LinkedInProfile;
   pagination: PaginationMetadata;
@@ -367,8 +367,8 @@ interface ColumnConfig<T> {
 const LinkedInTable = ({
   profiles,
   tableColor,
-  onEditLinkedIn,
-  onDeleteLinkedIn,
+  onEditProfile,
+  onDeleteProfile,
   isLoading = false,
   pagination,
   onPageChange,
@@ -440,9 +440,11 @@ const initialLinkedInColumnDefinitions: ColumnConfig<LinkedInProfile>[] = useMem
      id: 'name', 
      label: 'Name', 
      accessor: 'accountName', 
-     cell: (task: LinkedInProfile) => (
-       <div className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
-         {task.accountName}
+     cell: (profile: LinkedInProfile) => (
+       <div
+       onClick={()=>handleLinkedInClick(profile)}
+        className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
+         {profile.accountName}
        </div>
      )
    },
@@ -542,12 +544,12 @@ const initialLinkedInColumnDefinitions: ColumnConfig<LinkedInProfile>[] = useMem
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEditLinkedIn(profile)}>
+            <DropdownMenuItem onClick={() => onEditProfile(profile)}>
               <EditIcon className="mr-2 h-4 w-4" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onDeleteLinkedIn(profile.id)} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={() => onDeleteProfile(profile.id)} className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>

@@ -25,13 +25,15 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Deal, DealFormValues } from '../types';
 import PaginatedAutocomplete from '@/components/shared/foreign-key';
-import { FormItem } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogTitle, MenuItem } from '@mui/material';
 import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
-import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Controller } from 'react-hook-form';
 import { Form } from '@/components/hook-form/form-provider';
+import { Field } from '@/components/hook-form';
+import dayjs from 'dayjs';
 
 interface DealFormProps {
   isOpen: boolean;
@@ -46,8 +48,8 @@ const dealSchema = z.object({
   email: z.string().email({ message: 'Invalid email' }).optional().or(z.literal('')),
   stage: z.enum(['PROSPECTING', 'LEAD', 'DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']),
   value: z.number().min(0, { message: 'Value must be positive' }),
-  expectedCloseDate: z.date().nullable().optional(),
-  actualCloseDate: z.date().nullable().optional(),
+  expectedCloseDate: z.string().nullable().optional(),
+  actualCloseDate: z.string().nullable().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'ON_HOLD']),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']),
   source: z.enum(['WEBSITE', 'REFERRAL', 'COLD_CALL', 'EMAIL', 'SOCIAL_MEDIA', 'EVENT', 'OTHER']),
@@ -88,8 +90,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
         email: deal.email || '',
         stage: deal.stage,
         value: deal.value,
-        expectedCloseDate: deal.expectedCloseDate ? new Date(deal.expectedCloseDate) : null,
-        actualCloseDate: deal.actualCloseDate ? new Date(deal.actualCloseDate) : null,
+        expectedCloseDate: deal.expectedCloseDate,
+        actualCloseDate: deal.actualCloseDate,
         status: deal.status,
         priority: deal.priority,
         source: deal.source,
@@ -130,7 +132,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
           </DialogHeader>
-          
+
           <Form methods={methods} onSubmit={handleSubmit(handleFormSubmit)}>
             <div className="space-y-4 py-2">
               <div className="grid gap-4">
@@ -195,197 +197,111 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="stage" className="font-medium">Stage *</Label>
-                    <Controller
-                      name="stage"
-                      control={control}
-                      render={({ field }) => (
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select stage" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PROSPECTING">Prospecting</SelectItem>
-                            <SelectItem value="LEAD">New Lead</SelectItem>
-                            <SelectItem value="DISCOVERY">Discovery</SelectItem>
-                            <SelectItem value="PROPOSAL">Proposal</SelectItem>
-                            <SelectItem value="NEGOTIATION">Negotiation</SelectItem>
-                            <SelectItem value="CLOSED_WON">Closed Won</SelectItem>
-                            <SelectItem value="CLOSED_LOST">Closed Lost</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.stage && (
-                      <span className="text-sm text-red-500">{errors.stage.message}</span>
-                    )}
+                    <FormItem>
+                      <FormLabel>Stage </FormLabel>
+                      <Field.Select name="stage" >
+                        <MenuItem value="PROSPECTING">Prospecting</MenuItem>
+                        <MenuItem value="LEAD">New Lead</MenuItem>
+                        <MenuItem value="DISCOVERY">Discovery</MenuItem>
+                        <MenuItem value="PROPOSAL">Proposal</MenuItem>
+                        <MenuItem value="NEGOTIATION">Negotiation</MenuItem>
+                        <MenuItem value="CLOSED_WON">Closed Won</MenuItem>
+                        <MenuItem value="CLOSED_LOST">Closed Lost</MenuItem>
+                      </Field.Select>
+                    </FormItem>
+
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="status" className="font-medium">Status</Label>
-                    <Controller
-                      name="status"
-                      control={control}
-                      render={({ field }) => (
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ACTIVE">Active</SelectItem>
-                            <SelectItem value="INACTIVE">Inactive</SelectItem>
-                            <SelectItem value="ON_HOLD">On Hold</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.status && (
-                      <span className="text-sm text-red-500">{errors.status.message}</span>
-                    )}
+                    <FormItem>
+                      <FormLabel>Status </FormLabel>
+                      <Field.Select name="status" >
+                        <MenuItem value="ACTIVE">Active</MenuItem>
+                        <MenuItem value="INACTIVE">Inactive</MenuItem>
+                        <MenuItem value="ON_HOLD">On Hold</MenuItem>
+                      </Field.Select>
+                    </FormItem>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <FormItem>
+                      <FormLabel>Priority *</FormLabel>
+                      <Field.Select name="priority" >
+                        <MenuItem value="LOW">Low</MenuItem>
+                        <MenuItem value="MEDIUM">Medium</MenuItem>
+                        <MenuItem value="HIGH">High</MenuItem>
+                      </Field.Select>
+                    </FormItem>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <FormItem>
+                      <FormLabel>Source </FormLabel>
+                      <Field.Select name="source" >
+                        <MenuItem value="WEBSITE">Website</MenuItem>
+                        <MenuItem value="REFERRAL">Referral</MenuItem>
+                        <MenuItem value="COLD_CALL">Cold Call</MenuItem>
+                        <MenuItem value="EMAIL">Email</MenuItem>
+                        <MenuItem value="SOCIAL_MEDIA">Social Media</MenuItem>
+                        <MenuItem value="EVENT">Event</MenuItem>
+                        <MenuItem value="OTHER">Other</MenuItem>
+                      </Field.Select>
+                    </FormItem>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="priority" className="font-medium">Priority *</Label>
-                    <Controller
-                      name="priority"
-                      control={control}
-                      render={({ field }) => (
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="LOW">Low</SelectItem>
-                            <SelectItem value="MEDIUM">Medium</SelectItem>
-                            <SelectItem value="HIGH">High</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.priority && (
-                      <span className="text-sm text-red-500">{errors.priority.message}</span>
-                    )}
+                    <FormItem>
+                      <FormLabel>Expected Close Date</FormLabel>
+                      <Controller
+                        name="expectedCloseDate"
+                        control={methods.control}
+                        render={({ field }) => (
+                          <DatePicker
+                            sx={{ maxWidth: "210px" }}
+                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
+                            slotProps={{
+                              textField: {
+                                size: "small",
+                                // fullWidth: true,
+                                error: !!methods.formState.errors.expectedCloseDate,
+                                helperText: methods.formState.errors.expectedCloseDate?.message,
+                              },
+                            }}
+                          />
+                        )}
+                      />
+                    </FormItem>
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="source" className="font-medium">Source</Label>
-                    <Controller
-                      name="source"
-                      control={control}
-                      render={({ field }) => (
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select source" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="WEBSITE">Website</SelectItem>
-                            <SelectItem value="REFERRAL">Referral</SelectItem>
-                            <SelectItem value="COLD_CALL">Cold Call</SelectItem>
-                            <SelectItem value="EMAIL">Email</SelectItem>
-                            <SelectItem value="SOCIAL_MEDIA">Social Media</SelectItem>
-                            <SelectItem value="EVENT">Event</SelectItem>
-                            <SelectItem value="OTHER">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.source && (
-                      <span className="text-sm text-red-500">{errors.source.message}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label className="font-medium">Expected Close Date</Label>
-                    <Controller
-                      control={control}
-                      name="expectedCloseDate"
-                      render={({ field }) => (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground",
-                                errors.expectedCloseDate && "border-red-500"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value as Date}
-                              onSelect={field.onChange}
-                              initialFocus
-                              className={cn("p-3 pointer-events-auto")}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      )}
-                    />
-                    {errors.expectedCloseDate && (
-                      <span className="text-sm text-red-500">{errors.expectedCloseDate.message}</span>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label className="font-medium">Actual Close Date</Label>
-                    <Controller
-                      control={control}
-                      name="actualCloseDate"
-                      render={({ field }) => (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground",
-                                errors.actualCloseDate && "border-red-500"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value as Date}
-                              onSelect={field.onChange}
-                              initialFocus
-                              className={cn("p-3 pointer-events-auto")}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      )}
-                    />
-                    {errors.actualCloseDate && (
-                      <span className="text-sm text-red-500">{errors.actualCloseDate.message}</span>
-                    )}
+                    <FormItem>
+                      <FormLabel>Actual Close Date</FormLabel>
+                      <Controller
+                        name="actualCloseDate"
+                        control={methods.control}
+                        render={({ field }) => (
+                          <DatePicker
+                            sx={{ maxWidth: "210px" }}
+                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
+                            slotProps={{
+                              textField: {
+                                size: "small",
+                                // fullWidth: true,
+                                error: !!methods.formState.errors.actualCloseDate,
+                                helperText: methods.formState.errors.actualCloseDate?.message,
+                              },
+                            }}
+                          />
+                        )}
+                      />
+                    </FormItem>
                   </div>
                 </div>
 

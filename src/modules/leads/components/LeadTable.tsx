@@ -154,7 +154,9 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
     label: 'Lead Name', 
     accessor: (lead: ILead) => `${lead.firstname} ${lead.lastname}`,
     cell: (lead: ILead) => (
-      <div className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
+      <div 
+      onClick={() => handleLeadClick(lead)}
+      className="font-medium text-primary hover:underline whitespace-nowrap cursor-pointer">
         {lead.firstname} {lead.lastname}
       </div>
     )
@@ -172,9 +174,9 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
   },
   { 
     ...baseInitialLeadColumnConfig[3], 
-    id: 'sentBy', 
+    id: 'sentby', 
     label: 'Sent By', 
-    accessor: 'sentBy', 
+    accessor: 'sentby', 
     cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.sentby.email}</span> 
   },
     { 
