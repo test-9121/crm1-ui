@@ -14,6 +14,9 @@ interface TablePaginationProps {
   onPageSizeChange: (pageSize: number) => void;
   isDense?: boolean;
   onDenseChange?: (dense: boolean) => void;
+  // Add these for backward compatibility
+  rowsPerPage?: number;
+  onRowsPerPageChange?: (size: number) => void;
 }
 
 export const TablePagination: React.FC<TablePaginationProps> = ({
@@ -21,16 +24,21 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
   currentPage,
   totalPages,
   pageSize,
+  rowsPerPage, // Add backward compatibility prop
   onPageChange,
   onPageSizeChange,
+  onRowsPerPageChange, // Add backward compatibility prop
   isDense,
   onDenseChange,
 }) => {
-  const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
-  const endItem = Math.min(currentPage * pageSize, totalItems);
+  const effectivePageSize = pageSize || rowsPerPage || 10;
+  const startItem = totalItems > 0 ? (currentPage - 1) * effectivePageSize + 1 : 0;
+  const endItem = Math.min(currentPage * effectivePageSize, totalItems);
 
   const handleRowsPerPageChange = (value: string) => {
-    onPageSizeChange(Number(value));
+    const newPageSize = Number(value);
+    if (onPageSizeChange) onPageSizeChange(newPageSize);
+    if (onRowsPerPageChange) onRowsPerPageChange(newPageSize);
     onPageChange(1); // Reset to first page
   };
 
@@ -51,11 +59,11 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
         <div className="flex items-center space-x-2">
           <span>Rows per page:</span>
           <Select
-            value={String(pageSize)}
+            value={String(effectivePageSize)}
             onValueChange={handleRowsPerPageChange}
           >
             <SelectTrigger className="w-[70px] h-8">
-              <SelectValue placeholder={String(pageSize)} />
+              <SelectValue placeholder={String(effectivePageSize)} />
             </SelectTrigger>
             <SelectContent>
               {[5, 10, 25, 50, 100].map((option) => (

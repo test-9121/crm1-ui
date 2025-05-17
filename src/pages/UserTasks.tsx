@@ -99,7 +99,7 @@ const UserTasks = () => {
       <div className="flex flex-col gap-6 w-full max-w-full overflow-x-hidden">
         <UserTaskToolbar 
           onSearchChange={handleSearchChange}
-          onNewTask={() => {
+          onNewUserTask={() => {
             setTaskToEdit(null);
             setShowTaskForm(true);
           }}
@@ -110,7 +110,7 @@ const UserTasks = () => {
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          tasksCount={filteredTasks.length}
+          userTasksCount={filteredTasks.length}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}
@@ -135,7 +135,7 @@ const UserTasks = () => {
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
                 isLoading={isLoading}
-                onTaskClick={handleOpenTaskDetails}
+                onUserTaskClick={handleOpenTaskDetails}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}

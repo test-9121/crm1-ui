@@ -14,4 +14,6 @@ export interface PaginationMetadata {
   empty?: boolean;
   offset?: number;
   number?: number;
+  rowsPerPage?: number; // For backwards compatibility
+  currentPage?: number; // For backwards compatibility
 }

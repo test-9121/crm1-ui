@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { TargetTable } from "@/modules/targets/components/TargetTable";
+import TargetTable from "@/modules/targets/components/TargetTable";
 import { useTargets } from "@/modules/targets/hooks/useTargets";
 import { Target } from "@/modules/targets/types";
 import TargetForm from "@/modules/targets/components/TargetForm";
@@ -89,8 +89,9 @@ const Targets = () => {
   // Filter targets based on search term
   const filteredTargets = Array.isArray(targets) 
     ? targets.filter(target => 
-        target.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        target.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        target.name?.toLowerCase?.().includes(searchTerm.toLowerCase()) ||
+        target.description?.toLowerCase?.().includes(searchTerm.toLowerCase()) ||
+        String(target.id)?.includes(searchTerm)
       )
     : [];
 

@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ProjectTable } from "@/modules/projects/components/ProjectTable";
+import ProjectTable from "@/modules/projects/components/ProjectTable";
 import { useProjects } from "@/modules/projects/hooks/useProjects";
 import { Project } from "@/modules/projects/types";
 import ProjectForm from "@/modules/projects/components/ProjectForm";
@@ -81,7 +81,7 @@ const Projects = () => {
     setProjectToEdit(null);
   };
 
-  const showProjectDetails = (project: Project) => {
+  const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
     setIsDetailsPanelOpen(true);
   };
@@ -135,7 +135,7 @@ const Projects = () => {
                 onEditProject={handleEditProject}
                 onDeleteProject={handleDeleteProject}
                 isLoading={isLoading}
-                onProjectClick={showProjectDetails}
+                onProjectClick={handleProjectClick}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
