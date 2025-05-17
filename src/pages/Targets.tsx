@@ -1,5 +1,6 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -12,40 +13,43 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import TargetTable from "@/modules/targets/components/TargetTable";
+
 import { useTargets } from "@/modules/targets/hooks/useTargets";
+import { targetService } from "@/modules/targets/services/targetService";
 import { Target } from "@/modules/targets/types";
-import TargetForm from "@/modules/targets/components/TargetForm";
 import TargetHeader from "@/modules/targets/components/TargetHeader";
 import TargetToolbar from "@/modules/targets/components/TargetToolbar";
-import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
-import TargetDetailsPanelContent from "@/modules/targets/components/TargetDetailsPanelContent";
+import TargetTable from "@/modules/targets/components/TargetTable";
+import { TargetForm } from "@/modules/targets/components/TargetForm";
 
 const Targets = () => {
-  // State declarations
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [tableName, setTableName] = useState("Targets");
-  const [tableColor, setTableColor] = useState("#71cc81");
+  const [tableName, setTableName] = useState("New Targets");
+  const [tableColor, setTableColor] = useState("#16a38a"); // Emerald color
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showTargetForm, setShowTargetForm] = useState(false);
+  const [showNewTargetForm, setShowNewTargetForm] = useState(false);
   const [targetToEdit, setTargetToEdit] = useState<Target | null>(null);
   const [targetToDelete, setTargetToDelete] = useState<string | null>(null);
-  const [selectedTarget, setSelectedTarget] = useState<Target | null>(null);
-  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
 
-  // Fetch targets
   const {
-    targets = [],
+    targets,
     isLoading,
     isEmpty,
     pagination,
     handlePageChange,
     handlePageSizeChange,
-    deleteTarget
+    refetch
   } = useTargets();
 
-  // Handler functions
+  useEffect(() => {
+    if (targetToEdit) {
+      setShowNewTargetForm(true);
+    }
+  }, [targetToEdit]);
+
   const handleTableUpdate = (name: string, color: string) => {
     setTableName(name);
     setTableColor(color);
@@ -60,43 +64,63 @@ const Targets = () => {
     setSearchTerm(term);
   };
 
+  const handleNewTarget = async (data: any) => {
+    try {
+      if (targetToEdit) {
+        // If we have a target to edit, this is an update operation
+        await targetService.updateTarget(targetToEdit.id, data);
+        toast.success("Target updated successfully");
+      } else {
+        // If no target to edit, this is a create operation
+        await targetService.createTarget(data);
+        toast.success("Target created successfully");
+      }
+      // Invalidate the targets query to refetch the updated data
+      queryClient.invalidateQueries({ queryKey: ["targets"] });
+      return { success: true };
+    } catch (error: any) {
+      console.error("Error saving target:", error);
+      toast.error(error.message || "Failed to save target. Please try again later.");
+      return { success: false };
+    } finally {
+      setShowNewTargetForm(false);
+      setTargetToEdit(null);
+    }
+  };
+
   const handleEditTarget = (target: Target) => {
     setTargetToEdit(target);
-    setShowTargetForm(true);
+    setShowNewTargetForm(true);
   };
 
   const handleDeleteTarget = (targetId: string) => {
     setTargetToDelete(targetId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (targetToDelete) {
-      deleteTarget.mutate(targetToDelete);
+      try {
+        await targetService.deleteTarget(targetToDelete);
+        // Invalidate the targets query to refetch the updated data
+        queryClient.invalidateQueries({ queryKey: ["targets"] });
+        toast.success("Target deleted successfully");
+      } catch (error) {
+        console.error("Error deleting target:", error);
+        toast.error("Failed to delete target. Please try again later.");
+      }
       setTargetToDelete(null);
     }
   };
 
   const handleFormClose = () => {
-    setShowTargetForm(false);
+    setShowNewTargetForm(false);
     setTargetToEdit(null);
   };
 
-  const handleTargetClick = (target: Target) => {
-    setSelectedTarget(target);
-    setIsDetailsPanelOpen(true);
-  };
-
-  // Filter targets based on search term
-  const filteredTargets = Array.isArray(targets) 
-    ? targets.filter(target => {
-        const targetName = target.name || '';
-        const targetDesc = target.description || '';
-        const lowerSearchTerm = searchTerm.toLowerCase();
-        return targetName.toLowerCase().includes(lowerSearchTerm) || 
-               targetDesc.toLowerCase().includes(lowerSearchTerm) || 
-               String(target.id)?.includes(searchTerm);
-      })
-    : [];
+  const filteredTargets = targets.filter(target => 
+    (target.targetName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (target.targetDescription?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -105,8 +129,9 @@ const Targets = () => {
           onSearchChange={handleSearchChange}
           onNewTarget={() => {
             setTargetToEdit(null);
-            setShowTargetForm(true);
+            setShowNewTargetForm(true);
           }}
+          onRefresh={refetch}
         />
         
         <TargetHeader 
@@ -114,7 +139,7 @@ const Targets = () => {
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          targetsCount={filteredTargets.length}
+          targetsCount={targets.length}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}
@@ -139,33 +164,23 @@ const Targets = () => {
                 onEditTarget={handleEditTarget}
                 onDeleteTarget={handleDeleteTarget}
                 isLoading={isLoading}
-                onTargetClick={handleTargetClick}
+                accessedTarget={targets[0]} // Provide a default 
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
+                onTargetSelection={() => {}} // Add a dummy function for required props
               />
             )}
           </div>
         )}
 
-        {/* Side panel for displaying target details */}
-        <DetailsSidePanel
-          data={selectedTarget}
-          open={isDetailsPanelOpen}
-          onClose={() => setIsDetailsPanelOpen(false)}
-          renderContent={(target) => <TargetDetailsPanelContent target={target} />}
+        <TargetForm
+          open={showNewTargetForm}
+          onOpenChange={handleFormClose}
+          onSubmit={handleNewTarget}
+          initialData={targetToEdit}
         />
 
-        {/* Target Form */}
-        {showTargetForm && (
-          <TargetForm
-            open={showTargetForm}
-            onOpenChange={handleFormClose}
-            initialData={targetToEdit}
-          />
-        )}
-
-        {/* Delete Confirmation */}
         <AlertDialog open={targetToDelete !== null} onOpenChange={() => setTargetToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>

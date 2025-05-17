@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useOrganizations } from "@/modules/organizations/hooks/useOrganizations";
@@ -165,14 +164,11 @@ const Organizations = () => {
                 isLoading={isLoading}
                 onOrganizationClick={handleOpenOrganizationDetails}
                 pagination={{
-                  totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
-                  pageSize: pagination.pageSize || pagination.size,
-                  totalItems: pagination.totalElements,
-                  currentPage: pagination.pageNumber !== undefined 
-                    ? pagination.pageNumber + 1 
-                    : pagination.number !== undefined 
-                      ? pagination.number + 1
-                      : 1,
+                  totalPages: pagination.totalPages,
+                  pageSize: pagination.size,
+                  totalElements: pagination.totalElements,
+                  totalItems: pagination.totalElements, // For backward compatibility
+                  currentPage: pagination.page + 1,
                   onPageChange: handlePageChange,
                   onPageSizeChange: handlePageSizeChange
                 }}

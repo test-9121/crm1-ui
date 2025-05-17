@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
@@ -93,8 +92,8 @@ const LinkedIn = () => {
   // Filter profiles based on search term
   const filteredProfiles = Array.isArray(profiles) 
     ? profiles.filter(profile => 
-        (profile.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        (profile.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.name?.toLowerCase() || profile.profileName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (profile.title?.toLowerCase() || profile.profileTitle?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (profile.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
     : [];
@@ -144,7 +143,8 @@ const LinkedIn = () => {
                 pagination={{
                   totalPages: pagination.totalPages || Math.ceil(pagination.totalElements / pagination.size),
                   pageSize: pagination.pageSize || pagination.size,
-                  totalItems: pagination.totalElements,
+                  totalElements: pagination.totalElements,
+                  totalItems: pagination.totalElements, // Add this for backward compatibility
                   currentPage: pagination.pageNumber !== undefined 
                     ? pagination.pageNumber + 1 
                     : pagination.number !== undefined 

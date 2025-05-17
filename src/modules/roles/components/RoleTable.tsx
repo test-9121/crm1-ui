@@ -1,4 +1,3 @@
-
 // import React, { useState } from "react";
 // import { Role } from "@/modules/roles/types";
 // import { Badge } from "@/components/ui/badge";
@@ -844,13 +843,19 @@ const RoleTable = ({
         </Table>
         <CardFooter className="border-t pt-4">
           <TablePagination
-            totalItems={pagination?.totalElements || roles.length}
-            rowsPerPage={pagination?.pageSize || 5}
-            currentPage={pagination?.pageNumber + 1}
+            totalItems={pagination?.totalElements || pagination?.totalItems || roles.length}
+            pageSize={pagination?.pageSize || pagination?.size || 5}
+            currentPage={pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
+                      pagination?.currentPage !== undefined ? pagination.currentPage : 
+                      pagination?.number !== undefined ? pagination.number + 1 : 1}
+            totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || pagination?.totalItems || roles.length) / (pagination?.pageSize || pagination?.size || 5))}
             onPageChange={(page) => onPageChange(page - 1)}
-            onRowsPerPageChange={onPageSizeChange}
+            onPageSizeChange={onPageSizeChange}
             isDense={isDense}
             onDenseChange={setIsDense}
+            // For backward compatibility
+            rowsPerPage={pagination?.pageSize || pagination?.size || 5}
+            onRowsPerPageChange={onPageSizeChange}
           />
         </CardFooter>
       </Card>

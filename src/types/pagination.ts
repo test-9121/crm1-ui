@@ -16,4 +16,5 @@ export interface PaginationMetadata {
   number?: number;
   rowsPerPage?: number; // For backwards compatibility
   currentPage?: number; // For backwards compatibility
+  totalItems?: number; // For backwards compatibility
 }

@@ -1,5 +1,6 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -12,40 +13,56 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import UserTaskTable from "@/modules/user-tasks/components/UserTaskTable";
+
+// Import from restructured modules
 import { useUserTasks } from "@/modules/user-tasks/hooks/useUserTasks";
+import { useUsers, useProjects } from "@/modules/common/hooks/useEntities";
+import { userTaskService } from "@/modules/user-tasks/services/userTaskService";
 import { UserTask } from "@/modules/user-tasks/types";
-import UserTaskForm from "@/modules/user-tasks/components/UserTaskForm";
+import { UserTaskForm } from "@/modules/user-tasks/components/UserTaskForm";
 import UserTaskHeader from "@/modules/user-tasks/components/UserTaskHeader";
 import UserTaskToolbar from "@/modules/user-tasks/components/UserTaskToolbar";
-import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
-import UserTaskDetailsPanelContent from "@/modules/user-tasks/components/UserTaskDetailsPanelContent";
+import UserTaskTable from "@/modules/user-tasks/components/UserTaskTable";
 
 const UserTasks = () => {
-  // State declarations
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [tableName, setTableName] = useState("User Tasks");
-  const [tableColor, setTableColor] = useState("#9b87f5");
+  const [tableName, setTableName] = useState("New UserTasks");
+  const [tableColor, setTableColor] = useState("#3b82f6");
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<UserTask | null>(null);
-  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
-  const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
-  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
+  const [showNewUserTaskForm, setShowNewUserTaskForm] = useState(false);
+  const [userTaskToEdit, setUserTaskToEdit] = useState<UserTask | null>(null);
+  const [userTaskToDelete, setUserTaskToDelete] = useState<string | null>(null);
 
-  // Fetch tasks
-  const {
-    userTasks = [],
-    isLoading,
-    isEmpty,
-    pagination,
-    handlePageChange,
+  const { tasks, isLoading, isEmpty, getUserTaskById, pagination, 
+    handlePageChange, 
     handlePageSizeChange,
-    deleteUserTask
-  } = useUserTasks();
+    refetch } = useUserTasks();
+    
+  const { users, loading: usersLoading } = useUsers();
+  const { projects, loading: projectsLoading } = useProjects();
+  
+  // Effect to handle URL-based userTask editing
+  useEffect(() => {
+    if (id) {
+      const currentUserTask = getUserTaskById(id);
+      if (currentUserTask) {
+        setUserTaskToEdit(currentUserTask);
+        setShowNewUserTaskForm(true);
+      } else {
+        toast.error("UserTask not found");
+        navigate("/user-tasks");
+      }
+    } else {
+      // If no ID in URL, reset the edit state
+      setUserTaskToEdit(null);
+    }
+  }, [id, getUserTaskById, navigate]);
 
-  // Handler functions
   const handleTableUpdate = (name: string, color: string) => {
     setTableName(name);
     setTableColor(color);
@@ -60,49 +77,82 @@ const UserTasks = () => {
     setSearchTerm(term);
   };
 
-  const handleEditTask = (task: UserTask) => {
-    setTaskToEdit(task);
-    setShowTaskForm(true);
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    setTaskToDelete(taskId);
-  };
-
-  const confirmDelete = () => {
-    if (taskToDelete) {
-      deleteUserTask.mutate(taskToDelete);
-      setTaskToDelete(null);
+  const handleNewUserTask = async (data: any) => {
+    try {
+      if (id) {
+        // If we have an ID in the URL, this is an edit operation
+        const response = await userTaskService.updateUserTask(id, data);
+        return { success: true, data: response };
+      } else {
+        // If no ID, this is a create operation
+        const response = await userTaskService.createUserTask(data);
+        return { success: true, data: response };
+      }
+    } catch (error: any) {
+      console.error("Error saving userTask:", error);
+      return { 
+        success: false, 
+        error: error.message || "Failed to save userTask. Please try again later." 
+      };
+    } finally {
+      // Always invalidate the query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
     }
   };
 
+  const handleEditTask = (task: UserTask) => {
+    // Update URL with userTask ID instead of directly setting state
+    navigate(`/user-tasks/edit/${task.id}`);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setUserTaskToDelete(taskId);
+  };
+
+  const confirmDelete = async () => {
+    if (userTaskToDelete) {
+      try {
+        await userTaskService.deleteUserTask(userTaskToDelete);
+        // Invalidate the userTasks query to refetch the updated data
+        queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
+        toast.success("UserTask deleted successfully");
+      } catch (error) {
+        console.error("Error deleting userTask:", error);
+        toast.error("Failed to delete userTask. Please try again later.");
+      }
+      setUserTaskToDelete(null);
+    }
+  };
+
+  // Handler to close the form and navigate back to userTasks list
   const handleFormClose = () => {
-    setShowTaskForm(false);
-    setTaskToEdit(null);
+    setShowNewUserTaskForm(false);
+    setUserTaskToEdit(null);
+    
+    // If we're in edit mode, navigate back to the userTasks list
+    if (id) {
+      navigate("/user-tasks");
+    }
   };
 
-  const handleOpenTaskDetails = (task: UserTask) => {
-    setSelectedTask(task);
-    setIsDetailsPanelOpen(true);
-  };
+  const filteredTasks = tasks.filter(task => 
+    `${task.taskName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.taskDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (task.assignedTo?.firstName && task.assignedTo.firstName.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
-  // Filter tasks based on search term
-  const filteredTasks = Array.isArray(userTasks) 
-    ? userTasks.filter(task => 
-        task.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  const pageIsLoading = usersLoading || projectsLoading || isLoading;
 
   return (
     <>
       <div className="flex flex-col gap-6 w-full max-w-full overflow-x-hidden">
         <UserTaskToolbar 
           onSearchChange={handleSearchChange}
-          onNewUserTask={() => {
-            setTaskToEdit(null);
-            setShowTaskForm(true);
+          onNewTask={() => {
+            setUserTaskToEdit(null);
+            setShowNewUserTaskForm(true);
           }}
+          onRefresh={refetch}
         />
         
         <UserTaskHeader 
@@ -110,22 +160,23 @@ const UserTasks = () => {
           tableColor={tableColor}
           isEditing={isEditing}
           isCollapsed={isCollapsed}
-          userTasksCount={filteredTasks.length}
+          tasksCount={pagination.totalElements}
           onTableUpdate={handleTableUpdate}
           onCollapse={toggleCollapse}
           onEditingChange={setIsEditing}
         />
 
         {!isCollapsed && (
+          <>
           <div className="w-full overflow-x-auto">
-            {isLoading ? (
+            {pageIsLoading ? (
               <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500">Loading tasks...</p>
+                <p className="text-gray-500">Loading data...</p>
               </div>
             ) : isEmpty ? (
               <Alert>
                 <AlertDescription className="text-center py-8">
-                  No tasks available. Click the "New Task" button to add one.
+                  No userTasks available. Click the "New UserTask" button to add one.
                 </AlertDescription>
               </Alert>
             ) : (
@@ -135,40 +186,32 @@ const UserTasks = () => {
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
                 isLoading={isLoading}
-                onUserTaskClick={handleOpenTaskDetails}
+                accessedUserTask={tasks[0]}
                 pagination={pagination}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                accessedUserTask={userTasks[0] || null}
+                onTaskSelection={() => {}} // Add a dummy function for required props
               />
             )}
-          </div>
+            </div>
+          </>
         )}
 
-        {/* Side panel for displaying task details */}
-        <DetailsSidePanel
-          data={selectedTask}
-          open={isDetailsPanelOpen}
-          onClose={() => setIsDetailsPanelOpen(false)}
-          renderContent={(task) => <UserTaskDetailsPanelContent userTask={task} />}
+        <UserTaskForm
+          open={showNewUserTaskForm}
+          onOpenChange={handleFormClose}
+          onSubmit={handleNewUserTask}
+          initialData={userTaskToEdit}
+          users={users}
+          projects={projects}
         />
 
-        {/* Task Form */}
-        {showTaskForm && (
-          <UserTaskForm
-            open={showTaskForm}
-            onOpenChange={handleFormClose}
-            initialData={taskToEdit}
-          />
-        )}
-
-        {/* Delete Confirmation */}
-        <AlertDialog open={taskToDelete !== null} onOpenChange={() => setTaskToDelete(null)}>
+        <AlertDialog open={userTaskToDelete !== null} onOpenChange={() => setUserTaskToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the task.
+                This action cannot be undone. This will permanently delete the userTask.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
