@@ -73,7 +73,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     try {
       const response = await authApi.login(email, password);
-      console.log('Login response:', response);
       
       // Check if 2FA is required
       if (response.user.twoFactorEnabled) {
@@ -152,7 +151,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Store token and user data
       localStorage.setItem('accessToken', token);
       localStorage.setItem('user', JSON.stringify(response.user));
-      console.log('Google login response:', response);
       setUser(response.user);
       navigate('/dashboard');
     } catch (err) {
@@ -170,7 +168,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     try {
       const response = await authApi.loggedInUser();
-      console.log('GitHub login response:', response.user);
       // Store token and user data
       localStorage.setItem('accessToken', code);
       localStorage.setItem('user', JSON.stringify(response));

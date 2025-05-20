@@ -66,7 +66,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
     defaultValues: {
       name: '',
       email: '',
-      stage: 'LEAD',
+      stage: 'NEW',
       value: 0,
       expectedCloseDate: null,
       actualCloseDate: null,
@@ -105,7 +105,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
       reset({
         name: '',
         email: '',
-        stage: 'LEAD',
+        stage: 'NEW',
         value: 0,
         expectedCloseDate: null,
         actualCloseDate: null,
@@ -127,8 +127,8 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog open={isOpen} onClose={onClose} maxWidth="md">
-        <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }} className="max-h-[90vh] overflow-y-auto">
+      <Dialog open={isOpen} onClose={onClose}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">{isEditMode ? 'Edit Deal' : 'Create New Deal'}</DialogTitle>
           </DialogHeader>
@@ -179,18 +179,18 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="probability" className="font-medium">Probability (%)</Label>
-                    <Input
-                      id="probability"
-                      type="number"
-                      min="0"
-                      max="100"
-                      {...register('probability', { valueAsNumber: true })}
-                      placeholder="0"
-                      className={cn(errors.probability && "border-red-500")}
+                    <Label htmlFor="leadId" className="font-medium">Lead</Label>
+                    <PaginatedAutocomplete
+                      value={watch("leadId")}
+                      onChange={(val) => setValue("leadId", val)}
+                      endpoint="/api/leads/"
+                      placeholder="Select lead"
+                      dataField="leads"
+                      getLabel={(lead) => `${lead.firstname} ${lead.lastname}`}
+                      getValue={(lead) => lead.id}
                     />
-                    {errors.probability && (
-                      <span className="text-sm text-red-500">{errors.probability.message}</span>
+                    {errors.leadId && (
+                      <span className="text-sm text-red-500">{errors.leadId.message}</span>
                     )}
                   </div>
                 </div>
@@ -201,8 +201,7 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                       <FormLabel>Stage </FormLabel>
                       <Field.Select name="stage" >
                         <MenuItem value="PROSPECTING">Prospecting</MenuItem>
-                        <MenuItem value="LEAD">New Lead</MenuItem>
-                        <MenuItem value="DISCOVERY">Discovery</MenuItem>
+                        <MenuItem value="NEW">New Lead</MenuItem>
                         <MenuItem value="PROPOSAL">Proposal</MenuItem>
                         <MenuItem value="NEGOTIATION">Negotiation</MenuItem>
                         <MenuItem value="CLOSED_WON">Closed Won</MenuItem>
@@ -261,11 +260,13 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                         render={({ field }) => (
                           <DatePicker
                             sx={{ maxWidth: "210px" }}
-                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}
-                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}
+                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
                             slotProps={{
                               textField: {
                                 size: "small",
+                                // fullWidth: true,
                                 error: !!methods.formState.errors.expectedCloseDate,
                                 helperText: methods.formState.errors.expectedCloseDate?.message,
                               },
@@ -285,11 +286,13 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                         render={({ field }) => (
                           <DatePicker
                             sx={{ maxWidth: "210px" }}
-                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}
-                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}
+                            // label={<>Created Date <span style={{ color: 'red' }}>*</span></>}
+                            value={field.value ? dayjs(field.value, 'YYYY/DD/MM').toDate() : null}  // Convert dayjs to Date
+                            onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : '')}  // Handle the change and store in ISO format
                             slotProps={{
                               textField: {
                                 size: "small",
+                                // fullWidth: true,
                                 error: !!methods.formState.errors.actualCloseDate,
                                 helperText: methods.formState.errors.actualCloseDate?.message,
                               },
@@ -324,40 +327,6 @@ export default function DealForm({ isOpen, onClose, onSubmit, deal, isEditMode }
                   {errors.notes && (
                     <span className="text-sm text-red-500">{errors.notes.message}</span>
                   )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="leadId" className="font-medium">Lead</Label>
-                    <PaginatedAutocomplete
-                      value={watch("leadId")}
-                      onChange={(val) => setValue("leadId", val)}
-                      endpoint="/api/leads/"
-                      placeholder="Select lead"
-                      dataField="leads"
-                      getLabel={(lead) => `${lead.firstname} ${lead.lastname}`}
-                      getValue={(lead) => lead.id}
-                    />
-                    {errors.leadId && (
-                      <span className="text-sm text-red-500">{errors.leadId.message}</span>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="organizationId" className="font-medium">Organization</Label>
-                    <PaginatedAutocomplete
-                      value={watch("organizationId")}
-                      onChange={(val) => setValue("organizationId", val)}
-                      endpoint="/api/organizations"
-                      placeholder="Select organization"
-                      dataField="organizations"
-                      getLabel={(org) => org.name}
-                      getValue={(org) => org.id}
-                    />
-                    {errors.organizationId && (
-                      <span className="text-sm text-red-500">{errors.organizationId.message}</span>
-                    )}
-                  </div>
                 </div>
               </div>
 

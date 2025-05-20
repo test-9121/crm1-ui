@@ -47,7 +47,6 @@ const DealAnalytics: React.FC<DealAnalyticsProps> = ({ stats, deals, isLoading }
     fill: STAGE_COLORS[stage as keyof typeof STAGE_COLORS] || '#94a3b8',
   }));
 
-  console.log("graph", stageDistribution)
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-64">Loading analytics...</div>;
@@ -110,35 +109,6 @@ const DealAnalytics: React.FC<DealAnalyticsProps> = ({ stats, deals, isLoading }
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Deal Stage Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stageDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {stageDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`${value} deals`, 'Count']} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card> */}
 
         <Card className="overflow-hidden border-border/40 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/90">
           <CardHeader>

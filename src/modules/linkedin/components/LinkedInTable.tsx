@@ -341,7 +341,7 @@ interface LinkedInTableProps {
   onEditProfile: (profile: LinkedInProfile) => void;
   onDeleteProfile: (profileId: string) => void;
   isLoading?: boolean;
-  accessedLinkedIn: LinkedInProfile;
+  accessedLinkedIn?: LinkedInProfile;
   pagination: PaginationMetadata;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
@@ -350,7 +350,7 @@ interface LinkedInTableProps {
 interface ColumnConfig<T> {
   id: string;
   label: string;
-  accessor: keyof T | ((item: T) => any);
+  accessor: keyof T | ((item: T) => string);
   cell: (item: T) => JSX.Element;
   icon?: React.ComponentType<{ className?: string }>;
   defaultVisible?: boolean;

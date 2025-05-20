@@ -25,7 +25,6 @@ export const GitHubCallback = () => {
           console.log("GitHub Callback: Token received");
           // Decode the token to extract user info
           const decodedToken = jwtDecode<CustomJwtPayload>(token);
-          console.log("GitHub Callback: Decoded token:", decodedToken);
           
           // Set token in axios headers for future requests
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -68,7 +67,6 @@ export const GitHubCallback = () => {
         }
       } else if (code) {
         // OAuth code flow - we need to use this code directly
-        console.log("GitHub Callback: Authorization code received:", code);
         
         // For this flow, we'll assume the backend will handle the token exchange
         // and redirect to /oauth2/redirect with the token

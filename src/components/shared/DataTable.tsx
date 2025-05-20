@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Table,
@@ -449,16 +450,12 @@ export function DataTable<T>({
         <CardFooter className="border-t pt-4">
           <TablePagination 
             totalItems={pagination.totalItems}
-            pageSize={pagination.pageSize}
+            rowsPerPage={pagination.pageSize}
             currentPage={pagination.currentPage}
-            totalPages={Math.ceil(pagination.totalItems / pagination.pageSize)}
             onPageChange={pagination.onPageChange}
-            onPageSizeChange={pagination.onPageSizeChange}
+            onRowsPerPageChange={pagination.onPageSizeChange}
             isDense={isDense}
             onDenseChange={onDenseChange}
-            // For backward compatibility
-            rowsPerPage={pagination.pageSize}
-            onRowsPerPageChange={pagination.onPageSizeChange}
           />
         </CardFooter>
       )}

@@ -5,47 +5,31 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export interface TablePaginationProps {
-  // Primary properties with consistent naming
-  totalPages: number;
-  pageSize: number;
+interface TablePaginationProps {
+  totalItems: number;
+  rowsPerPage: number;
   currentPage: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
-  
-  // Optional properties
-  totalItems?: number;
-  totalElements?: number; // Support both naming conventions
+  onRowsPerPageChange: (rpp: number) => void;
   isDense?: boolean;
   onDenseChange?: (dense: boolean) => void;
-  
-  // For backward compatibility
-  rowsPerPage?: number;
-  onRowsPerPageChange?: (size: number) => void;
 }
 
 export const TablePagination: React.FC<TablePaginationProps> = ({
   totalItems,
-  totalElements,
+  rowsPerPage,
   currentPage,
-  totalPages,
-  pageSize,
-  rowsPerPage, // Support backward compatibility
   onPageChange,
-  onPageSizeChange,
-  onRowsPerPageChange, // Support backward compatibility
+  onRowsPerPageChange,
   isDense,
   onDenseChange,
 }) => {
-  const effectivePageSize = pageSize || rowsPerPage || 10;
-  const totalCount = totalItems || totalElements || 0;
-  const startItem = totalCount > 0 ? (currentPage - 1) * effectivePageSize + 1 : 0;
-  const endItem = Math.min(currentPage * effectivePageSize, totalCount);
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const startItem = totalItems > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0;
+  const endItem = Math.min(currentPage * rowsPerPage, totalItems);
 
   const handleRowsPerPageChange = (value: string) => {
-    const newPageSize = Number(value);
-    if (onPageSizeChange) onPageSizeChange(newPageSize);
-    if (onRowsPerPageChange) onRowsPerPageChange(newPageSize);
+    onRowsPerPageChange(Number(value));
     onPageChange(1); // Reset to first page
   };
 
@@ -66,11 +50,11 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
         <div className="flex items-center space-x-2">
           <span>Rows per page:</span>
           <Select
-            value={String(effectivePageSize)}
+            value={String(rowsPerPage)}
             onValueChange={handleRowsPerPageChange}
           >
             <SelectTrigger className="w-[70px] h-8">
-              <SelectValue placeholder={String(effectivePageSize)} />
+              <SelectValue placeholder={String(rowsPerPage)} />
             </SelectTrigger>
             <SelectContent>
               {[5, 10, 25, 50, 100].map((option) => (
@@ -83,7 +67,7 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
         </div>
 
         <span>
-          {startItem}–{endItem} of {totalCount}
+          {startItem}–{endItem} of {totalItems}
         </span>
 
         <div className="flex items-center space-x-1">

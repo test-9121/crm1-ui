@@ -47,7 +47,6 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
       form.reset();
-      toast.success("Reply added successfully");
     },
     onError: () => {
       toast.error("Failed to add reply");
@@ -94,7 +93,7 @@ export function LeadReplies({ leadId }: LeadRepliesProps) {
         <h3 className="font-medium">Add a New Reply</h3>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:w-[500px] max-h-[90vh]">
             <FormField
               control={form.control}
               name="replyText"

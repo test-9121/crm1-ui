@@ -297,7 +297,6 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@mui/material";
 import { TablePagination } from "@/components/table-pagination";
 import { CardFooter } from "@/components/ui/card";
-import { Target } from "framer-motion";
 
 const PREDEFINED_HEADER_COLORS = [
   { name: 'Default', value: undefined },
@@ -312,7 +311,7 @@ interface OrganizationTableProps {
   onEditOrganization: (organization: Organization) => void;
   onDeleteOrganization: (organizationId: string) => void;
   isLoading?: boolean;
-  accessedOrganization: Organization;
+  accessedOrganization?: Organization;
   pagination: PaginationMetadata;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
@@ -321,7 +320,7 @@ interface OrganizationTableProps {
 interface ColumnConfig<T> {
   id: string;
   label: string;
-  accessor: keyof T | ((item: T) => any);
+  accessor: keyof T | ((item: T) => unknown);
   cell: (item: T) => JSX.Element;
   icon?: React.ComponentType<{ className?: string }>;
   defaultVisible?: boolean;
@@ -336,7 +335,6 @@ interface ColumnConfig<T> {
 }
 
 const OrganizationTable = ({
-  accessedOrganization,
   organizations,
   tableColor,
   onEditOrganization,
@@ -354,7 +352,7 @@ const OrganizationTable = ({
   const [editingHeader, setEditingHeader] = useState<{ id: string; currentLabel: string } | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  const baseInitialOrganizationColumnConfig: Omit<ColumnConfig<Organization>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = [
+  const baseInitialOrganizationColumnConfig: Omit<ColumnConfig<Organization>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = useMemo(() => [
     {
       defaultVisible: true,
       canHide: false,
@@ -379,7 +377,6 @@ const OrganizationTable = ({
     { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
     { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
     { defaultVisible: true, canHide: true, minWidth: '180px', thClassName: 'bg-slate-50 dark:bg-slate-800' },
-    { defaultVisible: true, canHide: true, minWidth: '120px', thClassName: 'bg-slate-50 dark:bg-slate-800 text-center' },
     {
       defaultVisible: true,
       canHide: false,
@@ -389,7 +386,7 @@ const OrganizationTable = ({
       thClassName: 'sticky right-0 top-0 z-30 bg-slate-50 dark:bg-slate-800',
       tdClassName: 'sticky right-0 z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted'
     },
-  ];
+  ], []);
 
 const initialOrganizationColumnDefinitions: ColumnConfig<Organization>[] = useMemo(() => [
   { 
@@ -504,7 +501,7 @@ const initialOrganizationColumnDefinitions: ColumnConfig<Organization>[] = useMe
       ) 
     )
   },
-], [currentSelectedRows]);
+], [baseInitialOrganizationColumnConfig, currentSelectedRows, onDeleteOrganization, onEditOrganization]);
 
 
 

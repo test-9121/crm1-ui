@@ -2,18 +2,73 @@
 import { toast } from "@/components/ui/sonner";
 import { api } from "@/modules/common/services/api";
 import { Role } from "@/modules/roles/types";
+import { PaginationMetadata } from "@/modules/targets/types";
 
 export const roleService = {
-  getAll: async (): Promise<Role[]> => {
-    try {
-      const response = await api.get('/api/roles/');
-      return response.data.roles || response.data;
-    } catch (error) {
-      console.error("Error fetching roles, using mock data:", error);
-      toast.error("An error occurred. Please try again.");
-      return [];
+
+  getAll: async (page = 0, size = 5): Promise<{ data: Role[]; pagination: PaginationMetadata }> => {
+  try {
+    const response = await api.get(`/api/roles/?page=${page}&size=${size}`);
+
+    // Assuming the response structure is similar to profiles, adjust if needed
+    if (response.data && response.data.roles && response.data.roles.content) {
+      const pagedResponse = response.data.roles;
+
+      return {
+        data: pagedResponse.content || [],
+        pagination: {
+          pageNumber: pagedResponse.number,
+          pageSize: pagedResponse.size,
+          totalElements: pagedResponse.totalElements,
+          totalPages: pagedResponse.totalPages,
+          last: pagedResponse.last,
+          first: pagedResponse.first,
+          numberOfElements: pagedResponse.numberOfElements,
+          empty: pagedResponse.empty,
+          size: pagedResponse.size,
+          number: pagedResponse.number,
+        },
+      };
     }
-  },
+
+    // Handle direct array response fallback
+    const roles = response.data.roles || response.data || [];
+
+    return {
+      data: roles,
+      pagination: {
+        pageNumber: 0,
+        pageSize: roles.length,
+        totalElements: roles.length,
+        totalPages: 1,
+        last: true,
+        first: true,
+        numberOfElements: roles.length,
+        empty: roles.length === 0,
+        size: roles.length,
+        number: 0,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    toast.error("An error occurred. Please try again.");
+    return {
+      data: [],
+      pagination: {
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        first: true,
+        numberOfElements: 0,
+        empty: true,
+        size: 10,
+        number: 0,
+      },
+    };
+  }
+},
 
   getById: async (id: string): Promise<Role> => {
     const response = await api.get(`/api/roles/${id}`);

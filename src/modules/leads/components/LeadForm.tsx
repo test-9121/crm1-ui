@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import {
   Form,
   FormControl,
@@ -63,6 +61,7 @@ export function LeadForm({
   users,
   organizations
 }: LeadFormProps) {
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
@@ -70,19 +69,19 @@ export function LeadForm({
       firstname: "",
       lastname: "",
       email: "",
-      phonenumber: "",
+      phoneNumber: "",
       linkedin: "",
       website: "",
       region: "",
-      empcount: "0-10",
+      empCount: "0-10",
       status: "New",
-      leaddate: new Date(),
+      leaddate: new Date().toISOString(),
       industry: { id: "", name: "" },
       designation: { id: "", name: "" },
       organization: { id: "", name: "" },
-      sentbyId: "",
+      sentById: "",
       verified: false,
-      messagesent: false,
+      messageSent: false,
       comments: "",
       draftStatus: false,
     },
@@ -94,13 +93,13 @@ export function LeadForm({
         firstname: initialData.firstname || "",
         lastname: initialData.lastname || "",
         email: initialData.email || "",
-        phonenumber: initialData.phonenumber || "",
+        phoneNumber: initialData.phoneNumber || "",
         linkedin: initialData.linkedin || "",
         website: initialData.website || "",
         region: initialData.region || "",
-        empcount: initialData.empcount || "0-10",
+        empCount: initialData.empCount || "0-10",
         status: initialData.status || "New",
-        leaddate: initialData.leaddate ? new Date(initialData.leaddate) : new Date(),
+        leaddate: initialData.leaddate ? initialData.leaddate : "",
         industry: initialData.industry ? {
           id: initialData.industry.id,
           name: initialData.industry.name
@@ -113,9 +112,9 @@ export function LeadForm({
           id: initialData.organization.id,
           name: initialData.organization.name
         } : { id: "", name: "" },
-        sentbyId: initialData.sentby?.id || "",
+        sentById: initialData.sentBy?.id || "",
         verified: initialData.verified || false,
-        messagesent: initialData.messagesent || false,
+        messageSent: initialData.messageSent || false,
         comments: initialData.comments || "",
         draftStatus: initialData.draftStatus || false,
         industryId: initialData.industry?.id || ""
@@ -125,21 +124,22 @@ export function LeadForm({
         firstname: "",
         lastname: "",
         email: "",
-        phonenumber: "",
+        phoneNumber: "",
         linkedin: "",
         website: "",
         region: "",
-        empcount: "0-10",
+        empCount: "0-10",
         status: "New",
-        leaddate: new Date(),
+        leaddate: new Date().toISOString(),
         industry: { id: "", name: "" },
         designation: { id: "", name: "" },
         organization: { id: "", name: "" },
-        sentbyId: "",
+        sentById: "",
         verified: false,
-        messagesent: false,
+        messageSent: false,
         comments: "",
         draftStatus: false,
+        industryId: ""
       });
     }
   }, [initialData, form]);
@@ -188,24 +188,23 @@ export function LeadForm({
   ];
 
   return (
-     <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <Dialog open={open} onClose={() => handleDialogClose(false)}>
-      {/* <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto"> */}
-      <DialogHeader>
-        <DialogTitle>
-          {initialData ? "Edit Lead" : "Add New Lead"}
-        </DialogTitle>
-        {/* <DialogDescription>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Dialog open={open} onClose={() => handleDialogClose(false)}>
+        <DialogHeader>
+          <DialogTitle>
+            {initialData ? "Edit Lead" : "Add New Lead"}
+          </DialogTitle>
+          {/* <DialogDescription>
             {initialData ? "Update the lead information below." : "Fill in the details to create a new lead."}
           </DialogDescription> */}
-      </DialogHeader>
+        </DialogHeader>
 
-      <Tabs defaultValue="details" className=" py-2 px-5 w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="details">Lead Details</TabsTrigger>
-          <TabsTrigger value="replies" disabled={!initialData}>Replies</TabsTrigger>
-        </TabsList>
-       
+        <Tabs defaultValue="details" className=" py-2 px-5 w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">Lead Details</TabsTrigger>
+            <TabsTrigger value="replies" disabled={!initialData}>Replies</TabsTrigger>
+          </TabsList>
+
 
           <TabsContent value="details">
             <Form {...form}>
@@ -256,7 +255,7 @@ export function LeadForm({
 
                   <FormField
                     control={form.control}
-                    name="phonenumber"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
@@ -324,7 +323,7 @@ export function LeadForm({
 
                   <FormItem>
                     <FormLabel>Company Size</FormLabel>
-                    <Field.Select name="empcount" >
+                    <Field.Select name="empCount" >
                       {employeeCountOptions.map((size) => (
                         <MenuItem key={size} value={size}>
                           {size}
@@ -425,8 +424,8 @@ export function LeadForm({
                   <FormItem>
                     <FormLabel>Sent By *</FormLabel>
                     <PaginatedAutocomplete
-                      value={form.watch("sentbyId")}
-                      onChange={(val) => form.setValue("sentbyId", val)}
+                      value={form.watch("sentById")}
+                      onChange={(val) => form.setValue("sentById", val)}
                       endpoint="/api/auth/"
                       // placeholder="Select User"
                       dataField="users"
@@ -458,7 +457,7 @@ export function LeadForm({
 
                   <FormField
                     control={form.control}
-                    name="messagesent"
+                    name="messageSent"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
@@ -518,11 +517,8 @@ export function LeadForm({
           <TabsContent value="replies">
             {initialData && <LeadReplies leadId={initialData.id} />}
           </TabsContent>
-      </Tabs>
-    
-      
-      {/* </DialogContent> */ }
-    </Dialog >
+        </Tabs>
+      </Dialog >
     </LocalizationProvider >
   );
 }

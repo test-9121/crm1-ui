@@ -23,7 +23,6 @@ export const GoogleCallback = () => {
           console.log("Google Callback: Token received");
           // Decode the token to extract user info
           const decodedToken = jwtDecode<CustomJwtPayload>(token);
-          console.log("Google Callback: Decoded token:", decodedToken);
           
           // Set token in axios headers for future requests
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

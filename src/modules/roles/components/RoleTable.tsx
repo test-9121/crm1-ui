@@ -1,3 +1,4 @@
+
 // import React, { useState } from "react";
 // import { Role } from "@/modules/roles/types";
 // import { Badge } from "@/components/ui/badge";
@@ -341,7 +342,7 @@ interface RoleTableProps {
   onEditRole: (role: Role) => void;
   onDeleteRole: (roleId: string) => void;
   isLoading?: boolean;
-  accessedRole: Role;
+  accessedRole?: Role;
   pagination: PaginationMetadata;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
@@ -350,7 +351,7 @@ interface RoleTableProps {
 interface ColumnConfig<T> {
   id: string;
   label: string;
-  accessor: keyof T | ((item: T) => any);
+  accessor: keyof T | ((item: T) => unknown);
   cell: (item: T) => JSX.Element;
   icon?: React.ComponentType<{ className?: string }>;
   defaultVisible?: boolean;
@@ -365,7 +366,6 @@ interface ColumnConfig<T> {
 }
 
 const RoleTable = ({
-  accessedRole,
   roles,
   tableColor,
   onEditRole,
@@ -383,7 +383,7 @@ const RoleTable = ({
   const [editingHeader, setEditingHeader] = useState<{ id: string; currentLabel: string } | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  const baseInitialRoleColumnConfig: Omit<ColumnConfig<Role>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = [
+  const baseInitialRoleColumnConfig: Omit<ColumnConfig<Role>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = useMemo(()=>[
     {
       defaultVisible: true,
       canHide: false,
@@ -418,7 +418,7 @@ const RoleTable = ({
       thClassName: 'sticky right-0 top-0 z-30 bg-slate-50 dark:bg-slate-800',
       tdClassName: 'sticky right-0 z-20 bg-background group-hover:bg-slate-50 dark:group-hover:bg-slate-800 group-data-[state=selected]:bg-muted'
     },
-  ];
+  ],[]);
 
   const initialRoleColumnDefinitions: ColumnConfig<Role>[] = useMemo(() => [
     {
@@ -531,7 +531,7 @@ const RoleTable = ({
 
       )
     },
-  ], [currentSelectedRows]);
+  ], [baseInitialRoleColumnConfig, currentSelectedRows, onDeleteRole, onEditRole]);
 
 
 
@@ -843,19 +843,13 @@ const RoleTable = ({
         </Table>
         <CardFooter className="border-t pt-4">
           <TablePagination
-            totalItems={pagination?.totalElements || pagination?.totalItems || roles.length}
-            pageSize={pagination?.pageSize || pagination?.size || 5}
-            currentPage={pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
-                      pagination?.currentPage !== undefined ? pagination.currentPage : 
-                      pagination?.number !== undefined ? pagination.number + 1 : 1}
-            totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || pagination?.totalItems || roles.length) / (pagination?.pageSize || pagination?.size || 5))}
+            totalItems={pagination?.totalElements}
+            rowsPerPage={pagination?.pageSize}
+            currentPage={pagination?.pageNumber + 1}
             onPageChange={(page) => onPageChange(page - 1)}
-            onPageSizeChange={onPageSizeChange}
+            onRowsPerPageChange={onPageSizeChange}
             isDense={isDense}
             onDenseChange={setIsDense}
-            // For backward compatibility
-            rowsPerPage={pagination?.pageSize || pagination?.size || 5}
-            onRowsPerPageChange={onPageSizeChange}
           />
         </CardFooter>
       </Card>

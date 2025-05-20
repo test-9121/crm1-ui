@@ -263,7 +263,7 @@ export default function Deals() {
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium">Deal Stage</h5>
                   <div className="grid grid-cols-2 gap-2">
-                    {['LEAD', 'DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'].map((stage) => (
+                    {['NEW', 'DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'].map((stage) => (
                       <div key={stage} className="flex items-center space-x-2">
                         <Checkbox
                           id={`stage-${stage}`}
@@ -430,7 +430,7 @@ export default function Deals() {
         {view === 'list' && (
           <div className="mt-6">
             <DealList
-              deals={deals}
+              deals={filteredAllDeals}
               pagination={pagination}
               onPageChange={setPage}
               onPageSizeChange={setPageSize}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Table,
@@ -59,7 +60,7 @@ interface LeadTableProps {
 interface ColumnConfig<T> {
   id: string;
   label: string;
-  accessor: keyof T | ((item: T) => any);
+  accessor: keyof T | ((item: T) => string);
   cell: (item: T) => JSX.Element;
   icon?: React.ComponentType<{ className?: string }>;
   defaultVisible?: boolean;
@@ -173,17 +174,17 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
   },
   { 
     ...baseInitialLeadColumnConfig[3], 
-    id: 'sentby', 
+    id: 'sentBy', 
     label: 'Sent By', 
-    accessor: 'sentby', 
-    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.sentby.email}</span> 
+    accessor: 'sentBy', 
+    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.sentBy.email}</span> 
   },
     { 
     ...baseInitialLeadColumnConfig[4], 
     id: 'email', 
     label: 'Email', 
     accessor: 'email', 
-    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.email}</span> 
+    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead?.email}</span> 
   },
   { 
     ...baseInitialLeadColumnConfig[5], 
@@ -218,10 +219,10 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
   },
   { 
     ...baseInitialLeadColumnConfig[8], 
-    id: 'empcount', 
+    id: 'empCount', 
     label: 'Employee Count', 
-    accessor: 'empcount', 
-    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.empcount || '-'}</span> 
+    accessor: 'empCount', 
+    cell: (lead: ILead) => <span className="text-gray-700 dark:text-gray-300">{lead.empCount || '-'}</span> 
   },
   { 
     ...baseInitialLeadColumnConfig[9], 
@@ -236,11 +237,11 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
   },
   { 
     ...baseInitialLeadColumnConfig[10], 
-    id: 'messagesent', 
+    id: 'messageSent', 
     label: 'Message Sent', 
-    accessor: 'messagesent', 
+    accessor: 'messageSent', 
     cell: (lead: ILead) => (
-      lead.messagesent ? (
+      lead.messageSent ? (
         <Check className="h-5 w-5 text-green-500 mx-auto" />
       ) : <X className="h-5 w-5 text-red-500 mx-auto" />
     ) 
@@ -604,20 +605,13 @@ const initialLeadColumnDefinitions: ColumnConfig<ILead>[] = useMemo(() => [
         </Table>
         <CardFooter className="border-t pt-4">
           <TablePagination
-            totalItems={pagination?.totalElements || pagination?.totalItems || leads.length}
-            totalElements={pagination?.totalElements || pagination?.totalItems || leads.length}
-            pageSize={pagination?.pageSize || pagination?.size || 5}
-            currentPage={pagination?.currentPage !== undefined ? pagination.currentPage : 
-                      pagination?.pageNumber !== undefined ? pagination.pageNumber + 1 : 
-                      pagination?.number !== undefined ? pagination.number + 1 : 
-                      pagination?.page !== undefined ? pagination.page + 1 : 1}
-            totalPages={pagination?.totalPages || Math.ceil((pagination?.totalElements || pagination?.totalItems || leads.length) / (pagination?.pageSize || pagination?.size || 5))}
+            totalItems={pagination?.totalElements || leads.length}
+            rowsPerPage={pagination?.pageSize || 5}
+            currentPage={pagination?.pageNumber + 1}
             onPageChange={(page) => onPageChange(page - 1)}
-            onPageSizeChange={onPageSizeChange}
+            onRowsPerPageChange={onPageSizeChange}
             isDense={isDense}
             onDenseChange={setIsDense}
-            rowsPerPage={pagination?.pageSize || pagination?.size || 5}
-            onRowsPerPageChange={onPageSizeChange}
           />
         </CardFooter>
       </Card>

@@ -1,4 +1,3 @@
-
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -141,8 +140,7 @@ const TargetForm = ({ open, onOpenChange, initialData }: TargetFormProps) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md">
-        <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }}>
+      <Dialog open={open} onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Target" : "Create a New Target"}
@@ -389,7 +387,8 @@ const TargetForm = ({ open, onOpenChange, initialData }: TargetFormProps) => {
             </DialogFooter>
           </form>
         </Form>
-        </DialogContent>
+        {/* </ScrollArea> */}
+        {/* </DialogContent> */}
       </Dialog>
     </LocalizationProvider>
   );

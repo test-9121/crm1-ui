@@ -112,7 +112,6 @@ export const leadService = {
         responseType: 'blob'
       });
       
-      console.log(response.data)
       // Return the blob data as CSV
       return new Blob([response.data], { 
         type: 'text/csv' 

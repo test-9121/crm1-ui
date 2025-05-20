@@ -1,5 +1,5 @@
+
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/components/ui/sonner";
 import {
@@ -12,52 +12,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+// Role-related imports
 import { useRoles } from "@/modules/roles/hooks/useRoles";
 import { Role } from "@/modules/roles/types";
+import RoleForm from "@/modules/roles/components/RoleForm";
 import RoleHeader from "@/modules/roles/components/RoleHeader";
 import RoleToolbar from "@/modules/roles/components/RoleToolbar";
 import RoleTable from "@/modules/roles/components/RoleTable";
-import RoleForm from "@/modules/roles/components/RoleForm";
 import { DetailsSidePanel } from "@/components/shared/DetailsSidePanel/DetailsSidePanel";
 import RoleDetailsPanelContent from "@/modules/roles/components/RoleDetailsPanelContent";
-import { PaginationMetadata } from "@/types/pagination";
 
 const Roles = () => {
-  const queryClient = useQueryClient();
+  // Removed useNavigate, useParams, useLocation, useEffect
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [tableName, setTableName] = useState("Roles");
-  const [tableColor, setTableColor] = useState("#f43f5e"); // Rose color
+  const [tableName, setTableName] = useState("System Roles");
+  const [tableColor, setTableColor] = useState("#9b87f5");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showRoleForm, setShowRoleForm] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
-  
-  // States for role details panel
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [roleDetailsOpen, setRoleDetailsOpen] = useState(false);
+  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
 
-  // Create pagination state for roles
-  const [pagination, setPagination] = useState<PaginationMetadata>({
-    page: 0,
-    size: 10,
-    totalElements: 0,
-    totalPages: 0
-  });
-  
-  // Fetch roles
   const {
     roles = [],
     isLoading,
     isEmpty,
-    error,
-    createRole,
-    updateRole,
     deleteRole,
-    getRoleById
+    pagination,
+    handlePageChange,
+    handlePageSizeChange
   } = useRoles();
-
-  // Handler functions
   const handleTableUpdate = (name: string, color: string) => {
     setTableName(name);
     setTableColor(color);
@@ -72,26 +60,8 @@ const Roles = () => {
     setSearchTerm(term);
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPagination(prev => ({
-      ...prev,
-      page: newPage - 1 // Convert from 1-indexed UI to 0-indexed backend
-    }));
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPagination(prev => ({
-      ...prev,
-      page: 0,
-      size: newSize
-    }));
-  };
-
-  const refetch = () => {
-    queryClient.invalidateQueries({ queryKey: ["roles"] });
-  };
-
   const handleEditRole = (role: Role) => {
+    // Direct edit without navigation or API call
     setRoleToEdit(role);
     setShowRoleForm(true);
   };
@@ -107,39 +77,24 @@ const Roles = () => {
     }
   };
 
-  const showRoleDetails = (role: Role) => {
-    setSelectedRole(role);
-    setRoleDetailsOpen(true);
-  };
-
-  const hideRoleDetails = () => {
-    setRoleDetailsOpen(false);
-  };
-
   const handleFormClose = () => {
     setShowRoleForm(false);
     setRoleToEdit(null);
   };
 
-  // Update pagination with the roles length
-  if (Array.isArray(roles) && roles.length !== pagination.totalElements) {
-    setPagination(prev => ({
-      ...prev,
-      totalElements: roles.length,
-      totalPages: Math.ceil(roles.length / prev.size)
-    }));
-  }
+  const handleRowClick = (role: Role) => {
+    setSelectedRole(role);
+    setIsDetailsPanelOpen(true);
+  };
 
   // Filter roles based on search term
-  const filteredRoles = roles.filter(role => 
-    (role.roleName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (role.roleDescription || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Calculate displayed roles based on pagination
-  const startIdx = pagination.page * pagination.size;
-  const endIdx = startIdx + pagination.size;
-  const displayedRoles = filteredRoles.slice(startIdx, endIdx);
+  const filteredRoles = Array.isArray(roles) 
+    ? roles.filter(role => 
+        role.roleName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        role.roleDescription?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        role.rolePermission?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <>
@@ -177,21 +132,15 @@ const Roles = () => {
               </Alert>
             ) : (
               <RoleTable 
-                roles={displayedRoles}
+                roles={filteredRoles}
                 tableColor={tableColor}
                 onEditRole={handleEditRole}
                 onDeleteRole={handleDeleteRole}
                 isLoading={isLoading}
-                onRoleSelection={showRoleDetails}  // Changed from onRoleClick to onRoleSelection
-                pagination={{
-                  totalPages: pagination.totalPages,
-                  pageSize: pagination.size,
-                  currentPage: pagination.page + 1, // Convert to 1-indexed for UI
-                  totalItems: pagination.totalElements,
-                  totalElements: pagination.totalElements,
-                  onPageChange: handlePageChange,
-                  onPageSizeChange: handlePageSizeChange
-                }}
+                // onRowClick={handleRowClick}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
               />
             )}
           </div>
@@ -200,8 +149,8 @@ const Roles = () => {
         {/* Side panel for displaying role details */}
         <DetailsSidePanel
           data={selectedRole}
-          open={roleDetailsOpen}
-          onClose={hideRoleDetails}
+          open={isDetailsPanelOpen}
+          onClose={() => setIsDetailsPanelOpen(false)}
           renderContent={(role) => <RoleDetailsPanelContent role={role} />}
         />
 

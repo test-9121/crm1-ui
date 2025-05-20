@@ -3,28 +3,64 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { roleService } from "@/modules/roles/services/roleService";
 import { Role } from "@/modules/roles/types";
 import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
 
 export const useRoles = () => {
   const queryClient = useQueryClient();
-
-  const { 
-    data = [], 
-    isLoading, 
-    error 
-  } = useQuery({
-    queryKey: ["roles"],
-    queryFn: roleService.getAll,
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 5
   });
 
-  const getRoleById = (id: string): Role | undefined => {
-    return data.find(role => role.id === id);
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: ["roles", pagination.page, pagination.size],
+    queryFn: () => roleService.getAll(pagination.page, pagination.size),
+  });
+
+  const roles = data?.data || [];
+  const paginationData = data?.pagination || {
+    pageNumber: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true,
+    numberOfElements: 0,
+    empty: true,
+    size: 10,
+    number: 0,
   };
 
-  const isEmpty = data.length === 0 && !isLoading;
+  const handlePageChange = (newPage: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      page: 0, // Reset to first page when changing page size
+      size: newSize,
+    });
+  };
+
+  const isEmpty = roles.length === 0 && !isLoading && !isFetching;
+
+
+  const getRoleById = (id: string): Role | undefined => {
+    return roles.find(role => role.id === id);
+  };
 
   // Create role mutation
   const createRole = useMutation({
-    mutationFn: (roleData: Partial<Role>) => 
+    mutationFn: (roleData: Partial<Role>) =>
       roleService.create(roleData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
@@ -38,7 +74,7 @@ export const useRoles = () => {
 
   // Update role mutation
   const updateRole = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Role> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<Role> }) =>
       roleService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
@@ -64,13 +100,16 @@ export const useRoles = () => {
   });
 
   return {
-    roles: Array.isArray(data) ? data : [],
-    isLoading,
+    roles: Array.isArray(roles) ? roles : [],
+    pagination: paginationData,
+    isLoading: isLoading || isFetching,
     error,
     isEmpty,
     getRoleById,
     createRole,
     updateRole,
-    deleteRole
+    deleteRole,
+    handlePageChange,
+    handlePageSizeChange,
   };
 };

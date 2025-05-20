@@ -33,9 +33,9 @@ export const DealPipelineBoard: React.FC<BoardProps> = ({
   isLoading = false,
 }) => {
   const stageColumns: DealColumn[] = [
+    { id: 'NEW', title: 'New', dealIds: [] },
     { id: 'PROSPECTING', title: 'Prospecting', dealIds: [] },
-    { id: 'LEAD', title: 'New', dealIds: [] },
-    { id: 'DISCOVERY', title: 'Discovery', dealIds: [] },
+    // { id: 'DISCOVERY', title: 'Discovery', dealIds: [] },
     { id: 'PROPOSAL', title: 'Proposal', dealIds: [] },
     { id: 'NEGOTIATION', title: 'Negotiation', dealIds: [] },
     { id: 'CLOSED_WON', title: 'Closed Won', dealIds: [] },
@@ -130,7 +130,7 @@ export const DealPipelineBoard: React.FC<BoardProps> = ({
                       })}
                       {provided.placeholder}
 
-                      {column.id === 'LEAD' && (
+                      {column.id === 'NEW' && (
                         <Button
                           variant="ghost"
                           className="w-full flex items-center justify-center mt-2 border border-dashed border-gray-300"

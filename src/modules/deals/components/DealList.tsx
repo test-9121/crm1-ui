@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Table,
@@ -21,7 +22,6 @@ import { getPriorityColor } from './DealCard';
 import { formatCurrency } from '@/utils/format-number';
 import { TablePagination } from '@/components/table-pagination';
 import { PaginationMetadata } from '@/types/pagination';
-import { handleRowClick } from '@/components/shared/TableRowClickHandler';
 
 interface DealListProps {
   deals: Deal[];
@@ -78,7 +78,7 @@ export const DealList: React.FC<DealListProps> = ({
 }) => {
   return (
     <div className="rounded-md border">
-      <Table>
+      <Table className="overflow-auto custom-scrollbar h-1/2">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[300px]">Deal</TableHead>
@@ -86,7 +86,6 @@ export const DealList: React.FC<DealListProps> = ({
             <TableHead>Value</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Priority</TableHead>
-            <TableHead>Probability</TableHead>
             <TableHead>Expected Close</TableHead>
             <TableHead className="w-[70px]">Actions</TableHead>
           </TableRow>
@@ -108,8 +107,7 @@ export const DealList: React.FC<DealListProps> = ({
           )}
           {!isLoading &&
             deals.map((deal) => (
-              <TableRow key={deal.id} className="cursor-pointer hover:bg-muted/50" 
-                onClick={(e) => handleRowClick(e, deal, onOpenDetail)}>
+              <TableRow key={deal.id} className="cursor-pointer hover:bg-muted/50" onClick={() => onOpenDetail(deal)}>
                 <TableCell className="font-medium">
                   <div>
                     <div className="font-medium">{deal.name}</div>
@@ -126,7 +124,6 @@ export const DealList: React.FC<DealListProps> = ({
                     {deal.priority}
                   </Badge>
                 </TableCell>
-                <TableCell>{deal.probability || 0}%</TableCell>
                 <TableCell>
                   {deal.expectedCloseDate
                     ? new Date(deal.expectedCloseDate).toLocaleDateString()
@@ -162,14 +159,11 @@ export const DealList: React.FC<DealListProps> = ({
         </TableBody>
       </Table>
       
-      <TablePagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        pageSize={pagination.size}
-        totalItems={pagination.totalElements}
+      {/* <TablePagination
+        pagination={pagination}
         onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+        onRowsPerPageChange={onPageSizeChange}
+      /> */}
     </div>
   );
 };

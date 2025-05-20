@@ -3,7 +3,7 @@ import { Organization } from "@/modules/organizations/types";
 
 export type DealStage = 
   | "PROSPECTING" 
-  | "LEAD" 
+  | "NEW" 
   | "DISCOVERY" 
   | "PROPOSAL" 
   | "NEGOTIATION" 

@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/custom-dialog";
 
 interface LeadReplyCardProps {
   reply: LeadReply;
@@ -58,7 +59,6 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
     mutationFn: () => leadReplyService.deleteLeadReply(reply.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
-      toast.success("Reply deleted successfully");
       onUpdate();
     },
     onError: () => {
@@ -80,7 +80,6 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leadReplies", leadId] });
       setIsEditingReply(false);
-      toast.success("Reply updated successfully");
       onUpdate();
     },
     onError: () => {
@@ -204,23 +203,23 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Edit your reply..." 
-                          className="min-h-[100px]" 
-                          {...field} 
+                        <Textarea
+                          placeholder="Edit your reply..."
+                          className="min-h-[100px]"
+                          {...field}
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={editReplyForm.control}
                   name="replierId"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <select 
+                        <select
                           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                           {...field}
                         >
@@ -234,18 +233,18 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="flex space-x-2 justify-end">
                   <Button
-                    variant="outline" 
+                    variant="outline"
                     size="sm"
                     onClick={() => setIsEditingReply(false)}
                     type="button"
                   >
                     <X className="h-4 w-4 mr-1" /> Cancel
                   </Button>
-                  <Button 
-                    variant="default" 
+                  <Button
+                    variant="default"
                     size="sm"
                     type="submit"
                   >
@@ -309,23 +308,23 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Write your response..." 
-                        className="min-h-[80px] bg-background" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Write your response..."
+                        className="min-h-[80px] bg-background"
+                        {...field}
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={responseForm.control}
                 name="responderId"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select 
+                      <select
                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         {...field}
                       >
@@ -339,18 +338,18 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex space-x-2 justify-end">
                 <Button
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowResponseInput(false)}
                   type="button"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  variant="default" 
+                <Button
+                  variant="default"
                   size="sm"
                   type="submit"
                   disabled={isSubmittingResponse}
@@ -374,23 +373,23 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Edit your response..." 
-                        className="min-h-[80px] bg-background" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Edit your response..."
+                        className="min-h-[80px] bg-background"
+                        {...field}
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={editResponseForm.control}
                 name="responderId"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select 
+                      <select
                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         {...field}
                       >
@@ -404,18 +403,18 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex space-x-2 justify-end">
                 <Button
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   onClick={() => setResponseToEdit(null)}
                   type="button"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  variant="default" 
+                <Button
+                  variant="default"
                   size="sm"
                   type="submit"
                 >
@@ -463,40 +462,45 @@ export default function LeadReplyCard({ reply, users, leadId, onUpdate }: LeadRe
       )}
 
       {/* Delete Reply Confirmation Dialog */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this reply and all its responses. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteReply} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete"
+        content={
+          <>
+            Are you sure you want to delete <strong> { } </strong> items?
+          </>
+        }
+        action={
+          <Button
+            // variant="red"
+            className="flex items-center gap-1 bg-red-500 hover:bg-red-600"
+            onClick={confirmDeleteReply}
+          >
+            Delete
+          </Button>
+        }
+      />
       {/* Delete Response Confirmation Dialog */}
-      <AlertDialog open={!!responseToDelete} onOpenChange={() => setResponseToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Response</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this response? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteResponse} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <ConfirmDialog
+        open={!!responseToDelete}
+        onClose={() => setResponseToDelete(null)}
+        title="Delete"
+        content={
+          <>
+            Are you sure you want to delete <strong> { } </strong> items?
+          </>
+        }
+        action={
+          <Button
+            // variant="red"
+            className="flex items-center gap-1 bg-red-500 hover:bg-red-600"
+            onClick={confirmDeleteResponse}
+          >
+            Delete
+          </Button>
+        }
+      />
     </div>
   );
 }

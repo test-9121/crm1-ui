@@ -64,10 +64,9 @@ const ProjectForm = ({ open, onOpenChange, initialData }: ProjectFormProps) => {
           id: initialData.id,
           data,
         });
-        toast.success("Project updated successfully");
+        
       } else {
         await createProject.mutateAsync(data);
-        toast.success("Project created successfully");
       }
       onOpenChange(false);
     } catch (error) {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -114,8 +113,8 @@ const LinkedInForm = ({ open, onOpenChange, initialData }: LinkedInFormProps) =>
   };
 
   return (
-    <Dialog open={open} onClose={handleDialogClose} fullWidth maxWidth="md">
-      <DialogContent sx={{ maxWidth: "650px", margin: "0 auto" }}>
+    <Dialog open={open} onClose={handleDialogClose} fullWidth>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Edit LinkedIn Profile" : "New LinkedIn Profile"}

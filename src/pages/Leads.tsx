@@ -81,7 +81,7 @@ const Leads = () => {
     setSearchTerm(term);
   };
 
-  const handleNewLead = async (data: any) => {
+  const handleNewLead = async (data: ILead) => {
     try {
       if (id) {
         // If we have an ID in the URL, this is an edit operation
@@ -92,7 +92,7 @@ const Leads = () => {
         const response = await leadService.createLead(data);
         return { success: true, data: response };
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving lead:", error);
       return { 
         success: false, 

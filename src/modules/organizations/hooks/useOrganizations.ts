@@ -4,13 +4,13 @@ import { organizationService } from "@/modules/organizations/services/organizati
 import { Organization } from "@/modules/organizations/types";
 import { toast } from "@/components/ui/sonner";
 import { useState } from "react";
-import { PaginationMetadata } from "@/modules/targets/types";
+
 
 export const useOrganizations = () => {
   const queryClient = useQueryClient();
   const [pagination, setPagination] = useState({
     page: 0,
-    size: 10
+    size: 5
   });
 
   const { 
@@ -24,7 +24,8 @@ export const useOrganizations = () => {
     queryFn: () => organizationService.getAll(pagination.page, pagination.size),
   });
 
-  const organizations = data?.data || [];
+  const organizations = data?.data||  [];
+
   const paginationData = data?.pagination || {
     pageNumber: 0,
     pageSize: 10,
@@ -100,7 +101,7 @@ export const useOrganizations = () => {
   });
 
   return {
-    organizations,
+    organizations: Array.isArray(organizations) ? organizations : [],
     pagination: paginationData,
     isLoading: isLoading || isFetching,
     error,

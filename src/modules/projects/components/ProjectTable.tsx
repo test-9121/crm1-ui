@@ -360,7 +360,6 @@ const ProjectTable = ({
   const [editingHeader, setEditingHeader] = useState<{ id: string; currentLabel: string } | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  console.log(projects)
 
   const baseInitialProjectColumnConfig: Omit<ColumnConfig<Project>, 'id' | 'label' | 'accessor' | 'cell' | 'icon'>[] = [
   { 

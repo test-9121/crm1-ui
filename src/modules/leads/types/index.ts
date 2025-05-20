@@ -49,20 +49,20 @@ export interface ILead {
   lastname: string;
   industry: Industry;
   email: string;
-  phonenumber: string;
+  phoneNumber: string;
   status: Status;
   leaddate?: string;
   linkedin?: string;
   website?: string;
   region?: string;
-  empcount?: Empcount;
+  empCount?: Empcount;
   verified: boolean;
-  messagesent: boolean;
+  messageSent: boolean;
   comments?: string;
   leadReplies: any[]; // Update with proper type if needed
   leadTasks: any[]; // Update with proper type if needed
-  sentby: User;
-  sentbyId: string;
+  sentBy: User;
+  sentById: string;
   organization: Organization;
   organizationId: string;
   designation: Designation;

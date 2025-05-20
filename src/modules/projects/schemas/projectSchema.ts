@@ -1,6 +1,5 @@
 
 import * as z from "zod";
-import { ProjectStatus } from "@/modules/projects/types";
 
 export const projectSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
