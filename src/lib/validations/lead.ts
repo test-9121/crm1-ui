@@ -1,6 +1,5 @@
 
 import * as z from "zod";
-import { Status, Empcount } from "@/modules/leads/types";
 
 export const leadFormSchema = z.object({
   firstname: z.string().min(1, { message: "First name is required" }),
